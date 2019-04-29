@@ -24,7 +24,7 @@
   ==============================================================================
 */
 
-#if JUCE_PLUGINHOST_VST3 && (JUCE_MAC || JUCE_WINDOWS)
+#if JUCE_PLUGINHOST_VST3 && (JUCE_MAC || JUCE_WINDOWS || JUCE_LINUX)
 
 #include "juce_VST3Headers.h"
 #include "juce_VST3Common.h"
@@ -855,7 +855,7 @@ struct DLLHandle
 
         library.close();
 
-       #else
+       #elif JUCE_MAC
         if (bundleRef != nullptr)
         {
             releaseFactory();
@@ -866,6 +866,9 @@ struct DLLHandle
             CFRelease (bundleRef);
             bundleRef = nullptr;
         }
+       #else
+        releaseFactory();
+        dlclose(library);
        #endif
     }
 
@@ -905,7 +908,7 @@ struct DLLHandle
     {
        #if JUCE_WINDOWS
         return library.getFunction (functionName);
-       #else
+       #elif JUCE_MAC
         if (bundleRef == nullptr)
             return nullptr;
 
@@ -913,6 +916,8 @@ struct DLLHandle
         void* fn = CFBundleGetFunctionPointerForName (bundleRef, name);
         CFRelease (name);
         return fn;
+       #else
+        return dlsym(library, functionName);
        #endif
     }
 
@@ -950,7 +955,7 @@ private:
         return false;
     }
 
-   #else
+   #elif JUCE_MAC
     CFBundleRef bundleRef;
 
     bool open (const String& filePath)
@@ -999,6 +1004,18 @@ private:
         }
 
         return false;
+    }
+   #else
+    void *library = nullptr;
+
+    bool open (const String& filePath)
+    {
+        File vst3dir(filePath);
+        File soPath(filePath + "/Contents/x86_64-linux/" + vst3dir.getFileNameWithoutExtension() + ".so");
+
+
+        library = dlopen (soPath.getFullPathName().toUTF8(), RTLD_LAZY | RTLD_LOCAL);
+        return library != nullptr;
     }
    #endif
 
@@ -1151,7 +1168,7 @@ struct VST3PluginWindow : public AudioProcessorEditor,
 
         view = nullptr;
 
-       #if ! JUCE_MAC
+       #if ! JUCE_MAC && ! JUCE_LINUX
         for (int i = 0; i < ComponentPeer::getNumPeers(); ++i)
             if (auto* p = ComponentPeer::getPeer (i))
                 p->removeScaleFactorListener (this);
@@ -1183,7 +1200,7 @@ struct VST3PluginWindow : public AudioProcessorEditor,
     //==============================================================================
     void componentPeerChanged() override
     {
-       #if ! JUCE_MAC
+       #if ! JUCE_MAC && ! JUCE_LINUX
         if (auto* topPeer = getTopLevelComponent()->getPeer())
             topPeer->addScaleFactorListener (this);
        #endif
@@ -1198,7 +1215,7 @@ struct VST3PluginWindow : public AudioProcessorEditor,
 
         if (topComp->getPeer() != nullptr)
         {
-           #if JUCE_WINDOWS
+           #if JUCE_WINDOWS || JUCE_LINUX
             auto pos = (topComp->getLocalPoint (this, Point<int>()) * nativeScaleFactor).roundToInt();
            #endif
 
@@ -1221,7 +1238,7 @@ struct VST3PluginWindow : public AudioProcessorEditor,
                 SetWindowPos (pluginHandle, 0,
                               pos.x, pos.y, rect.getWidth(), rect.getHeight(),
                               isVisible() ? SWP_SHOWWINDOW : SWP_HIDEWINDOW);
-               #elif JUCE_MAC
+               #elif JUCE_MAC || JUCE_LINUX
                 embeddedComponent.setBounds (getLocalBounds());
                #endif
 
@@ -1235,7 +1252,7 @@ struct VST3PluginWindow : public AudioProcessorEditor,
                 SetWindowPos (pluginHandle, 0,
                               pos.x, pos.y, rect.getWidth(), rect.getHeight(),
                               isVisible() ? SWP_SHOWWINDOW : SWP_HIDEWINDOW);
-               #elif JUCE_MAC
+               #elif JUCE_MAC || JUCE_LINUX
                 embeddedComponent.setBounds (0, 0, (int) rect.getWidth(), (int) rect.getHeight());
                #endif
             }
@@ -1251,7 +1268,7 @@ struct VST3PluginWindow : public AudioProcessorEditor,
     {
         attachPluginWindow();
 
-       #if ! JUCE_MAC
+       #if ! JUCE_MAC && ! JUCE_LINUX
         if (auto* topPeer = getTopLevelComponent()->getPeer())
             nativeScaleFactorChanged ((float) topPeer->getPlatformScaleFactor());
        #endif
@@ -1396,6 +1413,10 @@ private:
             addAndMakeVisible (embeddedComponent);
             pluginHandle = (NSView*) embeddedComponent.getView();
             jassert (pluginHandle != nil);
+           #elif JUCE_LINUX
+            embeddedComponent.setBounds (getLocalBounds());
+            addAndMakeVisible (embeddedComponent);
+            pluginHandle = embeddedComponent.getWindowHandle();
            #endif
 
             if (pluginHandle != nullptr)
@@ -3146,7 +3167,7 @@ bool VST3PluginFormat::fileMightContainThisPluginType (const String& fileOrIdent
     auto f = File::createFileWithoutCheckingPath (fileOrIdentifier);
 
     return f.hasFileExtension (".vst3")
-          #if JUCE_MAC
+          #if JUCE_MAC || JUCE_LINUX
            && f.exists();
           #else
            && f.existsAsFile();
@@ -3206,7 +3227,7 @@ FileSearchPath VST3PluginFormat::getDefaultLocationsToSearch()
    #elif JUCE_MAC
     return FileSearchPath ("/Library/Audio/Plug-Ins/VST3;~/Library/Audio/Plug-Ins/VST3");
    #else
-    return FileSearchPath();
+    return FileSearchPath("/usr/lib/vst3;/usr/local/lib/vst3;~/.vst3");
    #endif
 }
 
