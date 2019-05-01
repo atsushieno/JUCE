@@ -1005,7 +1005,7 @@ private:
 
         return false;
     }
-   #else
+   #elif JUCE_LINUX
     void *library = nullptr;
 
     bool open (const String& filePath)
@@ -1017,6 +1017,12 @@ private:
         library = dlopen (soPath.getFullPathName().toUTF8(), RTLD_LAZY | RTLD_LOCAL);
         return library != nullptr;
     }
+   #else
+   bool open (const String& filePath)
+   {
+        // implement for other platforms...
+        jassertfalse;
+   }
    #endif
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DLLHandle)
@@ -1126,7 +1132,7 @@ private:
 //==============================================================================
 struct VST3PluginWindow : public AudioProcessorEditor,
                           public ComponentMovementWatcher,
-                         #if ! JUCE_MAC
+                         #if ! JUCE_MAC && ! JUCE_LINUX
                           public ComponentPeer::ScaleFactorListener,
                           public Timer,
                          #endif
@@ -1279,7 +1285,7 @@ struct VST3PluginWindow : public AudioProcessorEditor,
         componentMovedOrResized (true, true);
     }
 
-   #if ! JUCE_MAC
+   #if ! JUCE_MAC && ! JUCE_LINUX
     void nativeScaleFactorChanged (double newScaleFactor) override
     {
         if (pluginHandle == nullptr || approximatelyEqual ((float) newScaleFactor, nativeScaleFactor))
@@ -1375,7 +1381,7 @@ private:
    #elif JUCE_MAC
     AutoResizingNSViewComponentWithParent embeddedComponent;
     using HandleFormat = NSView*;
-   #else
+   #elif JUCE_LINUX
     Component embeddedComponent;
     using HandleFormat = void*;
    #endif
