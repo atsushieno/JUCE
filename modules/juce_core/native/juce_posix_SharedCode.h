@@ -582,6 +582,9 @@ MemoryMappedFile::~MemoryMappedFile()
 File juce_getExecutableFile();
 File juce_getExecutableFile()
 {
+   #if JUCE_EMSCRIPTEN
+    return File("/");
+   #else
     struct DLAddrReader
     {
         static String getFilename()
@@ -596,6 +599,7 @@ File juce_getExecutableFile()
 
     static String filename = DLAddrReader::getFilename();
     return File::getCurrentWorkingDirectory().getChildFile (filename);
+   #endif
 }
 
 //==============================================================================
