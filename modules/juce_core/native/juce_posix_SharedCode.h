@@ -552,6 +552,11 @@ void MemoryMappedFile::openInternal (const File& file, AccessMode mode, bool exc
 
     if (fileHandle != -1)
     {
+   #if JUCE_EMSCRIPTEN
+    address = malloc(range.getLength());
+    std::cerr << "MemoryMappedFile is not implemented for emscripten."
+              << std::endl;
+   #else
         auto m = mmap (nullptr, (size_t) range.getLength(),
                        mode == readWrite ? (PROT_READ | PROT_WRITE) : PROT_READ,
                        exclusive ? MAP_PRIVATE : MAP_SHARED, fileHandle,
@@ -566,16 +571,22 @@ void MemoryMappedFile::openInternal (const File& file, AccessMode mode, bool exc
         {
             range = Range<int64>();
         }
+   #endif
     }
 }
 
 MemoryMappedFile::~MemoryMappedFile()
 {
+   #if JUCE_EMSCRIPTEN
+    if (address != nullptr)
+        free (address);
+   #else
     if (address != nullptr)
         munmap (address, (size_t) range.getLength());
 
     if (fileHandle != 0)
         close (fileHandle);
+   #endif
 }
 
 //==============================================================================
