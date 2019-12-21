@@ -121,6 +121,7 @@ class EmscriptenComponentPeer : public ComponentPeer,
     static int highestZIndex;
     int zIndex{0};
     bool focused{false};
+    bool visibility{true};
 
     RectangleList<int> pendingRepaintAreas;
 
@@ -190,8 +191,17 @@ class EmscriptenComponentPeer : public ComponentPeer,
 
         virtual void setVisible (bool shouldBeVisible) override
         {
+            if (visibility == shouldBeVisible) return;
 
+            EM_ASM_ARGS({
+                var canvas = document.getElementById(UTF8ToString($0));
+                canvas.style.visibility = $1 ? "visible" : "hidden";
+            }, id.toRawUTF8(), shouldBeVisible);
+
+            visibility = shouldBeVisible;
         }
+
+        bool isVisible () const { return visibility; }
 
         virtual void setTitle (const String &title) override
         {
@@ -520,6 +530,9 @@ extern "C" void juce_mouseCallback(const char* type, int x, int y, int which,
     for (int i = emComponentPeerList.size() - 1; i >= 0; i --)
     {
         EmscriptenComponentPeer* peer = emComponentPeerList[i];
+
+        if (! peer -> isVisible()) continue;
+
         Point<float> pos = peer->globalToLocal(Point<float>(x, y));
 
         if (wheelDelta == 0)
@@ -537,8 +550,8 @@ extern "C" void juce_mouseCallback(const char* type, int x, int y, int which,
             peer->handleMouseWheel(MouseInputSource::InputSourceType::mouse,
                 pos, fakeMouseEventTime, wheelInfo);
         }
-        fakeMouseEventTime ++;
     }
+    fakeMouseEventTime ++;
 }
 
 extern "C" void juce_keyboardCallback(const char* type, int keyCode, const char * key)
