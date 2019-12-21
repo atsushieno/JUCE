@@ -182,6 +182,11 @@
   #endif
 #endif
 
+#if JUCE_EMSCRIPTEN
+  #define JUCE_LITTLE_ENDIAN 1
+  #define JUCE_32BIT 1
+#endif
+
 //==============================================================================
 // Compiler type macros.
 
