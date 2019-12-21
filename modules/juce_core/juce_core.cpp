@@ -91,7 +91,7 @@
  #include <net/if.h>
  #include <sys/ioctl.h>
 
- #if ! JUCE_ANDROID
+ #if ! JUCE_ANDROID && ! JUCE_EMSCRIPTEN
   #include <execinfo.h>
  #endif
  

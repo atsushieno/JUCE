@@ -123,8 +123,8 @@ private:
                                                           .findColour (ResizableWindow::backgroundColourId),
                               DocumentWindow::allButtons)
         {
-            setUsingNativeTitleBar (true);
-            setResizable (true, false);
+            setUsingNativeTitleBar (false);
+            setResizable (true, true);
             setResizeLimits (400, 400, 10000, 10000);
 
            #if JUCE_IOS || JUCE_ANDROID
