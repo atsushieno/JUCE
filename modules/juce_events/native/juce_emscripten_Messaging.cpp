@@ -49,19 +49,20 @@ std::atomic<bool> quitPosted{false};
 void dispatchLoop()
 {
     queueMtx.lock();
-    while (! messageQueue.empty())
+    std::deque<MessageManager::MessageBase*> messageCopy = messageQueue;
+    messageQueue.clear();
+    queueMtx.unlock();
+    
+    while (! messageCopy.empty())
     {
-        MessageManager::MessageBase* message = messageQueue.front();
-        messageQueue.pop_front();
-        queueMtx.unlock();
+        MessageManager::MessageBase* message = messageCopy.front();
+        messageCopy.pop_front();
         // std::cout << "dispatchLoop-msg: " << message <<
         //             "type: " << typeid(*message).name() << std::endl;
         message->messageCallback();
         message->decReferenceCount();
-        queueMtx.lock();
     }
-    queueMtx.unlock();
-
+    
    #if DEBUG
     EM_ASM({
         var logArea = document.querySelector("#output");
