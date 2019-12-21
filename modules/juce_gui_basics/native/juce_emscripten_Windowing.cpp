@@ -499,10 +499,12 @@ extern "C" void juce_mouseCallback(const char* type, int x, int y, int which,
     // std::clog << type << " " << x << " " << y << " " << which
     //           << " " << isShiftDown << " " << wheelDelta << std::endl;
     recentMousePosition = {x, y};
+    bool isDownEvent = type == std::string("down");
+    bool isUpEvent = type == std::string("up");
 
     ModifierKeys& mods = ModifierKeys::currentModifiers;
 
-    if (type == std::string("down"))
+    if (isDownEvent)
     {
         mods = mods.withoutMouseButtons();
         if (which == 0 || which > 2)
@@ -512,7 +514,7 @@ extern "C" void juce_mouseCallback(const char* type, int x, int y, int which,
         else if (which == 2)
             mods = mods.withFlags(ModifierKeys::rightButtonModifier);
     }
-    else if (type == std::string("up"))
+    else if (isUpEvent)
     {
         mods = mods.withoutMouseButtons();
     }
@@ -526,6 +528,7 @@ extern "C" void juce_mouseCallback(const char* type, int x, int y, int which,
     
     EmscriptenComponentPeer::ZIndexComparator comparator;
     emComponentPeerList.sort(comparator);
+    Point<int> posGlobal(x, y);
 
     for (int i = emComponentPeerList.size() - 1; i >= 0; i --)
     {
@@ -533,7 +536,9 @@ extern "C" void juce_mouseCallback(const char* type, int x, int y, int which,
 
         if (! peer -> isVisible()) continue;
 
-        Point<float> pos = peer->globalToLocal(Point<float>(x, y));
+        bool isPosInPeerBounds = peer -> getBounds().contains(posGlobal);
+        Point<float> pos = peer->globalToLocal(posGlobal.toFloat());
+        if (isDownEvent && ! isPosInPeerBounds) continue;
 
         if (wheelDelta == 0)
         {
@@ -550,6 +555,8 @@ extern "C" void juce_mouseCallback(const char* type, int x, int y, int which,
             peer->handleMouseWheel(MouseInputSource::InputSourceType::mouse,
                 pos, fakeMouseEventTime, wheelInfo);
         }
+
+        if (isPosInPeerBounds) break; // consume the event
     }
     fakeMouseEventTime ++;
 }
