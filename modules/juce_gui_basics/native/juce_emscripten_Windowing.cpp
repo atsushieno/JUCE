@@ -145,7 +145,6 @@ class EmscriptenComponentPeer : public ComponentPeer,
                 canvas.style.zIndex   = $6;
                 console.log($6, canvas.style.zIndex);
                 canvas.style.position = "absolute";
-                canvas.style.border   = "1px solid";
                 canvas.style.left = $1;
                 canvas.style.top  = $2;
                 canvas.width  = $3;
