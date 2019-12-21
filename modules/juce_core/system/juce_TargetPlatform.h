@@ -183,6 +183,10 @@
 #endif
 
 #if JUCE_EMSCRIPTEN
+  #ifdef _DEBUG
+    #define JUCE_DEBUG 1
+  #endif
+
   #define JUCE_LITTLE_ENDIAN 1
   #define JUCE_32BIT 1
 #endif
