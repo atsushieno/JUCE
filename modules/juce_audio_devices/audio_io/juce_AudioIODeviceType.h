@@ -166,6 +166,8 @@ public:
     static AudioIODeviceType* createAudioIODeviceType_Oboe();
     /** Creates a Bela device type if it's available on this platform, or returns null. */
     static AudioIODeviceType* createAudioIODeviceType_Bela();
+    /** Creates an OpenAL device type if it's available on this platform, or returns null. */
+    static AudioIODeviceType* createAudioIODeviceType_OpenAL();
 
     /** This method has been deprecated. You should call the method which takes a WASAPIDeviceMode instead. */
     JUCE_DEPRECATED (static AudioIODeviceType* createAudioIODeviceType_WASAPI (bool exclusiveMode));

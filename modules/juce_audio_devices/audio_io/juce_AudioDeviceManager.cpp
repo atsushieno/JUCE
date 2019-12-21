@@ -190,6 +190,7 @@ void AudioDeviceManager::createAudioDeviceTypes (OwnedArray<AudioIODeviceType>& 
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_Oboe());
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_OpenSLES());
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_Android());
+    addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_OpenAL());
 }
 
 void AudioDeviceManager::addAudioDeviceType (std::unique_ptr<AudioIODeviceType> newDeviceType)
