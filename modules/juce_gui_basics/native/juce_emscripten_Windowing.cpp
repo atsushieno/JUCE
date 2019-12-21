@@ -774,6 +774,20 @@ bool JUCE_CALLTYPE NativeMessageBox::showOkCancelBox(
     return result?1:0;
 }
 
+
+bool DragAndDropContainer::performExternalDragDropOfFiles (
+    const StringArray& files, bool canMoveFiles, Component* sourceComp,
+    std::function<void()> callback)
+{
+    return false;
+}
+
+bool DragAndDropContainer::performExternalDragDropOfText (
+    const String& text, Component* sourceComp, std::function<void()> callback)
+{
+    return false;
+}
+
 //==============================================================================
 const int extendedKeyModifier       = 0x10000;
 
