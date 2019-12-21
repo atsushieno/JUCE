@@ -30,7 +30,27 @@
 namespace juce
 {
 
-void MessageManager::doPlatformSpecificInitialisation() {}
+static void createDirIfNotExists(File::SpecialLocationType type)
+{
+    File dir = File::getSpecialLocation(type);
+    if (! dir.exists()) dir.createDirectory();
+}
+
+void MessageManager::doPlatformSpecificInitialisation()
+{
+    createDirIfNotExists(File::userHomeDirectory);
+    createDirIfNotExists(File::userDocumentsDirectory);
+    createDirIfNotExists(File::userMusicDirectory);
+    createDirIfNotExists(File::userMoviesDirectory);
+    createDirIfNotExists(File::userPicturesDirectory);
+    createDirIfNotExists(File::userDesktopDirectory);
+    createDirIfNotExists(File::userApplicationDataDirectory);
+    createDirIfNotExists(File::commonDocumentsDirectory);
+    createDirIfNotExists(File::commonApplicationDataDirectory);
+    createDirIfNotExists(File::globalApplicationsDirectory);
+    createDirIfNotExists(File::tempDirectory);
+}
+
 void MessageManager::doPlatformSpecificShutdown() {}
 
 //==============================================================================
