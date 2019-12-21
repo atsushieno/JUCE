@@ -1166,6 +1166,7 @@ public:
             expect (tempFile.getSize() == 10);
         }
 
+       #if ! JUCE_EMSCRIPTEN
         beginTest ("Memory-mapped files");
 
         {
@@ -1196,6 +1197,7 @@ public:
 
             expect (tempFile2.deleteFile());
         }
+       #endif
 
         beginTest ("More writing");
 
