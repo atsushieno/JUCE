@@ -15,8 +15,9 @@ This port was originally created [here](https://github.com/beschulz/juce_emscrip
 
 ## What is not working
 - audio (I'd go for an OpenALAudioDevice implementation in C++, because emscripten apparently supports OpenAL (via the AudioAPI) )
-- threading (maybe it's working already, at least for the high resolution timer thread, but not thoroughly tested)
 - `MemoryMappedFile` (`mmap` is not functioning correctly)
+- networking
+- native dialogs
 
 ## Hacking
 
