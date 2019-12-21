@@ -380,8 +380,10 @@ bool File::deleteFile() const
 
 bool File::moveInternal (const File& dest) const
 {
+   #if ! JUCE_EMSCRIPTEN
     if (rename (fullPath.toUTF8(), dest.getFullPathName().toUTF8()) == 0)
         return true;
+   #endif
 
     if (hasWriteAccess() && copyInternal (dest))
     {
