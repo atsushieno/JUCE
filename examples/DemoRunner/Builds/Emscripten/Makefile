@@ -35,13 +35,15 @@ ifeq ($(CONFIG),Debug)
     TARGET_ARCH := -march=native
   endif
 
-  JUCE_CPPFLAGS := $(DEPFLAGS) -DLINUX=1 -DDEBUG=1 -DJUCE_DEMO_RUNNER=1 -DJUCE_UNIT_TESTS=1 -DJUCER_LINUX_MAKE_6D53C8B4=1 -DJUCE_APP_VERSION=5.4.5 -DJUCE_APP_VERSION_HEX=0x50405 -I /usr/include/freetype2 -pthread -I../../JuceLibraryCode -I../../../../modules $(CPPFLAGS)
+  JUCE_CPPFLAGS := $(DEPFLAGS) -DLINUX=1 -DDEBUG=1 -D_DEBUG=1 -DJUCE_DEMO_RUNNER=1 -DJUCE_UNIT_TESTS=1 -DJUCER_LINUX_MAKE_6D53C8B4=1 -DJUCE_APP_VERSION=5.4.5 -DJUCE_APP_VERSION_HEX=0x50405 -I /usr/include/freetype2 -pthread -I../../JuceLibraryCode -I../../../../modules $(CPPFLAGS)
   JUCE_CPPFLAGS_APP := -DJucePlugin_Build_VST=0 -DJucePlugin_Build_VST3=0 -DJucePlugin_Build_AU=0 -DJucePlugin_Build_AUv3=0 -DJucePlugin_Build_RTAS=0 -DJucePlugin_Build_AAX=0 -DJucePlugin_Build_Standalone=0 -DJucePlugin_Build_Unity=0
   JUCE_TARGET_APP := DemoRunner.html
 
-  JUCE_CFLAGS += $(JUCE_CPPFLAGS) $(TARGET_ARCH) -O0 -D_NL_IDENTIFICATION_LANGUAGE=0 -D_NL_IDENTIFICATION_TERRITORY=0 $(CFLAGS)
-  JUCE_CXXFLAGS += $(JUCE_CFLAGS) -std=c++14 $(CXXFLAGS) -s USE_PTHREADS=1 -s USE_FREETYPE=1
-  JUCE_LDFLAGS += $(TARGET_ARCH) -L$(JUCE_BINDIR) -L$(JUCE_LIBDIR) -lrt -ldl -lpthread $(LDFLAGS) -s USE_PTHREADS=1 -s USE_FREETYPE=1 -s TOTAL_MEMORY=128MB -s NO_EXIT_RUNTIME -s EXPORTED_FUNCTIONS="['_main', '_juce_mouseCallback', '_juce_keyboardCallback']" -s EXTRA_EXPORTED_RUNTIME_METHODS="['cwrap']" --preload-file ../../../usr/X11R6/lib/X11/fonts/@/usr/X11R6/lib/X11/fonts/ --emrun
+  JUCE_CFLAGS += $(JUCE_CPPFLAGS) $(TARGET_ARCH) -g4 -O0 $(CFLAGS)
+  JUCE_CXXFLAGS += $(JUCE_CFLAGS) -std=c++14 $(CXXFLAGS) -s USE_PTHREADS=1 -s USE_FREETYPE=1 -s SAFE_HEAP=1 -s ASSERTIONS=1
+  JUCE_LDFLAGS += $(TARGET_ARCH) -L$(JUCE_BINDIR) -L$(JUCE_LIBDIR) -lrt -ldl -lpthread $(LDFLAGS) -s USE_PTHREADS=1 -s USE_FREETYPE=1 -s TOTAL_MEMORY=128MB -s NO_EXIT_RUNTIME -s EXPORTED_FUNCTIONS="['_main', '_juce_mouseCallback', '_juce_keyboardCallback']" -s EXTRA_EXPORTED_RUNTIME_METHODS="['cwrap']" \
+    --preload-file ../../../usr/X11R6/lib/X11/fonts/@/usr/X11R6/lib/X11/fonts/ \
+	--preload-file ../../../Assets@/examples/Assets --emrun
 
   CLEANCMD = rm -rf $(JUCE_OUTDIR)/$(TARGET) $(JUCE_OBJDIR)
 endif
@@ -60,9 +62,11 @@ ifeq ($(CONFIG),Release)
   JUCE_CPPFLAGS_APP := -DJucePlugin_Build_VST=0 -DJucePlugin_Build_VST3=0 -DJucePlugin_Build_AU=0 -DJucePlugin_Build_AUv3=0 -DJucePlugin_Build_RTAS=0 -DJucePlugin_Build_AAX=0 -DJucePlugin_Build_Standalone=0 -DJucePlugin_Build_Unity=0
   JUCE_TARGET_APP := DemoRunner.html
 
-  JUCE_CFLAGS += $(JUCE_CPPFLAGS) $(TARGET_ARCH) -O3 -D_NL_IDENTIFICATION_LANGUAGE=0 -D_NL_IDENTIFICATION_TERRITORY=0 $(CFLAGS)
+  JUCE_CFLAGS += $(JUCE_CPPFLAGS) $(TARGET_ARCH) -O3 $(CFLAGS)
   JUCE_CXXFLAGS += $(JUCE_CFLAGS) -std=c++14 $(CXXFLAGS) -s USE_PTHREADS=1 -s USE_FREETYPE=1
-  JUCE_LDFLAGS += $(TARGET_ARCH) -L$(JUCE_BINDIR) -L$(JUCE_LIBDIR) -lrt -ldl -lpthread $(LDFLAGS) -s USE_PTHREADS=1 -s USE_FREETYPE=1 -s TOTAL_MEMORY=128MB -s NO_EXIT_RUNTIME -s EXPORTED_FUNCTIONS="['_main', '_juce_mouseCallback', '_juce_keyboardCallback']" -s EXTRA_EXPORTED_RUNTIME_METHODS="['cwrap']" --preload-file ../../../usr/X11R6/lib/X11/fonts/@/usr/X11R6/lib/X11/fonts/ --emrun
+  JUCE_LDFLAGS += $(TARGET_ARCH) -L$(JUCE_BINDIR) -L$(JUCE_LIBDIR) -lrt -ldl -lpthread $(LDFLAGS) -s USE_PTHREADS=1 -s USE_FREETYPE=1 -s TOTAL_MEMORY=128MB -s NO_EXIT_RUNTIME -s EXPORTED_FUNCTIONS="['_main', '_juce_mouseCallback', '_juce_keyboardCallback']" -s EXTRA_EXPORTED_RUNTIME_METHODS="['cwrap']" \
+    --preload-file ../../../usr/X11R6/lib/X11/fonts/@/usr/X11R6/lib/X11/fonts/ \
+	--preload-file ../../../Assets@/examples/Assets --emrun
 
   CLEANCMD = rm -rf $(JUCE_OUTDIR)/$(TARGET) $(JUCE_OBJDIR)
 endif
