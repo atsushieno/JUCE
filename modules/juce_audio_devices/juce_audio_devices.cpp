@@ -205,7 +205,14 @@ namespace ump = universal_midi_packets;
   #include "native/juce_linux_Midi.cpp"
  #endif
 
-//==============================================================================
+#if JUCE_EMSCRIPTEN
+ #include <emscripten.h>
+ #include <AL/al.h>
+ #include <AL/alc.h>
+
+ #include "native/juce_emscripten_Audio.cpp"
+ #include "native/juce_emscripten_Midi.cpp"
+
 #elif JUCE_ANDROID
 
  #include "native/juce_android_Audio.cpp"
