@@ -40,6 +40,7 @@ class OpenALAudioIODevice : public AudioIODevice
     int bufferSize{512};
     double sampleRate{44100.0};
     int numIn{0}, numOut{0};
+    int numUnderRuns{0};
 
     ALCdevice* device{nullptr};
     ALCcontext* context{nullptr};
@@ -65,6 +66,7 @@ class OpenALAudioIODevice : public AudioIODevice
         {
             DBG("Starting OpenAL Audio Thread...");
             this->callback = callback;
+            callback->audioDeviceAboutToStart (parent);
             startThread (Thread::realtimeAudioPriority);
         }
 
@@ -72,6 +74,7 @@ class OpenALAudioIODevice : public AudioIODevice
         {
             DBG("Stopping OpenAL Audio Thread...");
             stopThread (500);
+            this->callback->audioDeviceStopped();
         }
 
         // https://kcat.strangesoft.net/openal-tutorial.html
@@ -80,23 +83,26 @@ class OpenALAudioIODevice : public AudioIODevice
             // int bytePerSampleIn = 2 * parent->numIn;
             int bytePerSampleOut = 2 * parent->numOut;
 
-            int16* formatBuffer = new int16[parent->bufferSize * parent->numOut];
-            for (int c = 0; c < parent->numOut; c ++)
-                for (int i = 0; i < parent->bufferSize; i ++)
-                    formatBuffer[c + i * parent->numOut] = 0;
+            while (! threadShouldExit())
+            {
+                int status = MAIN_THREAD_EM_ASM_INT ({
+                    return window.juce_hadUserInteraction;
+                });
+                if (status) break;
+                sleep (5);
+            }
 
-            for (int i = 0; i < parent->numBuffers; i ++)
-                alBufferData (parent->buffers[i], parent->format, formatBuffer,
-                    parent->bufferSize * bytePerSampleOut, parent->frequency);
+            if (threadShouldExit()) return;
 
             alSourceQueueBuffers (parent->source, parent->numBuffers, parent->buffers);
             alSourcePlay (parent->source);
             if ((parent->errorCode = alGetError()) != AL_NO_ERROR)
             {
                 DBG("OpenAL error occurred when starting to play.");
-                delete [] formatBuffer;
                 return;
             }
+
+            int16* formatBuffer = new int16[parent->bufferSize * parent->numOut];
 
             float** buffersIn;
             float** buffersOut;
@@ -117,18 +123,25 @@ class OpenALAudioIODevice : public AudioIODevice
                 alGetSourcei (parent->source, AL_BUFFERS_PROCESSED, & val);
                 if (val <= 0)
                 {
-                    // sleep(10);
+                    // This is bad for audio apps but it seems like without the sleep
+                    //   it becomes a busy loop that burns a lot of CPU.
+                    sleep (1);
                     continue;
                 }
-                DBG(val);
+                if (val == parent->numBuffers)
+                    parent->numUnderRuns ++;
+
+                // DBG(val);
                 while (val --)
                 {
                     for (int c = 0; c < parent->numOut; c ++)
                         for (int i = 0; i < parent->bufferSize; i ++)
                             buffersOut[c][i] = 0;
                     
-                    callback->audioDeviceIOCallback((const float**)buffersIn, parent->numIn,
+                    callback->audioDeviceIOCallback (
+                        (const float**)buffersIn, parent->numIn,
                         buffersOut, parent->numOut, parent->bufferSize);
+                    
                     for (int c = 0; c < parent->numOut; c ++)
                     {
                         for (int i = 0; i < parent->bufferSize; i ++)
@@ -139,6 +152,7 @@ class OpenALAudioIODevice : public AudioIODevice
                     alBufferData (buffer, parent->format, formatBuffer,
                         parent->bufferSize * bytePerSampleOut, parent->frequency);
                     alSourceQueueBuffers (parent->source, 1, & buffer);
+
                     if ((parent->errorCode = alGetError()) != AL_NO_ERROR)
                     {
                         DBG("OpenAL error occurred when playing.");
@@ -155,20 +169,24 @@ class OpenALAudioIODevice : public AudioIODevice
         }
     };
 
-    struct OpenMessage : public Message {};
-    
-    struct StartMessage : public Message {
-        AudioIODeviceCallback* callback;
-    };
-
-    struct StopMessage : public Message {};
-    struct CloseMessage : public Message {};
-
     std::unique_ptr<AudioThread> audioThread;
 
 public:
     OpenALAudioIODevice () : AudioIODevice ("OpenAL", "OpenAL")
     {
+        EM_ASM({
+            if (window.juce_hadUserInteraction == undefined)
+            {
+                window.juce_hadUserInteraction = false;
+                window.juce_interactionListener = function() {
+                    window.juce_hadUserInteraction = true;
+                    window.removeEventListener("mousedown",
+                      window.juce_interactionListener);
+                };
+                window.addEventListener("mousedown",
+                    window.juce_interactionListener);
+            }
+        });
     }
 
     ~OpenALAudioIODevice ()
@@ -210,20 +228,63 @@ public:
                  double sampleRate,
                  int bufferSizeSamples) override
     {
+        if (isDeviceOpen) close();
+
         this->bufferSize = bufferSizeSamples;
         this->sampleRate = sampleRate;
         numIn = inputChannels.countNumberOfSetBits ();
         numOut = outputChannels.countNumberOfSetBits ();
-        // String ret = openInternal ();
-        // postMessage (new OpenMessage());
-        Timer::callAfterDelay(2000, [this]() { openInternal(); });
+
+        ALenum errorCode = alGetError ();
+        device = alcOpenDevice (nullptr);
+        if (device == nullptr)
+            return "Failed to open device.";
+        DBG("OpenAL device has opened.");
+
+        context = alcCreateContext (device, nullptr);
+        alcMakeContextCurrent (context);
+        if (context == nullptr || (errorCode = alGetError()) != AL_NO_ERROR)
+            return "Failed to create context.";
+        DBG("OpenAL context is created.");
+
+        alGenBuffers (numBuffers, buffers);
+        alGenSources (1, & source);
+        if ((errorCode = alGetError()) != AL_NO_ERROR)
+            return "Failed to generate sources.";
+        DBG("OpenAL sources and buffers are generated.");
+
+        if (numOut == 1)
+            format = AL_FORMAT_MONO16;
+        else if (numOut == 2)
+            format = AL_FORMAT_STEREO16;
+        else
+            return "Invalid output channel configuration.";
+        frequency = (ALuint)sampleRate;
+        
+        isDeviceOpen = true;
+
         return {};
     }
     
     void close () override
     {
-        // postMessage (new CloseMessage());
-        Timer::callAfterDelay(2000, [this]() { closeInternal(); });
+        if (isDeviceOpen)
+        {
+            alDeleteSources (1, & source);
+            alDeleteBuffers (numBuffers, buffers);
+        }
+        if (context)
+        {
+            alcMakeContextCurrent (nullptr);
+            alcDestroyContext (context);
+            context = nullptr;
+        }
+        if (device)
+        {
+            alcCloseDevice (device);
+            device = nullptr;
+        }
+        isDeviceOpen = false;
     }
 
     bool isOpen () override
@@ -233,16 +294,17 @@ public:
 
     void start (AudioIODeviceCallback* newCallback) override
     {
-        // StartMessage* msg = new StartMessage();
-        // msg->callback = newCallback;
-        // postMessage (msg);
-        Timer::callAfterDelay(2000, [this, newCallback]() { startInternal(newCallback); });
+        numUnderRuns = 0;
+        audioThread.reset (new AudioThread(this));
+        audioThread->start (newCallback);
     }
 
     void stop () override
     {
-        // postMessage (new StopMessage());
-        Timer::callAfterDelay(2000, [this]() { stopInternal(); });
+        if (isPlaying())
+        {
+            audioThread->stop ();
+        }
     }
 
     bool isPlaying () override
@@ -288,101 +350,20 @@ public:
         return b;
     }
 
-    int getOutputLatencyInSamples () override             { /* TODO */ return 0; }
-    int getInputLatencyInSamples () override              { /* TODO */ return 0; }
-    int getXRunCount () const noexcept override           { return 0; }
-
-private:
-
-    // void handleMessage (const Message& msg) override
-    // {
-    //     if (dynamic_cast<const OpenMessage*>(& msg))
-    //         openInternal ();
-    //     else
-    //     if (dynamic_cast<const CloseMessage*>(& msg))
-    //         closeInternal ();
-    //     else
-    //     if (dynamic_cast<const StartMessage*>(& msg))
-    //     {
-    //         auto* startMsg = dynamic_cast<const StartMessage*>(& msg);
-    //         startInternal (startMsg -> callback);
-    //     }
-    //     else
-    //     if (dynamic_cast<const StopMessage*>(& msg))
-    //         stopInternal ();
-    // }
-
-    String openInternal ()
+    int getOutputLatencyInSamples () override
     {
-        if (isDeviceOpen)
-            closeInternal();
-
-        ALenum errorCode = alGetError ();
-        device = alcOpenDevice (nullptr);
-        if (device == nullptr)
-            return "Failed to open device.";
-        DBG("OpenAL device has opened.");
-
-        context = alcCreateContext (device, nullptr);
-        alcMakeContextCurrent (context);
-        if (context == nullptr || (errorCode = alGetError()) != AL_NO_ERROR)
-            return "Failed to create context.";
-        DBG("OpenAL context is created.");
-
-        alGenBuffers (numBuffers, buffers);
-        alGenSources (1, & source);
-        if ((errorCode = alGetError()) != AL_NO_ERROR)
-            return "Failed to generate sources.";
-        DBG("OpenAL sources and buffers are generated.");
-
-        if (numOut == 1)
-            format = AL_FORMAT_MONO16;
-        else if (numOut == 2)
-            format = AL_FORMAT_STEREO16;
-        else
-            return "Invalid output channel configuration.";
-        frequency = (ALuint)sampleRate;
-        
-        isDeviceOpen = true;
-
-        return {};
+        return numBuffers * bufferSize;
     }
 
-    void closeInternal ()
+    int getInputLatencyInSamples () override
     {
-        if (isDeviceOpen)
-        {
-            alDeleteSources (1, & source);
-            alDeleteBuffers (numBuffers, buffers);
-        }
-        if (context)
-        {
-            alcMakeContextCurrent (nullptr);
-            alcDestroyContext (context);
-            context = nullptr;
-        }
-        if (device)
-        {
-            alcCloseDevice (device);
-            device = nullptr;
-        }
-        isDeviceOpen = false;
+        return numBuffers * bufferSize;
     }
 
-    void startInternal (AudioIODeviceCallback* newCallback)
+    int getXRunCount () const noexcept override
     {
-        audioThread.reset (new AudioThread(this));
-        audioThread->start (newCallback);
+        return numUnderRuns;
     }
-
-    void stopInternal ()
-    {
-        if (isPlaying())
-        {
-            audioThread->stop ();
-        }
-    }
-
 };
 
 //==============================================================================
@@ -398,7 +379,6 @@ struct OpenALAudioIODeviceType  : public AudioIODeviceType
 
     AudioIODevice* createDevice (const String& outputName, const String& inputName) override
     {
-        // TODO: switching whether to support analog/digital with possible multiple Bela device types?
         if (outputName == "OpenAL" || inputName == "OpenAL")
             return new OpenALAudioIODevice();
 
