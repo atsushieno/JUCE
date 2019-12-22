@@ -23,6 +23,10 @@
 namespace juce
 {
 
+// Declarations from juce_emscripten_Messaging.
+extern std::vector<std::function<void()>> preDispatchLoopFuncs;
+extern std::vector<std::function<void()>> postDispatchLoopFuncs;
+
 int getAudioContextSampleRate() {
     return EM_ASM_INT({
         var AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -48,8 +52,7 @@ class OpenALAudioIODevice : public AudioIODevice
     ALuint frequency;
     ALenum format, errorCode{AL_NO_ERROR};
 
-    bool isDeviceOpen{false};
-
+public:
     class AudioFeedStateMachine
     {
     public:
@@ -241,24 +244,10 @@ class OpenALAudioIODevice : public AudioIODevice
         }
     };
 
-    std::unique_ptr<AudioThread> audioThread;
-
 public:
-    OpenALAudioIODevice () : AudioIODevice ("OpenAL", "OpenAL")
+    OpenALAudioIODevice (bool threadBased = false)
+    : AudioIODevice ("OpenAL", "OpenAL"), threadBased(threadBased)
     {
-        EM_ASM({
-            if (window.juce_hadUserInteraction == undefined)
-            {
-                window.juce_hadUserInteraction = false;
-                window.juce_interactionListener = function() {
-                    window.juce_hadUserInteraction = true;
-                    window.removeEventListener("mousedown",
-                      window.juce_interactionListener);
-                };
-                window.addEventListener("mousedown",
-                    window.juce_interactionListener);
-            }
-        });
     }
 
     ~OpenALAudioIODevice ()
@@ -292,7 +281,7 @@ public:
     
     int getDefaultBufferSize () override
     {
-        return 1024;
+        return 4096;
     }
 
     String open (const BigInteger& inputChannels,
@@ -367,21 +356,42 @@ public:
     void start (AudioIODeviceCallback* newCallback) override
     {
         numUnderRuns = 0;
-        audioThread.reset (new AudioThread(this));
-        audioThread->start (newCallback);
+        if (threadBased)
+        {
+            audioThread.reset (new AudioThread(this));
+            audioThread->start (newCallback);
+        } else
+        {
+            if (audioStateMachine)
+                sessionsOnPreDispatch.removeAllInstancesOf (audioStateMachine.get());
+            
+            audioStateMachine.reset (new AudioFeedStateMachine(this));
+            sessionsOnPreDispatch.add (audioStateMachine.get());
+            audioStateMachine->start (newCallback);
+        }
     }
 
     void stop () override
     {
         if (isPlaying())
         {
-            audioThread->stop ();
+            if (audioThread)
+                audioThread->stop ();
+            if (audioStateMachine)
+            {
+                sessionsOnPreDispatch.removeAllInstancesOf (audioStateMachine.get());
+                audioStateMachine.reset (nullptr);
+            }
         }
     }
 
     bool isPlaying () override
     {
-        return audioThread != nullptr && audioThread->isThreadRunning();
+        if (audioThread)
+            return audioThread->isThreadRunning();
+        if (audioStateMachine)
+            return audioStateMachine->getState () == AudioFeedStateMachine::StatePlaying;
+        return false;
     }
 
     String getLastError () override
@@ -436,12 +446,54 @@ public:
     {
         return numUnderRuns;
     }
+    
+    static Array<AudioFeedStateMachine*> sessionsOnPreDispatch;
+
+private:
+    bool isDeviceOpen{false};
+    bool threadBased{false};
+
+    std::unique_ptr<AudioThread> audioThread;
+    std::unique_ptr<AudioFeedStateMachine> audioStateMachine;
 };
+
+Array<OpenALAudioIODevice::AudioFeedStateMachine*>
+OpenALAudioIODevice::sessionsOnPreDispatch;
 
 //==============================================================================
 struct OpenALAudioIODeviceType  : public AudioIODeviceType
 {
-    OpenALAudioIODeviceType () : AudioIODeviceType ("OpenAL") {}
+    OpenALAudioIODeviceType () : AudioIODeviceType ("OpenAL")
+    {
+        EM_ASM({
+            if (window.juce_hadUserInteraction == undefined)
+            {
+                window.juce_hadUserInteraction = false;
+                window.juce_interactionListener = function() {
+                    window.juce_hadUserInteraction = true;
+                    window.removeEventListener("mousedown",
+                      window.juce_interactionListener);
+                };
+                window.addEventListener("mousedown",
+                    window.juce_interactionListener);
+            }
+        });
+        
+        if (! openALPreDispatchRegistered)
+        {
+            preDispatchLoopFuncs.push_back([]() {
+                using AudioFeedStateMachine = OpenALAudioIODevice::AudioFeedStateMachine;
+                for (auto* session : OpenALAudioIODevice::sessionsOnPreDispatch)
+                {
+                    if (session->getState() != AudioFeedStateMachine::StateStopped)
+                        session->nextStep ();
+                }
+            });
+            openALPreDispatchRegistered = true;
+        }
+    }
+
+    bool openALPreDispatchRegistered{false};
 
     StringArray getDeviceNames (bool) const override                       { return StringArray ("OpenAL"); }
     void scanForDevices () override                                        {}

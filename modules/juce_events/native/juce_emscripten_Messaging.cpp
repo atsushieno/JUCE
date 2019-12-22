@@ -66,8 +66,13 @@ std::deque<MessageManager::MessageBase*> messageQueue;
 std::mutex queueMtx;
 std::atomic<bool> quitPosted{false};
 
+std::vector<std::function<void()>> preDispatchLoopFuncs;
+std::vector<std::function<void()>> postDispatchLoopFuncs;
+
 void dispatchLoop()
 {
+    for (auto f : preDispatchLoopFuncs) f();
+
     queueMtx.lock();
     std::deque<MessageManager::MessageBase*> messageCopy = messageQueue;
     messageQueue.clear();
@@ -91,6 +96,8 @@ void dispatchLoop()
             logArea.value = logArea.value.substring(n - 1000, n);
     });
    #endif
+
+    for (auto f : postDispatchLoopFuncs) f();
 
     if (quitPosted)
     {
