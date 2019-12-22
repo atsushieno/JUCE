@@ -10,11 +10,12 @@ This port was originally created [here](https://github.com/beschulz/juce_emscrip
 - keyboard events
 - clipboard
 - font rendering (via freetype)
+- audio output (via OpenAL)
 
 (note: as of late 2019, this fork only works on Chrome because it needs SharedArrayBuffer support)
 
 ## What is not working
-- audio (I'd go for an OpenALAudioDevice implementation in C++, because emscripten apparently supports OpenAL (via the AudioAPI) )
+- audio capture and low-latency audio
 - `MemoryMappedFile` (`mmap` is not functioning correctly)
 - networking
 - native dialogs
