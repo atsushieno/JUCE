@@ -102,6 +102,8 @@ public:
             }
             if (buffersIn)
                 delete [] buffersIn;
+
+            OpenALAudioIODevice::sessionsOnPreDispatch.removeAllInstancesOf (this);
         }
 
         StateType getState () const { return state; }
@@ -174,7 +176,7 @@ public:
 
                 int bytePerSampleOut = 2 * numOut;
 
-                // DBG(val);
+                DBG(val);
                 while (val --)
                 {
                     for (int c = 0; c < numOut; c ++)
@@ -362,9 +364,6 @@ public:
             audioThread->start (newCallback);
         } else
         {
-            if (audioStateMachine)
-                sessionsOnPreDispatch.removeAllInstancesOf (audioStateMachine.get());
-            
             audioStateMachine.reset (new AudioFeedStateMachine(this));
             sessionsOnPreDispatch.add (audioStateMachine.get());
             audioStateMachine->start (newCallback);
@@ -378,10 +377,7 @@ public:
             if (audioThread)
                 audioThread->stop ();
             if (audioStateMachine)
-            {
-                sessionsOnPreDispatch.removeAllInstancesOf (audioStateMachine.get());
                 audioStateMachine.reset (nullptr);
-            }
         }
     }
 
