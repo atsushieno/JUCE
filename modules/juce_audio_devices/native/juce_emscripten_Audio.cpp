@@ -50,12 +50,167 @@ class OpenALAudioIODevice : public AudioIODevice
 
     bool isDeviceOpen{false};
 
-    struct AudioThread : public Thread
+    class AudioFeedStateMachine
     {
+    public:
+        enum StateType
+        {
+            StateWaitingForInteraction,
+            StatePlaying,
+            StateStopped
+        };
+
+        enum StatusType
+        {
+            StatusGood,
+            StatusError,
+            StatusNeedToWait
+        };
+
+    private:
         OpenALAudioIODevice* parent{nullptr};
         AudioIODeviceCallback* callback{nullptr};
+        ALuint source, buffers[numBuffers];
+        int numOut, bufferSize;
 
-        AudioThread (OpenALAudioIODevice* parent) : Thread ("OpenAL Audio Thread")
+        int16* formatBuffer{nullptr};
+        float** buffersIn{nullptr};
+        float** buffersOut{nullptr};
+
+        StateType state{StateWaitingForInteraction};
+
+    public:
+        AudioFeedStateMachine (OpenALAudioIODevice* parent) : parent(parent) { }
+
+        ~AudioFeedStateMachine ()
+        {
+            if (StatePlaying)
+            {
+                callback->audioDeviceStopped();
+            }
+
+            if (formatBuffer)
+                delete [] formatBuffer;
+            if (buffersOut)
+            {
+                for (int i = 0; i < parent->numOut; i ++)
+                    delete [] buffersOut[i];
+                delete [] buffersOut;
+            }
+            if (buffersIn)
+                delete [] buffersIn;
+        }
+
+        StateType getState () const { return state; }
+
+        void start (AudioIODeviceCallback* callback)
+        {
+            this->callback = callback;
+            callback->audioDeviceAboutToStart (parent);
+
+            source = parent->source;
+            for (int i = 0; i < numBuffers; i ++)
+                buffers[i] = parent->buffers[i];
+            
+            numOut = parent->numOut;
+            bufferSize = parent->bufferSize;
+        }
+
+        // Loosely adapted from https://kcat.strangesoft.net/openal-tutorial.html
+        StatusType nextStep (bool shouldStop = false)
+        {
+            if (state == StateWaitingForInteraction)
+            {
+                if (shouldStop)
+                {
+                    state = StateStopped;
+                    return StatusGood;
+                }
+                int status = MAIN_THREAD_EM_ASM_INT ({
+                    return window.juce_hadUserInteraction;
+                });
+                if (status)
+                {
+                    state = StatePlaying;
+                    
+                    alSourceQueueBuffers (source, numBuffers, buffers);
+                    alSourcePlay (source);
+                    if ((parent->errorCode = alGetError()) != AL_NO_ERROR)
+                    {
+                        DBG("OpenAL error occurred when starting to play.");
+                        return StatusError;
+                    }
+
+                    formatBuffer = new int16[bufferSize * numOut];
+                    buffersIn  = new float*[16];
+                    buffersOut = new float*[16];
+                    for (int i = 0; i < numOut; i ++)
+                        buffersOut[i] = new float[bufferSize];
+                }
+            }
+            if (state == StatePlaying)
+            {
+                if (shouldStop)
+                {
+                    state = StateStopped;
+                    callback->audioDeviceStopped();
+                    return StatusGood;
+                }
+
+                ALuint buffer;
+                ALint val;
+
+                alGetSourcei (source, AL_SOURCE_STATE, & val);
+                if(val != AL_PLAYING)
+                    alSourcePlay (source);
+                
+                alGetSourcei (source, AL_BUFFERS_PROCESSED, & val);
+                if (val <= 0) return StatusNeedToWait;
+                if (val == numBuffers)
+                    parent->numUnderRuns ++;
+
+                int bytePerSampleOut = 2 * numOut;
+
+                // DBG(val);
+                while (val --)
+                {
+                    for (int c = 0; c < numOut; c ++)
+                        for (int i = 0; i < bufferSize; i ++)
+                            buffersOut[c][i] = 0;
+                    
+                    callback->audioDeviceIOCallback (
+                        (const float**)buffersIn, parent->numIn,
+                        buffersOut, numOut, bufferSize);
+                    
+                    for (int c = 0; c < numOut; c ++)
+                    {
+                        for (int i = 0; i < bufferSize; i ++)
+                            formatBuffer[c + i * numOut] = buffersOut[c][i] * 32768;
+                    }
+                    
+                    alSourceUnqueueBuffers (source, 1, & buffer);
+                    alBufferData (buffer, parent->format, formatBuffer,
+                        bufferSize * bytePerSampleOut, parent->frequency);
+                    alSourceQueueBuffers (source, 1, & buffer);
+
+                    if ((parent->errorCode = alGetError()) != AL_NO_ERROR)
+                    {
+                        DBG("OpenAL error occurred when playing.");
+                        return StatusError;
+                    }
+                }
+            }
+            return StatusGood;
+        }
+    };
+
+    struct AudioThread : public Thread
+    {
+        AudioFeedStateMachine stateMachine;
+        OpenALAudioIODevice* parent;
+
+        AudioThread (OpenALAudioIODevice* parent)
+          : Thread("OpenAL Audio Thread"), stateMachine(parent)
         {
             this->parent = parent;
         }
@@ -65,8 +220,7 @@ class OpenALAudioIODevice : public AudioIODevice
         void start (AudioIODeviceCallback* callback)
         {
             DBG("Starting OpenAL Audio Thread...");
-            this->callback = callback;
-            callback->audioDeviceAboutToStart (parent);
+            stateMachine.start (callback);
             startThread (Thread::realtimeAudioPriority);
         }
 
@@ -74,98 +228,16 @@ class OpenALAudioIODevice : public AudioIODevice
         {
             DBG("Stopping OpenAL Audio Thread...");
             stopThread (500);
-            this->callback->audioDeviceStopped();
         }
 
-        // https://kcat.strangesoft.net/openal-tutorial.html
         void run () override
         {
-            // int bytePerSampleIn = 2 * parent->numIn;
-            int bytePerSampleOut = 2 * parent->numOut;
-
-            while (! threadShouldExit())
+            while (stateMachine.getState() != AudioFeedStateMachine::StateStopped)
             {
-                int status = MAIN_THREAD_EM_ASM_INT ({
-                    return window.juce_hadUserInteraction;
-                });
-                if (status) break;
-                sleep (5);
-            }
-
-            if (threadShouldExit()) return;
-
-            alSourceQueueBuffers (parent->source, parent->numBuffers, parent->buffers);
-            alSourcePlay (parent->source);
-            if ((parent->errorCode = alGetError()) != AL_NO_ERROR)
-            {
-                DBG("OpenAL error occurred when starting to play.");
-                return;
-            }
-
-            int16* formatBuffer = new int16[parent->bufferSize * parent->numOut];
-
-            float** buffersIn;
-            float** buffersOut;
-            buffersIn  = new float*[16];
-            buffersOut = new float*[16];
-            for (int i = 0; i < parent->numOut; i ++)
-                buffersOut[i] = new float[parent->bufferSize];
-
-            while (! threadShouldExit())
-            {
-                ALuint buffer;
-                ALint val;
-
-                alGetSourcei (parent->source, AL_SOURCE_STATE, & val);
-                if(val != AL_PLAYING)
-                    alSourcePlay (parent->source);
-                
-                alGetSourcei (parent->source, AL_BUFFERS_PROCESSED, & val);
-                if (val <= 0)
-                {
-                    // This is bad for audio apps but it seems like without the sleep
-                    //   it becomes a busy loop that burns a lot of CPU.
+                auto status = stateMachine.nextStep (threadShouldExit());
+                if (status == AudioFeedStateMachine::StatusNeedToWait)
                     sleep (1);
-                    continue;
-                }
-                if (val == parent->numBuffers)
-                    parent->numUnderRuns ++;
-
-                // DBG(val);
-                while (val --)
-                {
-                    for (int c = 0; c < parent->numOut; c ++)
-                        for (int i = 0; i < parent->bufferSize; i ++)
-                            buffersOut[c][i] = 0;
-                    
-                    callback->audioDeviceIOCallback (
-                        (const float**)buffersIn, parent->numIn,
-                        buffersOut, parent->numOut, parent->bufferSize);
-                    
-                    for (int c = 0; c < parent->numOut; c ++)
-                    {
-                        for (int i = 0; i < parent->bufferSize; i ++)
-                            formatBuffer[c + i * parent->numOut] = buffersOut[c][i] * 32768;
-                    }
-                    
-                    alSourceUnqueueBuffers (parent->source, 1, & buffer);
-                    alBufferData (buffer, parent->format, formatBuffer,
-                        parent->bufferSize * bytePerSampleOut, parent->frequency);
-                    alSourceQueueBuffers (parent->source, 1, & buffer);
-
-                    if ((parent->errorCode = alGetError()) != AL_NO_ERROR)
-                    {
-                        DBG("OpenAL error occurred when playing.");
-                        break;
-                    }
-                }
             }
-
-            delete [] formatBuffer;
-            for (int i = 0; i < parent->numOut; i ++)
-                delete [] buffersOut[i];
-            delete [] buffersOut;
-            delete [] buffersIn;
         }
     };
 
