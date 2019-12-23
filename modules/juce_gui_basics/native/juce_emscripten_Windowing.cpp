@@ -24,12 +24,20 @@
 
 extern juce::JUCEApplicationBase* juce_CreateApplication(); // (from START_JUCE_APPLICATION)
 
+namespace juce {
+    extern const char* const* juce_argv;  // declared in juce_core
+    extern int juce_argc;
+}
+
 static std::unique_ptr<juce::ScopedJuceInitialiser_GUI> libraryInitialiser;
 
 //==============================================================================
-void launchApp()
+void launchApp(int argc, char* argv[])
 {
     using namespace juce;
+
+    juce_argc = argc;
+    juce_argv = argv;
 
     libraryInitialiser.reset (new ScopedJuceInitialiser_GUI());
 

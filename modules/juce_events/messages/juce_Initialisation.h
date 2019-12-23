@@ -90,10 +90,10 @@ public:
 #elif JUCE_EMSCRIPTEN
   #define START_JUCE_APPLICATION(AppClass) \
    juce::JUCEApplicationBase* juce_CreateApplication() { return new AppClass(); } \
-   extern void launchApp(); \
+   extern void launchApp(int argc, char* argv[]); \
    extern "C" int main(int argc, char* argv[]) \
    { \
-      launchApp(); \
+      launchApp(argc, argv); \
       return 0; \
    }
 
