@@ -76,6 +76,9 @@ static double timeDispatchBeginMS{0};
 std::vector<std::function<void()>> preDispatchLoopFuncs;
 std::vector<std::function<void()>> postDispatchLoopFuncs;
 
+extern std::deque<std::string> debugPrintQueue;
+extern std::mutex debugPrintQueueMtx;
+
 double getTimeSpentInCurrentDispatchCycle()
 {
     double currentTimeMS = Time::getMillisecondCounterHiRes();
@@ -85,10 +88,21 @@ double getTimeSpentInCurrentDispatchCycle()
 
 static void dispatchLoop()
 {
-    // DBG("new dispatch loop cycle");
+    DBG("new dispatch loop cycle");
+    // std::cerr << "new dispatch loop cycle" << std::endl;
     timeDispatchBeginMS = Time::getMillisecondCounterHiRes();
 
     for (auto f : preDispatchLoopFuncs) f();
+
+   #if JUCE_DEBUG
+    debugPrintQueueMtx.lock();
+    while (! debugPrintQueue.empty())
+    {
+        std::cerr << debugPrintQueue.front() << std::endl;
+        debugPrintQueue.pop_front();
+    }
+    debugPrintQueueMtx.unlock();
+   #endif
 
     queueMtx.lock();
     std::deque<MessageManager::MessageBase*> messageCopy = messageQueue;

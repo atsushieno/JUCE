@@ -24,14 +24,31 @@
 extern "C" int cobalt_thread_mode();
 #elif JUCE_EMSCRIPTEN
 #include <emscripten.h>
+#include <deque>
 #endif
 
 namespace juce
 {
 
+#if JUCE_EMSCRIPTEN
+std::deque<std::string> debugPrintQueue;
+std::mutex debugPrintQueueMtx;
+#endif
+
 void Logger::outputDebugString (const String& text)
 {
+   #if JUCE_EMSCRIPTEN
+    if (Thread::getCurrentThread() == nullptr)
+        std::cerr << text << std::endl;
+    else
+    {
+        debugPrintQueueMtx.lock();
+        debugPrintQueue.push_back (text.toStdString());
+        debugPrintQueueMtx.unlock();
+    }
+   #else
     std::cerr << text << std::endl;
+   #endif
 }
 
 //==============================================================================
