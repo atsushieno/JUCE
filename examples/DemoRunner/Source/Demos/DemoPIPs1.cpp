@@ -43,23 +43,23 @@
 #include "../../../Audio/PluckedStringsDemo.h"
 
 #if JUCE_HAS_CONSTEXPR
-//  #include "../../../Audio/SimpleFFTDemo.h"
+ #include "../../../Audio/SimpleFFTDemo.h"
 //  #include "../../../BLOCKS/BlocksDrawingDemo.h"
 //  #include "../../../BLOCKS/BlocksMonitorDemo.h"
 //  #include "../../../BLOCKS/BlocksSynthDemo.h"
 
 
-//  #include "../../../DSP/ConvolutionDemo.h"
-//  #include "../../../DSP/FIRFilterDemo.h"
-//  #include "../../../DSP/GainDemo.h"
-//  #include "../../../DSP/IIRFilterDemo.h"
-//  #include "../../../DSP/OscillatorDemo.h"
-//  #include "../../../DSP/OverdriveDemo.h"
-//  #if JUCE_USE_SIMD
-//   #include "../../../DSP/SIMDRegisterDemo.h"
-//  #endif
-//  #include "../../../DSP/StateVariableFilterDemo.h"
-//  #include "../../../DSP/WaveShaperTanhDemo.h"
+ #include "../../../DSP/ConvolutionDemo.h"
+ #include "../../../DSP/FIRFilterDemo.h"
+ #include "../../../DSP/GainDemo.h"
+ #include "../../../DSP/IIRFilterDemo.h"
+ #include "../../../DSP/OscillatorDemo.h"
+ #include "../../../DSP/OverdriveDemo.h"
+ #if JUCE_USE_SIMD
+  #include "../../../DSP/SIMDRegisterDemo.h"
+ #endif
+ #include "../../../DSP/StateVariableFilterDemo.h"
+ #include "../../../DSP/WaveShaperTanhDemo.h"
 #endif
 
 // #include "../../../Utilities/Box2DDemo.h"
@@ -91,22 +91,22 @@ void registerDemos_One() noexcept
     REGISTER_DEMO (PluckedStringsDemo,      Audio,     false)
 
    #if JUCE_HAS_CONSTEXPR
-    // REGISTER_DEMO (SimpleFFTDemo,           Audio,     false)
+    REGISTER_DEMO (SimpleFFTDemo,           Audio,     false)
     // REGISTER_DEMO (BlocksDrawingDemo,       BLOCKS,    false)
     // REGISTER_DEMO (BlocksMonitorDemo,       BLOCKS,    false)
     // REGISTER_DEMO (BlocksSynthDemo,         BLOCKS,    false)
 
-    // REGISTER_DEMO (ConvolutionDemo,         DSP,       false)
-    // REGISTER_DEMO (FIRFilterDemo,           DSP,       false)
-    // REGISTER_DEMO (GainDemo,                DSP,       false)
-    // REGISTER_DEMO (IIRFilterDemo,           DSP,       false)
-    // REGISTER_DEMO (OscillatorDemo,          DSP,       false)
-    // REGISTER_DEMO (OverdriveDemo,           DSP,       false)
-    // #if JUCE_USE_SIMD
-    //  REGISTER_DEMO (SIMDRegisterDemo,       DSP,       false)
-    // #endif
-    // REGISTER_DEMO (StateVariableFilterDemo, DSP,       false)
-    // REGISTER_DEMO (WaveShaperTanhDemo,      DSP,       false)
+    REGISTER_DEMO (ConvolutionDemo,         DSP,       false)
+    REGISTER_DEMO (FIRFilterDemo,           DSP,       false)
+    REGISTER_DEMO (GainDemo,                DSP,       false)
+    REGISTER_DEMO (IIRFilterDemo,           DSP,       false)
+    REGISTER_DEMO (OscillatorDemo,          DSP,       false)
+    REGISTER_DEMO (OverdriveDemo,           DSP,       false)
+    #if JUCE_USE_SIMD
+     REGISTER_DEMO (SIMDRegisterDemo,       DSP,       false)
+    #endif
+    REGISTER_DEMO (StateVariableFilterDemo, DSP,       false)
+    REGISTER_DEMO (WaveShaperTanhDemo,      DSP,       false)
    #endif
 
     // REGISTER_DEMO (Box2DDemo,               Utilities, false)
