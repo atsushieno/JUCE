@@ -43,7 +43,7 @@ class OpenALAudioIODevice : public AudioIODevice
     static const int numBuffers{3};
     int bufferSize{512};
     double sampleRate{44100.0};
-    int numIn{0}, numOut{0};
+    int numIn{0}, numOut{2};
     int numUnderRuns{0};
 
     ALCdevice* device{nullptr};
@@ -260,11 +260,7 @@ public:
 
     StringArray getOutputChannelNames () override
     {
-        StringArray ret;
-        ret.add ("Out #1");
-        if (numOut == 2)
-          ret.add ("Out #2");
-        return ret;
+        return { "Out #1", "Out #2" };
     }
 
     StringArray getInputChannelNames () override
@@ -295,8 +291,6 @@ public:
 
         this->bufferSize = bufferSizeSamples;
         this->sampleRate = sampleRate;
-        numIn = inputChannels.countNumberOfSetBits ();
-        numOut = outputChannels.countNumberOfSetBits ();
 
         ALenum errorCode = alGetError ();
         device = alcOpenDevice (nullptr);
