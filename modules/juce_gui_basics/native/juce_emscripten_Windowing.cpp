@@ -24,22 +24,22 @@
 
 extern juce::JUCEApplicationBase* juce_CreateApplication(); // (from START_JUCE_APPLICATION)
 
+static std::unique_ptr<juce::ScopedJuceInitialiser_GUI> libraryInitialiser;
+
 //==============================================================================
 void launchApp()
 {
     using namespace juce;
 
-    DBG (SystemStats::getJUCEVersion());
+    libraryInitialiser.reset (new ScopedJuceInitialiser_GUI());
 
     JUCEApplicationBase::createInstance = &juce_CreateApplication;
-
-    initialiseJuce_GUI();
-
     JUCEApplicationBase* app = JUCEApplicationBase::createInstance();
     if (! app->initialiseApp())
         exit (app->getApplicationReturnValue());
 
     jassert (MessageManager::getInstance()->isThisTheMessageThread());
+    DBG (SystemStats::getJUCEVersion());
 
     MessageManager::getInstance()->runDispatchLoop();
 }

@@ -73,13 +73,13 @@ std::vector<std::function<void()>> postDispatchLoopFuncs;
 double getTimeSpentInCurrentDispatchCycle()
 {
     double currentTimeMS = Time::getMillisecondCounterHiRes();
-    DBG("getTimeSpentInCurrentDispatchCycle: " << currentTimeMS - timeDispatchBeginMS);
+    // DBG("getTimeSpentInCurrentDispatchCycle: " << currentTimeMS - timeDispatchBeginMS);
     return (currentTimeMS - timeDispatchBeginMS) / 1000.0;
 }
 
 static void dispatchLoop()
 {
-    DBG("new dispatch loop cycle");
+    // DBG("new dispatch loop cycle");
     timeDispatchBeginMS = Time::getMillisecondCounterHiRes();
 
     for (auto f : preDispatchLoopFuncs) f();
