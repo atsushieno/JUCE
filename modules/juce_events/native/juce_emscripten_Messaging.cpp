@@ -36,6 +36,8 @@ static void createDirIfNotExists(File::SpecialLocationType type)
     if (! dir.exists()) dir.createDirectory();
 }
 
+static bool appIsInsideEmrun{false};
+
 void MessageManager::doPlatformSpecificInitialisation()
 {
     createDirIfNotExists(File::userHomeDirectory);
@@ -49,6 +51,10 @@ void MessageManager::doPlatformSpecificInitialisation()
     createDirIfNotExists(File::commonApplicationDataDirectory);
     createDirIfNotExists(File::globalApplicationsDirectory);
     createDirIfNotExists(File::tempDirectory);
+
+    appIsInsideEmrun = EM_ASM_INT({
+        return document.title == "Emscripten-Generated Code";
+    });
 }
 
 void MessageManager::doPlatformSpecificShutdown() {}
@@ -99,15 +105,16 @@ static void dispatchLoop()
         message->decReferenceCount();
     }
     
-//    #if DEBUG
-    EM_ASM({
-        var logArea = document.querySelector("#output");
-        var n = logArea.value.length;
-        if (n > 1000)
-            logArea.value = logArea.value.substring(n - 1000, n);
-    });
-//    #endif
-
+    if (appIsInsideEmrun)
+    {
+        EM_ASM({
+            var logArea = document.querySelector("#output");
+            var n = logArea.value.length;
+            if (n > 1000)
+                logArea.value = logArea.value.substring(n - 1000, n);
+        });
+    }
+    
     for (auto f : postDispatchLoopFuncs) f();
 
     if (quitPosted)
