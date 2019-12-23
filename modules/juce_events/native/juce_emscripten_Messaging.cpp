@@ -99,8 +99,7 @@ static void dispatchLoop()
     {
         MessageManager::MessageBase* message = messageCopy.front();
         messageCopy.pop_front();
-        // std::cout << "dispatchLoop-msg: " << message <<
-        //             "type: " << typeid(*message).name() << std::endl;
+        // DBG("dispatchLoop-msg: " << message << "type: " << typeid(*message).name());
         message->messageCallback();
         message->decReferenceCount();
     }
@@ -114,7 +113,7 @@ static void dispatchLoop()
                 logArea.value = logArea.value.substring(n - 1000, n);
         });
     }
-    
+
     for (auto f : postDispatchLoopFuncs) f();
 
     if (quitPosted)

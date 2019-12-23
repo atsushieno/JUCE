@@ -136,11 +136,11 @@ class EmscriptenComponentPeer : public ComponentPeer,
         :ComponentPeer(component, styleFlags)
         {
             emComponentPeerList.add(this);
-            std::cout << "EmscriptenComponentPeer" << std::endl;
+            DBG("EmscriptenComponentPeer");
 
             id = Uuid().toDashedString();
 
-            std::cout << "id is " << id << std::endl;
+            DBG("id is " << id);
 
             attachEventCallbackToWindow();
 
@@ -209,12 +209,12 @@ class EmscriptenComponentPeer : public ComponentPeer,
 
         virtual void setTitle (const String &title) override
         {
-            std::cout << "setTitle: " << title << std::endl;
+            DBG("setTitle: " << title);
         }
 
         virtual void setBounds (const Rectangle< int > &newBounds, bool isNowFullScreen) override
         {
-            std::cout << "setBounds " << newBounds.toString().toStdString() << std::endl;
+            DBG("setBounds " << newBounds.toString());
 
             auto oldBounds = bounds;
             
@@ -311,7 +311,7 @@ class EmscriptenComponentPeer : public ComponentPeer,
 
         virtual void toFront (bool makeActive) override
         {
-            std::clog << "toFront " << id << " " << makeActive <<  std::endl;
+            DBG("toFront " << id << " " << (makeActive ? "true" : "false"));
 
             highestZIndex = EM_ASM_INT({
                 var canvas = document.getElementById(UTF8ToString($0));
@@ -340,7 +340,7 @@ class EmscriptenComponentPeer : public ComponentPeer,
 
         virtual void toBehind (ComponentPeer *other) override
         {
-            std::clog << "toBehind" << std::endl;
+            DBG("toBehind");
 
             if(EmscriptenComponentPeer* otherPeer = dynamic_cast<EmscriptenComponentPeer*>(other))
             {
@@ -376,7 +376,7 @@ class EmscriptenComponentPeer : public ComponentPeer,
 
         virtual void grabFocus() override
         {
-            std::clog << "grabFocus " << id << std::endl;
+            DBG("grabFocus " << id);
             if (! focused)
             {
                 for (auto* other : emComponentPeerList)
@@ -394,7 +394,7 @@ class EmscriptenComponentPeer : public ComponentPeer,
 
         virtual void textInputRequired(Point< int > position, TextInputTarget &) override
         {
-            std::cout << "textInputRequired" << std::endl;
+            DBG("textInputRequired");
         }
 
         virtual void repaint (const Rectangle<int>& area) override
@@ -409,12 +409,12 @@ class EmscriptenComponentPeer : public ComponentPeer,
 
         virtual void performAnyPendingRepaintsNow() override
         {
-            std::cout << "performAnyPendingRepaintsNow" << std::endl;
+            DBG("performAnyPendingRepaintsNow");
         }
 
         virtual void setAlpha (float newAlpha) override
         {
-            std::cout << "setAlpha" << std::endl;
+            DBG("setAlpha");
         }
 
         virtual StringArray getAvailableRenderingEngines() override
@@ -476,7 +476,7 @@ class EmscriptenComponentPeer : public ComponentPeer,
 
         void internalRepaint (const Rectangle<int> &area)
         {
-            std::cout << "repaint: " << area.toString().toStdString() << std::endl;
+            DBG("repaint: " << area.toString());
 
             Image temp(Image::ARGB, area.getWidth(), area.getHeight(), true);
             LowLevelGraphicsSoftwareRenderer g(temp);
@@ -541,8 +541,8 @@ int64 fakeMouseEventTime = 0;
 extern "C" void juce_mouseCallback(const char* type, int x, int y, int which,
     int isShiftDown, int isCtrlDown, int isAltDown, int wheelDelta)
 {
-    // std::clog << type << " " << x << " " << y << " " << which
-    //           << " " << isShiftDown << " " << wheelDelta << std::endl;
+    // DBG(type << " " << x << " " << y << " " << which
+    //          << " " << isShiftDown << " " << wheelDelta);
     recentMousePosition = {x, y};
     bool isDownEvent = type == std::string("down");
     bool isUpEvent = type == std::string("up");
@@ -608,7 +608,7 @@ extern "C" void juce_mouseCallback(const char* type, int x, int y, int which,
 
 extern "C" void juce_keyboardCallback(const char* type, int keyCode, const char * key)
 {
-    // std::cout << "key " << type << " " << keyCode << " " << key << std::endl;
+    // DBG("key " << type << " " << keyCode << " " << key);
     bool isChar = strlen(key) == 1;
     bool isDown = type == std::string("down");
     juce_wchar keyChar = isChar ? (juce_wchar)key[0] : 0;

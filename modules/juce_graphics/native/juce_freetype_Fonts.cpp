@@ -237,7 +237,7 @@ private:
         int faceIndex = 0;
         int numFaces = 0;
 
-        std::clog << "got font: " << file.getFullPathName() << std::endl;
+        DBG("got font: " << file.getFullPathName());
 
         do
         {
@@ -264,7 +264,7 @@ private:
                   && (face->style.equalsIgnoreCase (style) || style.isEmpty()))
                 return face;
 
-        std::cout << "NO MATCHING FONT FOUND" << std::endl;
+        DBG("NO MATCHING FONT FOUND");
 
         return nullptr;
     }
