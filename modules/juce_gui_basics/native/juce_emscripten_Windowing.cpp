@@ -49,10 +49,11 @@ void launchApp()
 namespace juce
 {
 
-class EmscriptenComponentPeer;
+extern double getTimeSpentInCurrentDispatchCycle();
 
-Point<int> recentMousePosition;
-Array<EmscriptenComponentPeer*> emComponentPeerList;
+class EmscriptenComponentPeer;
+static Point<int> recentMousePosition;
+static Array<EmscriptenComponentPeer*> emComponentPeerList;
 
 EM_JS(void, attachEventCallbackToWindow, (),
 {
@@ -122,7 +123,10 @@ class EmscriptenComponentPeer : public ComponentPeer,
     int zIndex{0};
     bool focused{false};
     bool visibility{true};
+    bool repaintMessagePosted{false};
+    double desiredFPS{120.0};
 
+    RectangleList<int> unfinishedRepaintAreas;
     RectangleList<int> pendingRepaintAreas;
 
     struct RepaintMessage : public Message {};
@@ -396,7 +400,11 @@ class EmscriptenComponentPeer : public ComponentPeer,
         virtual void repaint (const Rectangle<int>& area) override
         {
             pendingRepaintAreas.add(area);
-            postMessage(new RepaintMessage());
+            if (! repaintMessagePosted)
+            {
+                postMessage (new RepaintMessage());
+                repaintMessagePosted = true;
+            }
         }
 
         virtual void performAnyPendingRepaintsNow() override
@@ -420,11 +428,48 @@ class EmscriptenComponentPeer : public ComponentPeer,
         {
             if (dynamic_cast<const RepaintMessage*>(& msg))
             {
+                // First finish remaining repaints from the last interrupted
+                //   message cycle. This is to prevent a repaint area from being
+                //   indefinitely postponed through multiple message cycles.
+                for (int i = 0; i < unfinishedRepaintAreas.getNumRectangles(); i ++)
+                {
+                    Rectangle<int> area = unfinishedRepaintAreas.getRectangle(i);
+                    internalRepaint (area);
+                    pendingRepaintAreas.subtract (area);
+                    if (getTimeSpentInCurrentDispatchCycle() > 1.0 / desiredFPS)
+                    {
+                        RectangleList<int> remaining;
+                        for (int j = i + 1; j < unfinishedRepaintAreas.getNumRectangles(); j ++)
+                        {
+                            remaining.addWithoutMerging(
+                                unfinishedRepaintAreas.getRectangle(j));
+                        }
+                        unfinishedRepaintAreas = remaining;
+                        postMessage (new RepaintMessage());
+                        return;
+                    }
+                }
+                
+                unfinishedRepaintAreas.clear();
+
                 for (int i = 0; i < pendingRepaintAreas.getNumRectangles(); i ++)
                 {
                     Rectangle<int> area = pendingRepaintAreas.getRectangle(i);
-                    internalRepaint(area);
+                    internalRepaint (area);
+                    if (getTimeSpentInCurrentDispatchCycle() > 1.0 / desiredFPS)
+                    {
+                        for (int j = i + 1; j < pendingRepaintAreas.getNumRectangles(); j ++)
+                        {
+                            unfinishedRepaintAreas.addWithoutMerging(
+                                pendingRepaintAreas.getRectangle(j));
+                        }
+                        pendingRepaintAreas.clear();
+                        repaintMessagePosted = true;
+                        postMessage (new RepaintMessage());
+                        return;
+                    }
                 }
+                repaintMessagePosted = false;
                 pendingRepaintAreas.clear();
             }
         }

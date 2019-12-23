@@ -62,15 +62,26 @@ bool MessageManager::dispatchNextMessageOnSystemQueue (const bool returnIfNoPend
     return true;
 }
 
-std::deque<MessageManager::MessageBase*> messageQueue;
-std::mutex queueMtx;
-std::atomic<bool> quitPosted{false};
+static std::deque<MessageManager::MessageBase*> messageQueue;
+static std::mutex queueMtx;
+static std::atomic<bool> quitPosted{false};
+static double timeDispatchBeginMS{0};
 
 std::vector<std::function<void()>> preDispatchLoopFuncs;
 std::vector<std::function<void()>> postDispatchLoopFuncs;
 
-void dispatchLoop()
+double getTimeSpentInCurrentDispatchCycle()
 {
+    double currentTimeMS = Time::getMillisecondCounterHiRes();
+    DBG("getTimeSpentInCurrentDispatchCycle: " << currentTimeMS - timeDispatchBeginMS);
+    return (currentTimeMS - timeDispatchBeginMS) / 1000.0;
+}
+
+static void dispatchLoop()
+{
+    DBG("new dispatch loop cycle");
+    timeDispatchBeginMS = Time::getMillisecondCounterHiRes();
+
     for (auto f : preDispatchLoopFuncs) f();
 
     queueMtx.lock();
@@ -88,14 +99,14 @@ void dispatchLoop()
         message->decReferenceCount();
     }
     
-   #if DEBUG
+//    #if DEBUG
     EM_ASM({
         var logArea = document.querySelector("#output");
         var n = logArea.value.length;
         if (n > 1000)
             logArea.value = logArea.value.substring(n - 1000, n);
     });
-   #endif
+//    #endif
 
     for (auto f : postDispatchLoopFuncs) f();
 
