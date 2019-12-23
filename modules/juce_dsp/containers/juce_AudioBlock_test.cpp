@@ -358,6 +358,7 @@ private:
     template <typename T = SampleType>
     SIMDVoid<T> copyingTests()
     {
+       #if JUCE_USE_SIMD
         auto numSIMDElements = SIMDRegister<NumericType>::SIMDNumElements;
         AudioBuffer<NumericType> numericData ((int) block.getNumChannels(),
                                               (int) (block.getNumSamples() * numSIMDElements));
@@ -396,6 +397,7 @@ private:
             expectEquals (block.getSample (0, 2).get (1), numericData.getSample (0, (int) (numSIMDElements + 1)));
             expectEquals (block.getSample (1, 3).get (1), numericData.getSample (1, (int) ((numSIMDElements * 2) + 1)));
         }
+       #endif
     }
    #endif
 
