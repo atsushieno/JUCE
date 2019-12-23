@@ -24,6 +24,7 @@
 extern "C" int cobalt_thread_mode();
 #elif JUCE_EMSCRIPTEN
 #include <emscripten.h>
+#include <emscripten/threading.h>
 #include <deque>
 #endif
 
@@ -39,7 +40,7 @@ void Logger::outputDebugString (const String& text)
 {
    #if JUCE_EMSCRIPTEN
     if (Thread::getCurrentThread() == nullptr)
-        std::cerr << text << std::endl;
+        std::cout << text << std::endl;
     else
     {
         debugPrintQueueMtx.lock();
@@ -60,7 +61,7 @@ SystemStats::OperatingSystemType SystemStats::getOperatingSystemType()
 String SystemStats::getOperatingSystemName()
 {
    #if JUCE_EMSCRIPTEN
-    char* str = (char*)EM_ASM_INT({
+    char* str = (char*)MAIN_THREAD_EM_ASM_INT({
         var userAgent = navigator.userAgent;
         var lengthBytes = lengthBytesUTF8(userAgent) + 1;
         var heapBytes = _malloc(lengthBytes);
@@ -94,7 +95,7 @@ static String getCpuInfo (const char* key)
 String SystemStats::getDeviceDescription()
 {
    #if JUCE_EMSCRIPTEN
-    char* str = (char*)EM_ASM_INT({
+    char* str = (char*)MAIN_THREAD_EM_ASM_INT({
         var platform = navigator.platform;
         var lengthBytes = lengthBytesUTF8(platform) + 1;
         var heapBytes = _malloc(lengthBytes);
@@ -112,7 +113,7 @@ String SystemStats::getDeviceDescription()
 String SystemStats::getDeviceManufacturer()
 {
    #if JUCE_EMSCRIPTEN
-    char* str = (char*)EM_ASM_INT({
+    char* str = (char*)MAIN_THREAD_EM_ASM_INT({
         var vendor = navigator.vendor;
         var lengthBytes = lengthBytesUTF8(vendor) + 1;
         var heapBytes = _malloc(lengthBytes);
@@ -162,7 +163,7 @@ int SystemStats::getCpuSpeedInMegahertz()
 int SystemStats::getMemorySizeInMegabytes()
 {
    #if JUCE_EMSCRIPTEN
-    int heapSizeLimit = EM_ASM_INT({
+    int heapSizeLimit = MAIN_THREAD_EM_ASM_INT({
         if (performance != undefined)
             if (performance.memory != undefined)
                 return performance.memory.jsHeapSizeLimit / 1024 / 1024;
@@ -222,7 +223,7 @@ static String getLocaleValue (nl_item key)
 #if JUCE_EMSCRIPTEN
 String SystemStats::getDisplayLanguage()
 {
-    char* str = (char*)EM_ASM_INT({
+    char* str = (char*)MAIN_THREAD_EM_ASM_INT({
         var language = navigator.language;
         var lengthBytes = lengthBytesUTF8(language) + 1;
         var heapBytes = _malloc(lengthBytes);
@@ -281,9 +282,7 @@ void CPUInformation::initialise() noexcept
     hasAVX512VPOPCNTDQ = flags.contains ("avx512_vpopcntdq");
    
    #if JUCE_EMSCRIPTEN
-    numLogicalCPUs = EM_ASM_INT({
-        return navigator.hardwareConcurrency;
-    });
+    numLogicalCPUs = emscripten_num_logical_cores();
     numPhysicalCPUs = numLogicalCPUs;
    #else
     numLogicalCPUs  = getCpuInfo ("processor").getIntValue() + 1;

@@ -28,7 +28,7 @@ extern std::vector<std::function<void()>> preDispatchLoopFuncs;
 extern std::vector<std::function<void()>> postDispatchLoopFuncs;
 
 int getAudioContextSampleRate() {
-    return EM_ASM_INT({
+    return MAIN_THREAD_EM_ASM_INT({
         var AudioContext = window.AudioContext || window.webkitAudioContext;
         var ctx = new AudioContext();
         var sr = ctx.sampleRate;
@@ -455,7 +455,7 @@ struct OpenALAudioIODeviceType  : public AudioIODeviceType
 {
     OpenALAudioIODeviceType () : AudioIODeviceType ("OpenAL")
     {
-        EM_ASM({
+        MAIN_THREAD_EM_ASM({
             if (window.juce_hadUserInteraction == undefined)
             {
                 window.juce_hadUserInteraction = false;

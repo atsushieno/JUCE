@@ -25,9 +25,92 @@
 extern juce::JUCEApplicationBase* juce_CreateApplication(); // (from START_JUCE_APPLICATION)
 
 namespace juce {
-    extern const char* const* juce_argv;  // declared in juce_core
-    extern int juce_argc;
+
+extern const char* const* juce_argv;  // declared in juce_core
+extern int juce_argc;
+
+// A singleton class that accepts mouse and keyboard events from browser
+//   main thread and post them as messages onto the message thread.
+// It is useful when main thread != message thread (-s PROXY_TO_PTHREAD).
+class MainThreadEventProxy : public MessageListener
+{
+public:
+    struct MouseEvent : public Message
+    {
+        String type;
+        int x, y;
+        int which;
+        bool isShiftDown, isCtrlDown, isAltDown;
+        int wheelDelta;
+    };
+
+    struct KeyboardEvent : public Message
+    {
+        String type;
+        int keyCode;
+        String key;
+    };
+
+    static MainThreadEventProxy& getInstance()
+    {
+        if (globalInstance == nullptr)
+        {
+            globalInstance.reset (new MainThreadEventProxy());
+        }
+        return *globalInstance;
+    }
+
+private:
+    void handleMessage (const Message& msg) override
+    {
+        if (dynamic_cast<const MouseEvent*>(& msg))
+        {
+            const MouseEvent* e = dynamic_cast<const MouseEvent*>(& msg);
+            handleMouseEvent (*e);
+        } else
+        if (dynamic_cast<const KeyboardEvent*>(& msg))
+        {
+            const KeyboardEvent* e = dynamic_cast<const KeyboardEvent*>(& msg);
+            handleKeyboardEvent (*e);
+        }
+    }
+
+    void handleMouseEvent (const MouseEvent& e);
+    void handleKeyboardEvent (const KeyboardEvent& e);
+
+    static std::unique_ptr<MainThreadEventProxy> globalInstance;
+};
+
+std::unique_ptr<MainThreadEventProxy> MainThreadEventProxy::globalInstance;
+
+extern "C" void juce_mouseCallback(const char* type, int x, int y, int which,
+    int isShiftDown, int isCtrlDown, int isAltDown, int wheelDelta)
+{
+    // DBG(type << " " << x << " " << y << " " << which
+    //          << " " << isShiftDown << " " << wheelDelta);
+    auto* e = new MainThreadEventProxy::MouseEvent();
+    e->type = String(type);
+    e->x = x;
+    e->y = y;
+    e->which = which;
+    e->isShiftDown = isShiftDown;
+    e->isCtrlDown = isCtrlDown;
+    e->isAltDown = isAltDown;
+    e->wheelDelta = wheelDelta;
+    MainThreadEventProxy::getInstance().postMessage(e);
 }
+
+extern "C" void juce_keyboardCallback(const char* type, int keyCode, const char * key)
+{
+    // DBG("key " << type << " " << keyCode << " " << key);
+    auto* e = new MainThreadEventProxy::KeyboardEvent();
+    e->type = String(type);
+    e->keyCode = keyCode;
+    e->key = String(key);
+    MainThreadEventProxy::getInstance().postMessage(e);
+}
+
+} // namespace juce
 
 static std::unique_ptr<juce::ScopedJuceInitialiser_GUI> libraryInitialiser;
 
@@ -45,6 +128,9 @@ void launchApp(int argc, char* argv[])
     JUCEApplicationBase* app = JUCEApplicationBase::createInstance();
     if (! app->initialiseApp())
         exit (app->getApplicationReturnValue());
+    
+    MessageManager::getInstance();
+    MainThreadEventProxy::getInstance();
 
     jassert (MessageManager::getInstance()->isThisTheMessageThread());
     DBG (SystemStats::getJUCEVersion());
@@ -53,6 +139,7 @@ void launchApp(int argc, char* argv[])
 }
 
 #include <emscripten.h>
+#include <emscripten/threading.h>
 #include <unordered_map>
 
 namespace juce
@@ -151,9 +238,10 @@ class EmscriptenComponentPeer : public ComponentPeer,
 
             DBG("id is " << id);
 
-            attachEventCallbackToWindow();
+            emscripten_sync_run_in_main_runtime_thread(EM_FUNC_SIG_V,
+                attachEventCallbackToWindow);
 
-            EM_ASM_INT({
+            MAIN_THREAD_EM_ASM_INT({
                 var canvas = document.createElement('canvas');
                 canvas.id  = UTF8ToString($0);
                 canvas.style.zIndex   = $6;
@@ -179,7 +267,7 @@ class EmscriptenComponentPeer : public ComponentPeer,
         ~EmscriptenComponentPeer()
         {
             emComponentPeerList.removeAllInstancesOf(this);
-            EM_ASM_ARGS({
+            MAIN_THREAD_EM_ASM({
                 var canvas = document.getElementById(UTF8ToString($0));
                 canvas.parentElement.removeChild(canvas);
             }, id.toRawUTF8());
@@ -206,7 +294,7 @@ class EmscriptenComponentPeer : public ComponentPeer,
         {
             if (visibility == shouldBeVisible) return;
 
-            EM_ASM_ARGS({
+            MAIN_THREAD_EM_ASM({
                 var canvas = document.getElementById(UTF8ToString($0));
                 canvas.style.visibility = $1 ? "visible" : "hidden";
             }, id.toRawUTF8(), shouldBeVisible);
@@ -227,7 +315,7 @@ class EmscriptenComponentPeer : public ComponentPeer,
 
             auto oldBounds = bounds;
             
-            EM_ASM_ARGS({
+            MAIN_THREAD_EM_ASM({
                 var canvas = document.getElementById(UTF8ToString($0));
                 canvas.style.left = $1 + 'px';
                 canvas.style.top  = $2 + 'px';
@@ -275,7 +363,7 @@ class EmscriptenComponentPeer : public ComponentPeer,
         bool fullscreen=false;
         virtual void setFullScreen (bool shouldBeFullScreen) override
         {
-            EM_ASM_ARGS({
+            MAIN_THREAD_EM_ASM({
                 var canvas = document.getElementById(UTF8ToString($0));
                 canvas.style.left='0px';
                 canvas.style.top ='0px';
@@ -286,8 +374,8 @@ class EmscriptenComponentPeer : public ComponentPeer,
 
             bounds = bounds.withZeroOrigin();
 
-            bounds.setWidth ( EM_ASM_ARGS({ return window.innerWidth; }, 0) );
-            bounds.setHeight( EM_ASM_ARGS({ return window.innerHeight; }, 0) );
+            bounds.setWidth ( MAIN_THREAD_EM_ASM_INT({ return window.innerWidth; }, 0) );
+            bounds.setHeight( MAIN_THREAD_EM_ASM_INT({ return window.innerHeight; }, 0) );
 
             this->setBounds(bounds, true);
         }
@@ -322,7 +410,7 @@ class EmscriptenComponentPeer : public ComponentPeer,
         {
             DBG("toFront " << id << " " << (makeActive ? "true" : "false"));
 
-            highestZIndex = EM_ASM_INT({
+            highestZIndex = MAIN_THREAD_EM_ASM_INT({
                 var canvas = document.getElementById(UTF8ToString($0));
                 canvas.style.zIndex = parseInt($1)+1;
                 console.log(canvas.style.zIndex, $1);
@@ -341,7 +429,7 @@ class EmscriptenComponentPeer : public ComponentPeer,
 
         void updateZIndex()
         {
-            zIndex = EM_ASM_INT({
+            zIndex = MAIN_THREAD_EM_ASM_INT({
                 var canvas = document.getElementById(UTF8ToString($0));
                 return canvas.zIndex;
             }, id.toRawUTF8());
@@ -353,7 +441,7 @@ class EmscriptenComponentPeer : public ComponentPeer,
 
             if(EmscriptenComponentPeer* otherPeer = dynamic_cast<EmscriptenComponentPeer*>(other))
             {
-                int newZIndex = EM_ASM_INT({
+                int newZIndex = MAIN_THREAD_EM_ASM_INT({
                     var canvas = document.getElementById(UTF8ToString($0));
                     var other  = document.getElementById(UTF8ToString($1));
                     canvas.zIndex = parseInt(other.zIndex)-1;
@@ -504,7 +592,7 @@ class EmscriptenComponentPeer : public ComponentPeer,
 
             Image::BitmapData bitmapData(temp, Image::BitmapData::readOnly);
 
-            EM_ASM_ARGS({
+            MAIN_THREAD_EM_ASM({
                 var id = UTF8ToString($0);
                 var pointer = $1;
                 var width   = $2;
@@ -548,25 +636,22 @@ int EmscriptenComponentPeer::highestZIndex = 10;
 static int64 fakeMouseEventTime = 0;
 static std::unordered_map<int, bool> keyDownStatus;
 
-extern "C" void juce_mouseCallback(const char* type, int x, int y, int which,
-    int isShiftDown, int isCtrlDown, int isAltDown, int wheelDelta)
+void MainThreadEventProxy::handleMouseEvent (const MouseEvent& e)
 {
-    // DBG(type << " " << x << " " << y << " " << which
-    //          << " " << isShiftDown << " " << wheelDelta);
-    recentMousePosition = {x, y};
-    bool isDownEvent = type == std::string("down");
-    bool isUpEvent = type == std::string("up");
+    recentMousePosition = {e.x, e.y};
+    bool isDownEvent = e.type == "down";
+    bool isUpEvent = e.type == "up";
 
     ModifierKeys& mods = ModifierKeys::currentModifiers;
 
     if (isDownEvent)
     {
         mods = mods.withoutMouseButtons();
-        if (which == 0 || which > 2)
+        if (e.which == 0 || e.which > 2)
             mods = mods.withFlags(ModifierKeys::leftButtonModifier);
-        else if (which == 1)
+        else if (e.which == 1)
             mods = mods.withFlags(ModifierKeys::middleButtonModifier);
-        else if (which == 2)
+        else if (e.which == 2)
             mods = mods.withFlags(ModifierKeys::rightButtonModifier);
     }
     else if (isUpEvent)
@@ -574,16 +659,16 @@ extern "C" void juce_mouseCallback(const char* type, int x, int y, int which,
         mods = mods.withoutMouseButtons();
     }
     
-    mods = isShiftDown ? mods.withFlags(ModifierKeys::shiftModifier)
-                       : mods.withoutFlags(ModifierKeys::shiftModifier);
-    mods = isCtrlDown  ? mods.withFlags(ModifierKeys::ctrlModifier)
-                       : mods.withoutFlags(ModifierKeys::ctrlModifier);
-    mods = isAltDown   ? mods.withFlags(ModifierKeys::altModifier)
-                       : mods.withoutFlags(ModifierKeys::altModifier);
+    mods = e.isShiftDown ? mods.withFlags(ModifierKeys::shiftModifier)
+                         : mods.withoutFlags(ModifierKeys::shiftModifier);
+    mods = e.isCtrlDown  ? mods.withFlags(ModifierKeys::ctrlModifier)
+                         : mods.withoutFlags(ModifierKeys::ctrlModifier);
+    mods = e.isAltDown   ? mods.withFlags(ModifierKeys::altModifier)
+                         : mods.withoutFlags(ModifierKeys::altModifier);
     
     EmscriptenComponentPeer::ZIndexComparator comparator;
     emComponentPeerList.sort(comparator);
-    Point<int> posGlobal(x, y);
+    Point<int> posGlobal(e.x, e.y);
 
     for (int i = emComponentPeerList.size() - 1; i >= 0; i --)
     {
@@ -595,7 +680,7 @@ extern "C" void juce_mouseCallback(const char* type, int x, int y, int which,
         Point<float> pos = peer->globalToLocal(posGlobal.toFloat());
         if (isDownEvent && ! isPosInPeerBounds) continue;
 
-        if (wheelDelta == 0)
+        if (e.wheelDelta == 0)
         {
             peer->handleMouseEvent(MouseInputSource::InputSourceType::mouse,
                 pos, mods, MouseInputSource::invalidPressure, 0.0f, fakeMouseEventTime);
@@ -603,7 +688,7 @@ extern "C" void juce_mouseCallback(const char* type, int x, int y, int which,
         {
             MouseWheelDetails wheelInfo;
             wheelInfo.deltaX = 0.0f;
-            wheelInfo.deltaY = wheelDelta / 480.0f;
+            wheelInfo.deltaY = e.wheelDelta / 480.0f;
             wheelInfo.isReversed = false;
             wheelInfo.isSmooth = false;
             wheelInfo.isInertial = false;
@@ -616,12 +701,12 @@ extern "C" void juce_mouseCallback(const char* type, int x, int y, int which,
     fakeMouseEventTime ++;
 }
 
-extern "C" void juce_keyboardCallback(const char* type, int keyCode, const char * key)
+void MainThreadEventProxy::handleKeyboardEvent (const KeyboardEvent& e)
 {
-    // DBG("key " << type << " " << keyCode << " " << key);
-    bool isChar = strlen(key) == 1;
-    bool isDown = type == std::string("down");
-    juce_wchar keyChar = isChar ? (juce_wchar)key[0] : 0;
+    bool isChar = e.key.length() == 1;
+    bool isDown = e.type == "down";
+    juce_wchar keyChar = isChar ? (juce_wchar)e.key[0] : 0;
+    int keyCode = e.keyCode;
 
     ModifierKeys& mods = ModifierKeys::currentModifiers;
     auto changedModifier = ModifierKeys::noModifiers;
@@ -738,10 +823,10 @@ bool juce_areThereAnyAlwaysOnTopWindows()
 void Displays::findDisplays (float masterScale)
 {
     Display d;
-    int width = EM_ASM_INT({
+    int width = MAIN_THREAD_EM_ASM_INT({
         return document.documentElement.clientWidth;
     });
-    int height = EM_ASM_INT({
+    int height = MAIN_THREAD_EM_ASM_INT({
         return document.documentElement.scrollHeight;
     });
     
@@ -776,7 +861,7 @@ void LookAndFeel::playAlertSound()
 //==============================================================================
 void SystemClipboard::copyTextToClipboard (const String& text)
 {
-    EM_ASM({
+    MAIN_THREAD_EM_ASM({
         if (navigator.clipboard)
         {   // async copy
             navigator.clipboard.writeText(UTF8ToString($0));
@@ -813,7 +898,9 @@ EM_JS(const char*, emscriptenGetClipboard, (), {
 
 String SystemClipboard::getTextFromClipboard()
 {
-    const char* data = emscriptenGetClipboard();
+    const char* data = (const char*)
+        emscripten_sync_run_in_main_runtime_thread(
+            EM_FUNC_SIG_I, emscriptenGetClipboard);
     String ret(data);
     free((void*)data);
     return ret;
@@ -827,7 +914,7 @@ void JUCE_CALLTYPE NativeMessageBox::showMessageBoxAsync (
     Component *associatedComponent,
     ModalComponentManager::Callback *callback)
 {
-    EM_ASM_ARGS({
+    MAIN_THREAD_EM_ASM({
         alert( UTF8ToString($0) );
     }, message.toRawUTF8());
 
@@ -841,7 +928,7 @@ bool JUCE_CALLTYPE NativeMessageBox::showOkCancelBox(
     Component *associatedComponent,
     ModalComponentManager::Callback *callback)
 {
-    int result = EM_ASM_ARGS({
+    int result = MAIN_THREAD_EM_ASM_INT({
         return window.confirm( UTF8ToString($0) );
     }, message.toRawUTF8());
     if(callback != nullptr) callback->modalStateFinished(result?1:0);

@@ -18,7 +18,7 @@ This port was originally a proof-of-concept created [here](https://github.com/be
 - `juce_core`: all except network and `MemoryMappedFile` are supported
    - File: based on Emscripten's memory file system; directories such as `/tmp` and `/home` are created on startup.
    - Logging: `DBG(...)` prints to console (`std::cerr`), not emrun console.
-   - Threads: supported except some [platform-specific limitations](https://emscripten.org/docs/porting/pthreads.html).
+   - Threads: without `-s PROXY_TO_PTHREAD=1` linker flag, threading is subjected to some [platform-specific limitations](https://emscripten.org/docs/porting/pthreads.html) - notably, the program will hang if you spawn new threads from the main thread and wait for them to start within the same message dispatch cycle. Toggle this linker flag to run the message loop on a pthread and you will have full threading support.
    - SystemStats: operating system maps to browser `userAgent` info; number of logical/physical CPUs is `navigator.hardwareConcurrency`; memory size is javascript heap size, which could be different from what's available to WASM module; CPU speed is set to 1000 MHz.
 - `juce_cryptography`: fully supported
 - `juce_data_structures`: fully supported

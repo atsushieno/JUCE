@@ -52,7 +52,7 @@ void MessageManager::doPlatformSpecificInitialisation()
     createDirIfNotExists(File::globalApplicationsDirectory);
     createDirIfNotExists(File::tempDirectory);
 
-    appIsInsideEmrun = EM_ASM_INT({
+    appIsInsideEmrun = MAIN_THREAD_EM_ASM_INT({
         return document.title == "Emscripten-Generated Code";
     });
 }
@@ -88,7 +88,7 @@ double getTimeSpentInCurrentDispatchCycle()
 
 static void dispatchLoop()
 {
-    DBG("new dispatch loop cycle");
+    // DBG("new dispatch loop cycle");
     // std::cerr << "new dispatch loop cycle" << std::endl;
     timeDispatchBeginMS = Time::getMillisecondCounterHiRes();
 
@@ -98,7 +98,7 @@ static void dispatchLoop()
     debugPrintQueueMtx.lock();
     while (! debugPrintQueue.empty())
     {
-        std::cerr << debugPrintQueue.front() << std::endl;
+        std::cout << debugPrintQueue.front() << std::endl;
         debugPrintQueue.pop_front();
     }
     debugPrintQueueMtx.unlock();
@@ -120,7 +120,7 @@ static void dispatchLoop()
     
     if (appIsInsideEmrun)
     {
-        EM_ASM({
+        MAIN_THREAD_EM_ASM({
             var logArea = document.querySelector("#output");
             var n = logArea.value.length;
             if (n > 1000)
