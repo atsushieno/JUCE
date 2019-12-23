@@ -1,26 +1,43 @@
-# PoC port of [JUCE](http://www.juce.com/) for the browser via emscripten
+# Port of [JUCE](http://www.juce.com/) for the browser via emscripten
 
-This port was originally created [here](https://github.com/beschulz/juce_emscripten) by @beschulz. This fork is an unofficial continuation of the attempt.
+This port was originally a proof-of-concept created [here](https://github.com/beschulz/juce_emscripten) by @beschulz. This fork is an unofficial continuation of the attempt towards a complete JUCE framework running inside a browser.
 
-## What is working
-- `File` class (with Emscripten's memory file system)
-- messaging
-- basic GUI with async repaints
-- mouse wheel, left/right/middle buttons, shift/ctrl/alt modifiers
-- keyboard events
-- clipboard
-- font rendering (via freetype)
-- audio output (via OpenAL)
+## Status
+
+- `juce_analytics`: not supported
+- `juce_audio_basics`: fully supported
+- `juce_audio_devices`: partial support
+   - Audio input: not supported
+   - Audio output: supported through Emscripten's OpenAL API (`OpenALAudioIODevice`)
+   - MIDI input/output: not supported
+- `juce_audio_formats`: fully supported
+- `juce_audio_plugin_client`: not supported (with no plan to port)
+- `juce_audio_processors`: partial support (no supported plugin format)
+- `juce_audio_utils`: fully supported
+- `juce_box2d`: fully supported
+- `juce_core`: all except network and `MemoryMappedFile` are supported
+   - File: based on Emscripten's memory file system; directories such as `/tmp` and `/home` are created on startup.
+   - Logging: `DBG(...)` prints to console (`std::cerr`), not emrun console.
+   - Threads: supported except some [platform-specific limitations](https://emscripten.org/docs/porting/pthreads.html).
+   - SystemStats: operating system maps to browser `userAgent` info; number of logical/physical CPUs is `navigator.hardwareConcurrency`; memory size is javascript heap size, which could be different from what's available to WASM module; CPU speed is set to 1000 MHz.
+- `juce_cryptography`: fully supported
+- `juce_data_structures`: fully supported
+- `juce_dsp`: all except SIMD features are supported
+- `juce_events`: fully supported; the message loop is [synchronized with browser repaints](https://emscripten.org/docs/api_reference/emscripten.h.html#c.emscripten_set_main_loop).
+- `juce_graphics`: fully supported; font rendering is based on freetype.
+- `juce_gui_basics`: mostly supported
+   - Clipboard: the first paste will fail due to security restrictions. With the user's permission, following pastes will succeed.
+   - Native window title bar: not supported.
+   - Native dialogs: not supported.
+- `juce_gui_extra`: fully supported
+- `juce_opengl`: not supported
+- `juce_osc`: not supported
+- `juce_product_unlocking`: all supported except features that depend on networking.
+- `juce_video`: not supported.
 
 (note: as of late 2019, this fork only works on Chrome because it needs SharedArrayBuffer support)
 
-## What is not working
-- audio capture and low-latency audio
-- `MemoryMappedFile` (`mmap` is not functioning correctly)
-- networking
-- native dialogs
-
-## Hacking
+## Build instructions
 
 - [Download Emscripten](http://kripken.github.io/emscripten-site/docs/getting_started/downloads.html)
 - install Emscripten
@@ -40,7 +57,7 @@ source ./emsdk_env.sh
 
 - compile the sample
 ```shell
-cd examples/juce_emscripten/Builds/Linux/
+cd examples/DemoRunner/Builds/Emscripten/
 emmake make
 cd build
 python -m SimpleHTTPServer
@@ -49,41 +66,13 @@ python -m SimpleHTTPServer
 
 Note: I had to modify the auto-generated Makefile to get everything to work. So be carefull when you modify and save the jucer project. In the long run, it would be nice to have a emscripten target inside the introjucer.
 
-## Thoughts
-
-I just slapped this together to see, if it's possible. So don't expect your fancy JUCE Applications to Just Work (tm). There's still a lot of work to be done.
-
-One of the hardest problems is threading. There are WebWorkers, but they use an entirely different model (no shared memory with main thread).
-
-Networking is another interesting problem. Maybe one could adapt the Juce networking API to use WebSockets.
-
-The URL-class also needs adoption to work inside the browser.
-
-Audio should be possible via the WebAudioAPI or emscriptens OpenAL wrapper.
-
-OpenGL should be doable.
-
-Currently I am using LowLevelGraphicsSoftwareRenderer to do the rendering. But the API of LowLevelGraphicsContext looks suspiciously like the canvas API. There might be some performance to be gained by implementing LowLevelGraphicsCanvasRenderer.
-
-It would be nice to have support for @font-face fonts.
-
-It would be great to have a working implementation of WebBrowserComponent - just for the Inception-like effect :) 
-
-Overall I was surprised, how nicely everything worked out. I see a lot of practical applications for JUCE supporting emscripten as a platform:
-  - rich audio applications in the browser
-  - node.js license-key validation (if you're using juce_cryptography)
-  - bringing your existing applications to the web
-
-
 ## Licensing
 
-Most of the JUCE-code is [licensed via GPLv2, v3, and AGPLv3](https://github.com/julianstorer/JUCE). A commercial license is available.
+See JUCE licensing below.
+
 [Lato](http://www.latofonts.com/lato-free-fonts/) (The Font I used for the example) is licensed under SIL Open Font License.
-My additions and modifications to this repository are licensed under the what-ever-is-compatible-with-the-existing-licensing-but-I-just-hope-it-will-be-usefull license.
 
 ----
-
-![alt text](https://assets.juce.com/juce/JUCE_banner.png "JUCE")
 
 JUCE is an open-source cross-platform C++ application framework used for rapidly
 developing high quality desktop and mobile applications, including VST, AU (and AUv3),
