@@ -45,6 +45,7 @@ void launchApp()
 }
 
 #include <emscripten.h>
+#include <unordered_map>
 
 namespace juce
 {
@@ -536,7 +537,8 @@ class EmscriptenComponentPeer : public ComponentPeer,
 };
 
 int EmscriptenComponentPeer::highestZIndex = 10;
-int64 fakeMouseEventTime = 0;
+static int64 fakeMouseEventTime = 0;
+static std::unordered_map<int, bool> keyDownStatus;
 
 extern "C" void juce_mouseCallback(const char* type, int x, int y, int which,
     int isShiftDown, int isCtrlDown, int isAltDown, int wheelDelta)
@@ -632,6 +634,8 @@ extern "C" void juce_keyboardCallback(const char* type, int keyCode, const char 
         (keyChar >= 'A' && keyChar <= 'Z'))
         keyCode = keyChar;
     
+    keyDownStatus[keyCode] = isDown;
+
     for (int i = emComponentPeerList.size() - 1; i >= 0; i --)
     {
         EmscriptenComponentPeer* peer = emComponentPeerList[i];
@@ -690,8 +694,7 @@ void MouseInputSource::setRawMousePosition (Point<float>)
 //==============================================================================
 bool KeyPress::isKeyCurrentlyDown (const int keyCode)
 {
-    // TODO
-    return false;
+    return keyDownStatus[keyCode];
 }
 
 //==============================================================================
