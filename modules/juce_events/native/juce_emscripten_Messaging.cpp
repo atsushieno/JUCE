@@ -38,6 +38,29 @@ static void createDirIfNotExists(File::SpecialLocationType type)
 
 static bool appIsInsideEmrun{false};
 
+static std::deque<MessageManager::MessageBase*> messageQueue;
+static std::mutex queueMtx;
+static std::atomic<bool> quitPosted{false};
+static double timeDispatchBeginMS{0};
+
+static Thread::ThreadID messageThreadID{nullptr}; // JUCE message thread
+static Thread::ThreadID mainThreadID{nullptr};    // Javascript main thread
+
+std::vector<std::function<void()>> preDispatchLoopFuncs;
+// These callbacks are only executed if main thread isn't message thread.
+std::vector<std::function<void()>> mainThreadLoopFuncs;
+
+void registerCallbackToMainThread (std::function<void()> f)
+{
+    if (mainThreadID == messageThreadID)
+        preDispatchLoopFuncs.push_back (f);
+    else
+        mainThreadLoopFuncs.push_back (f);
+}
+
+extern std::deque<std::string> debugPrintQueue;
+extern std::mutex debugPrintQueueMtx;
+
 void MessageManager::doPlatformSpecificInitialisation()
 {
     createDirIfNotExists(File::userHomeDirectory);
@@ -52,14 +75,54 @@ void MessageManager::doPlatformSpecificInitialisation()
     createDirIfNotExists(File::globalApplicationsDirectory);
     createDirIfNotExists(File::tempDirectory);
 
+    messageThreadID = Thread::getCurrentThreadId();
+
     appIsInsideEmrun = MAIN_THREAD_EM_ASM_INT({
         return document.title == "Emscripten-Generated Code";
+    });
+
+    MAIN_THREAD_EM_ASM({
+        if (window.juce_animationFrameCallback) return;
+
+        window.juce_animationFrameCallback = Module.cwrap (
+            'juce_animationFrameCallback', 'int', ['number']);
+        
+        if (window.juce_animationFrameCallback (-1.0) == 1)
+        {
+            window.juce_animationFrameWrapper = function (timestamp)
+            {
+                window.juce_animationFrameCallback (timestamp);
+                window.requestAnimationFrame (window.juce_animationFrameWrapper);
+            };
+
+            window.requestAnimationFrame (window.juce_animationFrameWrapper);
+        }
     });
 }
 
 void MessageManager::doPlatformSpecificShutdown() {}
 
-//==============================================================================
+// If timestamp < 0, this callback tests if the calling thread (main thread) is
+//   different from the message thread and return the result.
+// If timestamp >= 0, it always returns 0.
+extern "C" int juce_animationFrameCallback (double timestamp)
+{
+    if (timestamp < 0)
+    {
+        mainThreadID = Thread::getCurrentThreadId();
+        return mainThreadID != messageThreadID;
+    }
+
+    static double prevTimestamp = 0;
+    if (timestamp - prevTimestamp > 20)
+        DBG("juce_animationFrameCallback " << timestamp - prevTimestamp);
+    prevTimestamp = timestamp;
+    
+    for (auto f : mainThreadLoopFuncs) f();
+
+    return 0;
+}
+
 bool MessageManager::dispatchNextMessageOnSystemQueue (const bool returnIfNoPendingMessages)
 {
     Logger::outputDebugString ("*** Modal loops are not possible in Android!! Exiting...");
@@ -67,17 +130,6 @@ bool MessageManager::dispatchNextMessageOnSystemQueue (const bool returnIfNoPend
 
     return true;
 }
-
-static std::deque<MessageManager::MessageBase*> messageQueue;
-static std::mutex queueMtx;
-static std::atomic<bool> quitPosted{false};
-static double timeDispatchBeginMS{0};
-
-std::vector<std::function<void()>> preDispatchLoopFuncs;
-std::vector<std::function<void()>> postDispatchLoopFuncs;
-
-extern std::deque<std::string> debugPrintQueue;
-extern std::mutex debugPrintQueueMtx;
 
 double getTimeSpentInCurrentDispatchCycle()
 {
@@ -127,8 +179,6 @@ static void dispatchLoop()
                 logArea.value = logArea.value.substring(n - 1000, n);
         });
     }
-
-    for (auto f : postDispatchLoopFuncs) f();
 
     if (quitPosted)
     {

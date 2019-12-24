@@ -24,8 +24,7 @@ namespace juce
 {
 
 // Declarations from juce_emscripten_Messaging.
-extern std::vector<std::function<void()>> preDispatchLoopFuncs;
-extern std::vector<std::function<void()>> postDispatchLoopFuncs;
+extern void registerCallbackToMainThread (std::function<void()> f);
 
 int getAudioContextSampleRate() {
     return MAIN_THREAD_EM_ASM_INT({
@@ -103,7 +102,7 @@ public:
             if (buffersIn)
                 delete [] buffersIn;
 
-            OpenALAudioIODevice::sessionsOnPreDispatch.removeAllInstancesOf (this);
+            OpenALAudioIODevice::sessionsOnMainThread.removeAllInstancesOf (this);
         }
 
         StateType getState () const { return state; }
@@ -359,7 +358,7 @@ public:
         } else
         {
             audioStateMachine.reset (new AudioFeedStateMachine(this));
-            sessionsOnPreDispatch.add (audioStateMachine.get());
+            sessionsOnMainThread.add (audioStateMachine.get());
             audioStateMachine->start (newCallback);
         }
     }
@@ -437,7 +436,7 @@ public:
         return numUnderRuns;
     }
     
-    static Array<AudioFeedStateMachine*> sessionsOnPreDispatch;
+    static Array<AudioFeedStateMachine*> sessionsOnMainThread;
 
 private:
     bool isDeviceOpen{false};
@@ -448,7 +447,7 @@ private:
 };
 
 Array<OpenALAudioIODevice::AudioFeedStateMachine*>
-OpenALAudioIODevice::sessionsOnPreDispatch;
+OpenALAudioIODevice::sessionsOnMainThread;
 
 //==============================================================================
 struct OpenALAudioIODeviceType  : public AudioIODeviceType
@@ -469,21 +468,21 @@ struct OpenALAudioIODeviceType  : public AudioIODeviceType
             }
         });
         
-        if (! openALPreDispatchRegistered)
+        if (! openALMainThreadRegistered)
         {
-            preDispatchLoopFuncs.push_back([]() {
+            registerCallbackToMainThread ([]() {
                 using AudioFeedStateMachine = OpenALAudioIODevice::AudioFeedStateMachine;
-                for (auto* session : OpenALAudioIODevice::sessionsOnPreDispatch)
+                for (auto* session : OpenALAudioIODevice::sessionsOnMainThread)
                 {
                     if (session->getState() != AudioFeedStateMachine::StateStopped)
                         session->nextStep ();
                 }
             });
-            openALPreDispatchRegistered = true;
+            openALMainThreadRegistered = true;
         }
     }
 
-    bool openALPreDispatchRegistered{false};
+    bool openALMainThreadRegistered{false};
 
     StringArray getDeviceNames (bool) const override                       { return StringArray ("OpenAL"); }
     void scanForDevices () override                                        {}
