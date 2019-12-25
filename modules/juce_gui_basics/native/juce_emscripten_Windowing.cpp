@@ -587,56 +587,31 @@ class EmscriptenComponentPeer : public ComponentPeer,
             g.setOrigin (-area.getPosition());
             handlePaint (g);
 
-            /*{
-                Graphics g_(temp);
-                g_.setColour(Colours::red);
-                g_.fillEllipse(0,0,100,100);
-                g_.setColour(Colours::green);
-                g_.fillEllipse(100,0,100,100);
-                g_.setColour(Colours::blue);
-                g_.fillEllipse(0,100,100,100);
-            }*/
-
-            Image::BitmapData bitmapData(temp, Image::BitmapData::readOnly);
+            Image::BitmapData bitmapData (temp, Image::BitmapData::readOnly);
+            uint8* pixels = bitmapData.getPixelPointer(0, 0);
+            int dataSize = bitmapData.width * bitmapData.height * 4;
+            for (int i = 0; i < dataSize; i += 4)
+                std::swap (pixels[i], pixels[i + 2]);
 
             MAIN_THREAD_EM_ASM({
                 var id = UTF8ToString($0);
                 var pointer = $1;
                 var width   = $2;
                 var height  = $3;
-                var dest_x  = $4;
-                var dest_y  = $5;
 
                 var canvas = document.getElementById(id);
                 var ctx = canvas.getContext("2d");
 
-                var buffer = new Uint8ClampedArray(Module.HEAPU8.buffer, pointer, width*height*4);
-
-                for (var idx = 0; idx < buffer.length; idx += 4)
-                {
-                    var r = buffer[idx+0];
-                    var b = buffer[idx+2];
-
-                    buffer[idx+0] = b;
-                    buffer[idx+2] = r;
-                }
-
+                var buffer = new Uint8ClampedArray(
+                    Module.HEAPU8.buffer, pointer, width * height * 4);
                 var imageData = ctx.createImageData(width, height);
                 imageData.data.set(buffer);
-
-                var tmp = document.createElement('canvas');
-                tmp.width = width;
-                tmp.height = height;
-                var tmp_ctx = tmp.getContext("2d");
-                tmp_ctx.putImageData(imageData, 0,0);
-
-                ctx.drawImage(tmp, dest_x, dest_y);
-
-                delete tmp;
+                ctx.putImageData(imageData, $4, $5);
                 delete buffer;
-            }, id.toRawUTF8(), bitmapData.getPixelPointer(0,0), temp.getWidth(), temp.getHeight(), area.getX(), area.getY());
+            }, id.toRawUTF8(),
+               pixels, bitmapData.width, bitmapData.height,
+               area.getX(), area.getY());
         }
-
 };
 
 int EmscriptenComponentPeer::highestZIndex = 10;
