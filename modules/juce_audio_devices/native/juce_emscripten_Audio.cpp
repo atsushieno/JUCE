@@ -44,6 +44,7 @@ class OpenALAudioIODevice : public AudioIODevice
     double sampleRate{44100.0};
     int numIn{0}, numOut{2};
     int numUnderRuns{0};
+    bool playing{false};
 
     ALCdevice* device{nullptr};
     ALCcontext* context{nullptr};
@@ -86,7 +87,6 @@ public:
 
         ~AudioFeedStateMachine ()
         {
-            ScopedLock lock (OpenALAudioIODevice::sessionsLock);
             OpenALAudioIODevice::sessionsOnMainThread.removeAllInstancesOf (this);
 
             if (StatePlaying)
@@ -281,7 +281,7 @@ public:
     
     int getDefaultBufferSize () override
     {
-        return 4096;
+        return 2048;
     }
 
     String open (const BigInteger& inputChannels,
@@ -290,64 +290,16 @@ public:
                  int bufferSizeSamples) override
     {
         DBG("OpenALAudioIODevice: open");
-        if (isDeviceOpen) close();
-
-        this->bufferSize = bufferSizeSamples;
-        this->sampleRate = sampleRate;
-
-        ALenum errorCode = alGetError ();
-        device = alcOpenDevice (nullptr);
-        if (device == nullptr)
-            return "Failed to open device.";
-        DBG("OpenAL device has opened.");
-
-        context = alcCreateContext (device, nullptr);
-        alcMakeContextCurrent (context);
-        if (context == nullptr || (errorCode = alGetError()) != AL_NO_ERROR)
-            return "Failed to create context.";
-        DBG("OpenAL context is created.");
-
-        alGenBuffers (numBuffers, buffers);
-        alGenSources (1, & source);
-        if ((errorCode = alGetError()) != AL_NO_ERROR)
-            return "Failed to generate sources.";
-        DBG("OpenAL sources and buffers are generated.");
-
-        if (numOut == 1)
-            format = AL_FORMAT_MONO16;
-        else if (numOut == 2)
-            format = AL_FORMAT_STEREO16;
-        else
-            return "Invalid output channel configuration.";
-        frequency = (ALuint)sampleRate;
-        
-        isDeviceOpen = true;
-
-        return {};
+        ScopedLock lock (sessionsLock);
+        return openInternal (inputChannels, outputChannels,
+            sampleRate, bufferSizeSamples);
     }
     
     void close () override
     {
         DBG("OpenALAudioIODevice: close");
-        stop();
-
-        if (isDeviceOpen)
-        {
-            alDeleteSources (1, & source);
-            alDeleteBuffers (numBuffers, buffers);
-        }
-        if (context)
-        {
-            alcMakeContextCurrent (nullptr);
-            alcDestroyContext (context);
-            context = nullptr;
-        }
-        if (device)
-        {
-            alcCloseDevice (device);
-            device = nullptr;
-        }
-        isDeviceOpen = false;
+        ScopedLock lock (sessionsLock);
+        closeInternal();
     }
 
     bool isOpen () override
@@ -358,39 +310,21 @@ public:
     void start (AudioIODeviceCallback* newCallback) override
     {
         DBG("OpenALAudioIODevice: start");
-        numUnderRuns = 0;
-        if (threadBased)
-        {
-            audioThread.reset (new AudioThread(this));
-            audioThread->start (newCallback);
-        } else
-        {
-            ScopedLock lock (sessionsLock);
-            audioStateMachine.reset (new AudioFeedStateMachine(this));
-            audioStateMachine->start (newCallback);
-            sessionsOnMainThread.add (audioStateMachine.get());
-        }
+        ScopedLock lock (sessionsLock);
+        startInternal (newCallback);
     }
 
     void stop () override
     {
         DBG("OpenALAudioIODevice: stop");
+        ScopedLock lock (sessionsLock);
         if (isPlaying())
-        {
-            if (audioThread)
-                audioThread->stop ();
-            if (audioStateMachine)
-                audioStateMachine.reset (nullptr);
-        }
+            stopInternal();
     }
 
     bool isPlaying () override
     {
-        if (audioThread)
-            return audioThread->isThreadRunning();
-        if (audioStateMachine)
-            return audioStateMachine->getState () == AudioFeedStateMachine::StatePlaying;
-        return false;
+        return playing;
     }
 
     String getLastError () override
@@ -452,6 +386,94 @@ public:
 private:
     bool isDeviceOpen{false};
     bool threadBased{false};
+
+    String openInternal (const BigInteger& inputChannels,
+                         const BigInteger& outputChannels,
+                         double sampleRate,
+                         int bufferSizeSamples)
+    {
+        closeInternal();
+
+        this->bufferSize = bufferSizeSamples;
+        this->sampleRate = sampleRate;
+
+        ALenum errorCode = alGetError ();
+        device = alcOpenDevice (nullptr);
+        if (device == nullptr)
+            return "Failed to open device.";
+        DBG("OpenAL device has opened.");
+
+        context = alcCreateContext (device, nullptr);
+        alcMakeContextCurrent (context);
+        if (context == nullptr || (errorCode = alGetError()) != AL_NO_ERROR)
+            return "Failed to create context.";
+        DBG("OpenAL context is created.");
+
+        alGenBuffers (numBuffers, buffers);
+        alGenSources (1, & source);
+        if ((errorCode = alGetError()) != AL_NO_ERROR)
+            return "Failed to generate sources.";
+        DBG("OpenAL sources and buffers are generated.");
+
+        if (numOut == 1)
+            format = AL_FORMAT_MONO16;
+        else if (numOut == 2)
+            format = AL_FORMAT_STEREO16;
+        else
+            return "Invalid output channel configuration.";
+        frequency = (ALuint)sampleRate;
+        
+        isDeviceOpen = true;
+
+        return {};
+    }
+    
+    void closeInternal ()
+    {
+        stopInternal();
+
+        if (isDeviceOpen)
+        {
+            alDeleteSources (1, & source);
+            alDeleteBuffers (numBuffers, buffers);
+        }
+        if (context)
+        {
+            alcMakeContextCurrent (nullptr);
+            alcDestroyContext (context);
+            context = nullptr;
+        }
+        if (device)
+        {
+            alcCloseDevice (device);
+            device = nullptr;
+        }
+        isDeviceOpen = false;
+    }
+
+    void startInternal (AudioIODeviceCallback* newCallback)
+    {
+        numUnderRuns = 0;
+        if (threadBased)
+        {
+            audioThread.reset (new AudioThread(this));
+            audioThread->start (newCallback);
+        } else
+        {
+            audioStateMachine.reset (new AudioFeedStateMachine(this));
+            audioStateMachine->start (newCallback);
+            sessionsOnMainThread.add (audioStateMachine.get());
+        }
+        playing = true;
+    }
+
+    void stopInternal ()
+    {
+        if (audioThread)
+            audioThread->stop ();
+        if (audioStateMachine)
+            audioStateMachine.reset (nullptr);
+    }
 
     std::unique_ptr<AudioThread> audioThread;
     std::unique_ptr<AudioFeedStateMachine> audioStateMachine;
