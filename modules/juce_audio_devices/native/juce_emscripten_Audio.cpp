@@ -190,7 +190,11 @@ public:
                     for (int c = 0; c < numOut; c ++)
                     {
                         for (int i = 0; i < bufferSize; i ++)
-                            formatBuffer[c + i * numOut] = buffersOut[c][i] * 32768;
+                        {
+                            float x = std::min(buffersOut[c][i], 1.0f);
+                            x = std::max(x, -1.0f);
+                            formatBuffer[c + i * numOut] = x * 32767;
+                        }
                     }
                     
                     alSourceUnqueueBuffers (source, 1, & buffer);
