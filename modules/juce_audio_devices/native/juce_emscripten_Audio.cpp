@@ -86,6 +86,9 @@ public:
 
         ~AudioFeedStateMachine ()
         {
+            ScopedLock lock (OpenALAudioIODevice::sessionsLock);
+            OpenALAudioIODevice::sessionsOnMainThread.removeAllInstancesOf (this);
+
             if (StatePlaying)
             {
                 callback->audioDeviceStopped();
@@ -101,8 +104,6 @@ public:
             }
             if (buffersIn)
                 delete [] buffersIn;
-
-            OpenALAudioIODevice::sessionsOnMainThread.removeAllInstancesOf (this);
         }
 
         StateType getState () const { return state; }
@@ -249,10 +250,12 @@ public:
     OpenALAudioIODevice (bool threadBased = false)
     : AudioIODevice ("OpenAL", "OpenAL"), threadBased(threadBased)
     {
+        DBG("OpenALAudioIODevice: constructor");
     }
 
     ~OpenALAudioIODevice ()
     {
+        DBG("OpenALAudioIODevice: destructor");
         if (isDeviceOpen)
             close();
     }
@@ -286,6 +289,7 @@ public:
                  double sampleRate,
                  int bufferSizeSamples) override
     {
+        DBG("OpenALAudioIODevice: open");
         if (isDeviceOpen) close();
 
         this->bufferSize = bufferSizeSamples;
@@ -324,6 +328,9 @@ public:
     
     void close () override
     {
+        DBG("OpenALAudioIODevice: close");
+        stop();
+
         if (isDeviceOpen)
         {
             alDeleteSources (1, & source);
@@ -350,6 +357,7 @@ public:
 
     void start (AudioIODeviceCallback* newCallback) override
     {
+        DBG("OpenALAudioIODevice: start");
         numUnderRuns = 0;
         if (threadBased)
         {
@@ -357,14 +365,16 @@ public:
             audioThread->start (newCallback);
         } else
         {
+            ScopedLock lock (sessionsLock);
             audioStateMachine.reset (new AudioFeedStateMachine(this));
-            sessionsOnMainThread.add (audioStateMachine.get());
             audioStateMachine->start (newCallback);
+            sessionsOnMainThread.add (audioStateMachine.get());
         }
     }
 
     void stop () override
     {
+        DBG("OpenALAudioIODevice: stop");
         if (isPlaying())
         {
             if (audioThread)
@@ -436,6 +446,7 @@ public:
         return numUnderRuns;
     }
     
+    static CriticalSection sessionsLock;
     static Array<AudioFeedStateMachine*> sessionsOnMainThread;
 
 private:
@@ -448,6 +459,7 @@ private:
 
 Array<OpenALAudioIODevice::AudioFeedStateMachine*>
 OpenALAudioIODevice::sessionsOnMainThread;
+CriticalSection OpenALAudioIODevice::sessionsLock;
 
 //==============================================================================
 struct OpenALAudioIODeviceType  : public AudioIODeviceType
@@ -472,6 +484,7 @@ struct OpenALAudioIODeviceType  : public AudioIODeviceType
         {
             registerCallbackToMainThread ([]() {
                 using AudioFeedStateMachine = OpenALAudioIODevice::AudioFeedStateMachine;
+                ScopedLock lock (OpenALAudioIODevice::sessionsLock);
                 for (auto* session : OpenALAudioIODevice::sessionsOnMainThread)
                 {
                     if (session->getState() != AudioFeedStateMachine::StateStopped)
