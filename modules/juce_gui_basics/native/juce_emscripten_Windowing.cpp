@@ -254,6 +254,10 @@ class EmscriptenComponentPeer : public ComponentPeer,
                 canvas.height = $4;
                 canvas.oncontextmenu = function(e) { e.preventDefault(); };
                 canvas.setAttribute('data-peer', $5);
+                canvas.addEventListener ('wheel', function(e) {
+                    if (event.ctrlKey)
+                        event.preventDefault();
+                }, true);
                 document.body.appendChild(canvas);
             }, id.toRawUTF8(), bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight(), this, ++highestZIndex);
             
