@@ -315,18 +315,35 @@ class EmscriptenComponentPeer : public ComponentPeer,
             DBG("setBounds " << newBounds.toString());
 
             auto oldBounds = bounds;
-            
-            MAIN_THREAD_EM_ASM({
-                var canvas = document.getElementById(UTF8ToString($0));
-                canvas.style.left = $1 + 'px';
-                canvas.style.top  = $2 + 'px';
-                if(canvas.width  != $3) canvas.width  = $3;
-                if(canvas.height != $4) canvas.height = $4;
-            }, id.toRawUTF8(), newBounds.getX(), newBounds.getY(), newBounds.getWidth(), newBounds.getHeight());
-            
             bounds = newBounds;
             fullscreen = isNowFullScreen;
 
+            MAIN_THREAD_EM_ASM({
+                var canvas = document.getElementById (UTF8ToString($0));
+                canvas.style.left = $1 + 'px';
+                canvas.style.top  = $2 + 'px';
+                if (canvas.width != $3 || canvas.height != $4)
+                {
+                    var canvasWasNotEmpty = canvas.width > 0 && canvas.height > 0;
+                    if (canvasWasNotEmpty)
+                    {
+                        var copyCanvas = document.createElement ('canvas');
+                        var copyCtx = copyCanvas.getContext ('2d');
+                        copyCanvas.width = canvas.width;
+                        copyCanvas.height = canvas.height;
+                        copyCtx.drawImage (canvas, 0, 0);
+                    }
+                    canvas.width  = $3;
+                    canvas.height = $4;
+                    if (canvasWasNotEmpty)
+                    {
+                        var ctx = canvas.getContext ('2d');
+                        ctx.drawImage (copyCanvas, 0, 0);
+                    }
+                }
+            }, id.toRawUTF8(), bounds.getX(), bounds.getY(),
+            bounds.getWidth(), bounds.getHeight());
+            
             handleMovedOrResized();
 
             if (! newBounds.isEmpty() &&
