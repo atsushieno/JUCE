@@ -39,6 +39,7 @@ static void createDirIfNotExists(File::SpecialLocationType type)
 static bool appIsInsideEmrun{false};
 
 static std::deque<MessageManager::MessageBase*> messageQueue;
+static std::deque<MessageManager::MessageBase*> eventQueue;
 static std::mutex queueMtx;
 static std::atomic<bool> quitPosted{false};
 static double timeDispatchBeginMS{0};
@@ -143,11 +144,29 @@ double getTimeSpentInCurrentDispatchCycle()
     return (currentTimeMS - timeDispatchBeginMS) / 1000.0;
 }
 
+static void dispatchEvents()
+{
+    queueMtx.lock();
+    std::deque<MessageManager::MessageBase*> eventCopy = eventQueue;
+    eventQueue.clear();
+    queueMtx.unlock();
+
+    while (! eventCopy.empty())
+    {
+        MessageManager::MessageBase* message = eventCopy.front();
+        eventCopy.pop_front();
+        message->messageCallback();
+        message->decReferenceCount();
+    }
+}
+
 static void dispatchLoop()
 {
-    // DBG("new dispatch loop cycle");
+    DBG("new dispatch loop cycle");
     // std::cerr << "new dispatch loop cycle" << std::endl;
     timeDispatchBeginMS = Time::getMillisecondCounterHiRes();
+
+    dispatchEvents();
 
     for (auto f : preDispatchLoopFuncs) f();
 
@@ -170,11 +189,10 @@ static void dispatchLoop()
     {
         MessageManager::MessageBase* message = messageCopy.front();
         messageCopy.pop_front();
-        // DBG("dispatchLoop-msg: " << message << "type: " << typeid(*message).name());
         message->messageCallback();
         message->decReferenceCount();
     }
-    
+
     if (appIsInsideEmrun)
     {
         MAIN_THREAD_EM_ASM({
@@ -189,13 +207,17 @@ static void dispatchLoop()
     {
         emscripten_cancel_main_loop();
     }
+    DBG("ending dispatch loop cycle");
 }
 
 bool MessageManager::postMessageToSystemQueue (MessageManager::MessageBase* const message)
 {
     queueMtx.lock();
-    messageQueue.push_back(message);
-    message -> incReferenceCount();
+    if (dynamic_cast<EmscriptenEventMessage* const>(message))
+        eventQueue.push_back (message);
+    else
+        messageQueue.push_back (message);
+    message->incReferenceCount();
     queueMtx.unlock();
     return true;
 }

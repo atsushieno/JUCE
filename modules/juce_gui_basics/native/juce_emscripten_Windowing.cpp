@@ -35,7 +35,7 @@ extern int juce_argc;
 class MainThreadEventProxy : public MessageListener
 {
 public:
-    struct MouseEvent : public Message
+    struct MouseEvent : public EmscriptenEventMessage
     {
         String type;
         int x, y;
@@ -44,7 +44,7 @@ public:
         int wheelDelta;
     };
 
-    struct KeyboardEvent : public Message
+    struct KeyboardEvent : public EmscriptenEventMessage
     {
         String type;
         int keyCode;
