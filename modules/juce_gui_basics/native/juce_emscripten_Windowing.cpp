@@ -146,6 +146,7 @@ namespace juce
 {
 
 extern double getTimeSpentInCurrentDispatchCycle();
+extern bool isMessageThreadProxied();
 
 class EmscriptenComponentPeer;
 static Point<int> recentMousePosition;
@@ -553,6 +554,12 @@ class EmscriptenComponentPeer : public ComponentPeer,
                 {
                     Rectangle<int> area = pendingRepaintAreas.getRectangle(i);
                     internalRepaint (area);
+                    
+                    // Do not interrupt repaints if the message thread is different
+                    //   from the main thread since the main loop is no longer blocked
+                    //   by the message loop.
+                    if (isMessageThreadProxied()) continue;
+                    
                     if (getTimeSpentInCurrentDispatchCycle() > 1.0 / desiredFPS)
                     {
                         for (int j = i + 1; j < pendingRepaintAreas.getNumRectangles(); j ++)

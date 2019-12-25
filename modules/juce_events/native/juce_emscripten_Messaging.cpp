@@ -50,7 +50,12 @@ std::vector<std::function<void()>> preDispatchLoopFuncs;
 // These callbacks are only executed if main thread isn't message thread.
 std::vector<std::function<void()>> mainThreadLoopFuncs;
 
-void registerCallbackToMainThread (std::function<void()> f)
+extern bool isMessageThreadProxied()
+{
+    return messageThreadID != mainThreadID;
+}
+
+extern void registerCallbackToMainThread (std::function<void()> f)
 {
     if (mainThreadID == messageThreadID)
         preDispatchLoopFuncs.push_back (f);
@@ -117,7 +122,7 @@ extern "C" int juce_animationFrameCallback (double timestamp)
     if (timestamp - prevTimestamp > 20)
         DBG("juce_animationFrameCallback " << timestamp - prevTimestamp);
     prevTimestamp = timestamp;
-    
+
     for (auto f : mainThreadLoopFuncs) f();
 
     return 0;
