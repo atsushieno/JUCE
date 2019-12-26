@@ -735,6 +735,10 @@ void MainThreadEventProxy::handleKeyboardEvent (const KeyboardEvent& e)
     for (int i = emComponentPeerList.size() - 1; i >= 0; i --)
     {
         EmscriptenComponentPeer* peer = emComponentPeerList[i];
+
+        if (! peer->isVisible()) continue;
+        if (! peer->isFocused()) continue;
+
         if (changedModifier != ModifierKeys::noModifiers)
             peer->handleModifierKeysChange();
         peer->handleKeyUpOrDown(isDown);
