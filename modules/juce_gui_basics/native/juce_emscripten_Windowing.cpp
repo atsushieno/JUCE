@@ -954,12 +954,41 @@ Image juce_createIconForFile (const File& file)
 }
 
 //==============================================================================
-void* CustomMouseCursorInfo::create() const                                                     { return nullptr; }
-void* MouseCursor::createStandardMouseCursor (const MouseCursor::StandardCursorType)            { return nullptr; }
+void *dummy_cursor_info = (void*) 1;
+void* CustomMouseCursorInfo::create() const                                                     { return dummy_cursor_info; }
+void* MouseCursor::createStandardMouseCursor (const MouseCursor::StandardCursorType type)            { return (void*) (int*) type; }
 void MouseCursor::deleteMouseCursor (void* const /*cursorHandle*/, const bool /*isStandard*/)   {}
 
+std::map<enum MouseCursor::StandardCursorType, String> cursorNames = {
+    {MouseCursor::StandardCursorType::NoCursor, String("none")},
+    {MouseCursor::StandardCursorType::NormalCursor, String("default")},
+    {MouseCursor::StandardCursorType::WaitCursor, String("wait")},
+    {MouseCursor::StandardCursorType::IBeamCursor, String("text")},
+    {MouseCursor::StandardCursorType::CrosshairCursor, String("crosshair")},
+    {MouseCursor::StandardCursorType::CopyingCursor, String("copy")},
+    {MouseCursor::StandardCursorType::PointingHandCursor, String("pointer")},
+    {MouseCursor::StandardCursorType::DraggingHandCursor, String("move")},
+    {MouseCursor::StandardCursorType::LeftRightResizeCursor, String("ew-resize")},
+    {MouseCursor::StandardCursorType::UpDownResizeCursor, String("ns-resize")},
+    {MouseCursor::StandardCursorType::UpDownLeftRightResizeCursor, String("nwse-resize")},
+    {MouseCursor::StandardCursorType::TopEdgeResizeCursor, String("n-resize")},
+    {MouseCursor::StandardCursorType::BottomEdgeResizeCursor, String("s-resize")},
+    {MouseCursor::StandardCursorType::LeftEdgeResizeCursor, String("w-resize")},
+    {MouseCursor::StandardCursorType::RightEdgeResizeCursor, String("e-resize")},
+    {MouseCursor::StandardCursorType::TopLeftCornerResizeCursor, String("nw-resize")},
+    {MouseCursor::StandardCursorType::TopRightCornerResizeCursor, String("ne-resize")},
+    {MouseCursor::StandardCursorType::BottomLeftCornerResizeCursor, String("sw-resize")},
+    {MouseCursor::StandardCursorType::BottomRightCornerResizeCursor, String("se-resize")}
+    };
+
 //==============================================================================
-void MouseCursor::showInWindow (ComponentPeer*) const   {}
+void MouseCursor::showInWindow (ComponentPeer* peer) const   {
+    auto type = (MouseCursor::StandardCursorType) (int) getHandle();
+    const char *css = cursorNames[type].toRawUTF8();
+    MAIN_THREAD_EM_ASM({
+        document.body.style.cursor = UTF8ToString($0);
+    }, css);
+}
 
 //==============================================================================
 void LookAndFeel::playAlertSound()
