@@ -275,7 +275,6 @@ class EmscriptenComponentPeer : public ComponentPeer,
                 var canvas = document.createElement('canvas');
                 canvas.id  = UTF8ToString($0);
                 canvas.style.zIndex   = $6;
-                console.log($6, canvas.style.zIndex);
                 canvas.style.position = "absolute";
                 canvas.style.left = $1;
                 canvas.style.top  = $2;
@@ -496,7 +495,6 @@ class EmscriptenComponentPeer : public ComponentPeer,
             highestZIndex = MAIN_THREAD_EM_ASM_INT({
                 var canvas = document.getElementById(UTF8ToString($0));
                 canvas.style.zIndex = parseInt($1)+1;
-                console.log(canvas.style.zIndex, $1);
                 return parseInt(canvas.style.zIndex);
             }, id.toRawUTF8(), highestZIndex);
 
