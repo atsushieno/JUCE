@@ -908,7 +908,7 @@ String SystemClipboard::getTextFromClipboard()
     const char* data = (const char*)
         emscripten_sync_run_in_main_runtime_thread(
             EM_FUNC_SIG_I, emscriptenGetClipboard);
-    String ret(data);
+    String ret = String::fromUTF8(data);
     free((void*)data);
     return ret;
 }
