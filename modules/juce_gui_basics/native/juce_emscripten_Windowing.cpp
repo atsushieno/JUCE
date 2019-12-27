@@ -195,10 +195,12 @@ EM_JS(void, attachEventCallbackToWindow, (),
         'juce_keyboardCallback', 'void', ['string', 'number', 'string']);
     
     window.addEventListener('keydown', function(e) {
-        window.juce_keyboardCallback('down', e.which || e.keyCode, e.key);
+        if (e.keyCode === 32)
+            e.preventDefault();
+        window.juce_keyboardCallback ('down', e.which || e.keyCode, e.key);
     });
     window.addEventListener('keyup', function(e) {
-        window.juce_keyboardCallback('up', e.which || e.keyCode, e.key);
+        window.juce_keyboardCallback ('up', e.which || e.keyCode, e.key);
     });
 
     window.juce_clipboard = "";
