@@ -28,6 +28,7 @@ namespace juce {
 
 extern const char* const* juce_argv;  // declared in juce_core
 extern int juce_argc;
+extern std::unique_ptr<juce::ScopedJuceInitialiser_GUI> libraryInitialiser; // from juce_emscriptenMessaging
 
 // A singleton class that accepts mouse and keyboard events from browser
 //   main thread and post them as messages onto the message thread.
@@ -111,8 +112,6 @@ extern "C" void juce_keyboardCallback(const char* type, int keyCode, const char 
 }
 
 } // namespace juce
-
-static std::unique_ptr<juce::ScopedJuceInitialiser_GUI> libraryInitialiser;
 
 //==============================================================================
 void launchApp(int argc, char* argv[])
