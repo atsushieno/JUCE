@@ -129,13 +129,11 @@ extern "C" void juce_keyboardCallback(const char* type, int keyCode, const char 
 extern "C" void juce_inputCallback(void* componentPeer,
     const char* type, const char* data)
 {
-    if (strlen(data) > 0) {
-        auto* e = new MainThreadEventProxy::InputEvent();
-        e->target = static_cast<EmscriptenComponentPeer*>(componentPeer);
-        e->type = String(CharPointer_UTF8(type));
-        e->data = String(CharPointer_UTF8(data));
-        MainThreadEventProxy::getInstance().postMessage(e);
-    }
+    auto* e = new MainThreadEventProxy::InputEvent();
+    e->target = static_cast<EmscriptenComponentPeer*>(componentPeer);
+    e->type = String(CharPointer_UTF8(type));
+    e->data = String(CharPointer_UTF8(data));
+    MainThreadEventProxy::getInstance().postMessage(e);
 }
 
 } // namespace juce
@@ -294,6 +292,14 @@ class EmscriptenComponentPeer : public ComponentPeer,
                 canvas._inputProxy.style.position = 'absolute';
                 canvas._inputProxy.style.opacity = 0;
                 canvas._inputProxy.style.zIndex = 0;
+                canvas._inputProxy.addEventListener ('compositionstart', function (e)
+                {
+                    window.juce_inputCallback($5, e.type, e.data);
+                });
+                canvas._inputProxy.addEventListener ('compositionupdate', function (e)
+                {
+                    window.juce_inputCallback($5, e.type, e.data);
+                });
                 canvas._inputProxy.addEventListener ('compositionend', function (e)
                 {
                     window.juce_inputCallback($5, e.type, e.data);
@@ -331,6 +337,8 @@ class EmscriptenComponentPeer : public ComponentPeer,
         }
 
         int getZIndex () const { return zIndex; }
+
+        String getId() const { return id; }
 
         struct ZIndexComparator
         {
@@ -568,10 +576,11 @@ class EmscriptenComponentPeer : public ComponentPeer,
         {
             MAIN_THREAD_EM_ASM({
                 var canvas = document.getElementById(UTF8ToString($0));
-                var bounds = canvas.getBoundingClientRect();
+                var left = parseInt(canvas.style.left, 10);
+                var top = parseInt(canvas.style.top, 10);
                 canvas._duringInput = true;
-                canvas._inputProxy.style.left = (bounds.left + $1) + 'px';
-                canvas._inputProxy.style.top = (bounds.top + $2) + 'px';
+                canvas._inputProxy.style.left = (left + $1) + 'px';
+                canvas._inputProxy.style.top = (top + $2) + 'px';
                 canvas._inputProxy.focus();
             }, id.toRawUTF8(), position.x, position.y);
         }
@@ -818,8 +827,26 @@ void MainThreadEventProxy::handleKeyboardEvent (const KeyboardEvent& e)
 void MainThreadEventProxy::handleInputEvent (const InputEvent& e)
 {
     TextInputTarget* input = e.target->findCurrentTextInputTarget();
-    DBG("handleInputEvent " << e.type << " " << e.data);
-    if (e.type == "compositionend")
+    // DBG("handleInputEvent " << e.type << " " << e.data);
+    if (e.type == "compositionstart" || e.type == "compositionupdate")
+    {
+        Component* inputComponent = dynamic_cast<Component*>(input);
+        if (inputComponent)
+        {
+            auto bounds = inputComponent->getScreenBounds();
+            auto caret = input->getCaretRectangle();
+            int x = bounds.getX() + caret.getX();
+            int y = bounds.getY() + caret.getY();
+            MAIN_THREAD_EM_ASM({
+                var canvas = document.getElementById(UTF8ToString($0));
+                canvas._duringInput = true;
+                canvas._inputProxy.style.left = $1 + 'px';
+                canvas._inputProxy.style.top = $2 + 'px';
+                canvas._inputProxy.focus();
+            }, e.target->getId().toRawUTF8(), x, y);
+        }
+    } else
+    if (e.type == "compositionend" && e.data.length() > 0)
         input->insertTextAtCaret (e.data);
 }
 
