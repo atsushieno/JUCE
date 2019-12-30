@@ -30,6 +30,8 @@ extern const char* const* juce_argv;  // declared in juce_core
 extern int juce_argc;
 extern std::unique_ptr<juce::ScopedJuceInitialiser_GUI> libraryInitialiser; // from juce_emscriptenMessaging
 
+class EmscriptenComponentPeer;
+
 // A singleton class that accepts mouse and keyboard events from browser
 //   main thread and post them as messages onto the message thread.
 // It is useful when main thread != message thread (-s PROXY_TO_PTHREAD).
@@ -50,6 +52,13 @@ public:
         String type;
         int keyCode;
         String key;
+    };
+
+    struct InputEvent : public EmscriptenEventMessage
+    {
+        EmscriptenComponentPeer* target;
+        String type;
+        String data;
     };
 
     static MainThreadEventProxy& getInstance()
@@ -73,11 +82,17 @@ private:
         {
             const KeyboardEvent* e = dynamic_cast<const KeyboardEvent*>(& msg);
             handleKeyboardEvent (*e);
+        } else
+        if (dynamic_cast<const InputEvent*>(& msg))
+        {
+            const InputEvent* e = dynamic_cast<const InputEvent*>(& msg);
+            handleInputEvent (*e);
         }
     }
 
     void handleMouseEvent (const MouseEvent& e);
     void handleKeyboardEvent (const KeyboardEvent& e);
+    void handleInputEvent (const InputEvent& e);
 
     static std::unique_ptr<MainThreadEventProxy> globalInstance;
 };
@@ -109,6 +124,18 @@ extern "C" void juce_keyboardCallback(const char* type, int keyCode, const char 
     e->keyCode = keyCode;
     e->key = String(key);
     MainThreadEventProxy::getInstance().postMessage(e);
+}
+
+extern "C" void juce_inputCallback(void* componentPeer,
+    const char* type, const char* data)
+{
+    if (strlen(data) > 0) {
+        auto* e = new MainThreadEventProxy::InputEvent();
+        e->target = static_cast<EmscriptenComponentPeer*>(componentPeer);
+        e->type = String(CharPointer_UTF8(type));
+        e->data = String(CharPointer_UTF8(data));
+        MainThreadEventProxy::getInstance().postMessage(e);
+    }
 }
 
 } // namespace juce
@@ -147,7 +174,6 @@ namespace juce
 extern double getTimeSpentInCurrentDispatchCycle();
 extern bool isMessageThreadProxied();
 
-class EmscriptenComponentPeer;
 static Point<int> recentMousePosition;
 static Array<EmscriptenComponentPeer*> emComponentPeerList;
 
@@ -194,6 +220,10 @@ EM_JS(void, attachEventCallbackToWindow, (),
     window.juce_keyboardCallback = Module.cwrap(
         'juce_keyboardCallback', 'void', ['string', 'number', 'string']);
     
+    // component peer pointer, event name, data
+    window.juce_inputCallback = Module.cwrap(
+        'juce_inputCallback', 'void', ['number', 'string', 'string']);
+
     window.addEventListener('keydown', function(e) {
         if (e.keyCode === 32)
             e.preventDefault();
@@ -258,7 +288,28 @@ class EmscriptenComponentPeer : public ComponentPeer,
                 canvas.addEventListener ('wheel', function(e) {
                     event.preventDefault();
                 }, true);
+                canvas._duringInput = false;
+                canvas._inputProxy = document.createElement('input');
+                canvas._inputProxy.type = 'text';
+                canvas._inputProxy.style.position = 'absolute';
+                canvas._inputProxy.style.opacity = 0;
+                canvas._inputProxy.style.zIndex = 0;
+                canvas._inputProxy.addEventListener ('compositionend', function (e)
+                {
+                    window.juce_inputCallback($5, e.type, e.data);
+                    canvas._inputProxy.value = "";
+                });
+                canvas._inputProxy.addEventListener ('focus', function (e)
+                {
+                    if (! canvas._duringInput) canvas.focus();
+                });
+                canvas._inputProxy.addEventListener ('focusout', function (e)
+                {
+                    if (canvas._duringInput)
+                        canvas._inputProxy.focus();
+                });
                 document.body.appendChild(canvas);
+                document.body.appendChild(canvas._inputProxy);
             }, id.toRawUTF8(), bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight(), this, ++highestZIndex);
             
             zIndex = highestZIndex;
@@ -274,6 +325,7 @@ class EmscriptenComponentPeer : public ComponentPeer,
             emComponentPeerList.removeAllInstancesOf(this);
             MAIN_THREAD_EM_ASM({
                 var canvas = document.getElementById(UTF8ToString($0));
+                canvas.parentElement.removeChild(canvas._inputProxy);
                 canvas.parentElement.removeChild(canvas);
             }, id.toRawUTF8());
         }
@@ -430,8 +482,9 @@ class EmscriptenComponentPeer : public ComponentPeer,
 
         virtual void toFront (bool makeActive) override
         {
+            if (zIndex == highestZIndex) return;
             DBG("toFront " << id << " " << (makeActive ? "true" : "false"));
-
+            
             highestZIndex = MAIN_THREAD_EM_ASM_INT({
                 var canvas = document.getElementById(UTF8ToString($0));
                 canvas.style.zIndex = parseInt($1)+1;
@@ -513,7 +566,22 @@ class EmscriptenComponentPeer : public ComponentPeer,
 
         virtual void textInputRequired(Point< int > position, TextInputTarget &) override
         {
-            DBG("textInputRequired");
+            MAIN_THREAD_EM_ASM({
+                var canvas = document.getElementById(UTF8ToString($0));
+                var bounds = canvas.getBoundingClientRect();
+                canvas._duringInput = true;
+                canvas._inputProxy.style.left = (bounds.left + $1) + 'px';
+                canvas._inputProxy.style.top = (bounds.top + $2) + 'px';
+                canvas._inputProxy.focus();
+            }, id.toRawUTF8(), position.x, position.y);
+        }
+
+        virtual void dismissPendingTextInput() override
+        {
+            MAIN_THREAD_EM_ASM({
+                var canvas = document.getElementById(UTF8ToString($0));
+                canvas._duringInput = false;
+            }, id.toRawUTF8());
         }
 
         virtual void repaint (const Rectangle<int>& area) override
@@ -601,7 +669,7 @@ class EmscriptenComponentPeer : public ComponentPeer,
 
         void internalRepaint (const Rectangle<int> &area)
         {
-            DBG("repaint: " << area.toString());
+            // DBG("repaint: " << area.toString());
 
             Image temp(Image::ARGB, area.getWidth(), area.getHeight(), true);
             LowLevelGraphicsSoftwareRenderer g(temp);
@@ -745,6 +813,14 @@ void MainThreadEventProxy::handleKeyboardEvent (const KeyboardEvent& e)
         if (isDown)
             peer->handleKeyPress(KeyPress(keyCode, mods, keyChar));
     }
+}
+
+void MainThreadEventProxy::handleInputEvent (const InputEvent& e)
+{
+    TextInputTarget* input = e.target->findCurrentTextInputTarget();
+    DBG("handleInputEvent " << e.type << " " << e.data);
+    if (e.type == "compositionend")
+        input->insertTextAtCaret (e.data);
 }
 
 //==============================================================================
