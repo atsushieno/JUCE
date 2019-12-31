@@ -1,6 +1,8 @@
-# Port of [JUCE](http://www.juce.com/) for the browser via emscripten
+# Port of [JUCE](http://www.juce.com/) for the browser via Emscripten
 
 This port was originally a proof-of-concept created [here](https://github.com/beschulz/juce_emscripten) by @beschulz. This fork is an unofficial continuation of the attempt towards a complete JUCE framework running inside a browser.
+
+Play with JUCE [DemoRunner](https://synthesizerv.com/lab/wasm-juce-demorunner/DemoRunner.html) in your browser.
 
 ## Status
 
@@ -27,19 +29,18 @@ This port was originally a proof-of-concept created [here](https://github.com/be
 - `juce_graphics`: fully supported; font rendering is based on freetype.
 - `juce_gui_basics`: mostly supported
    - Clipboard: the first paste will fail due to security restrictions. With the user's permission, following pastes will succeed.
+   - Input Method: works but without showing the characters being typed in until finish.
    - Native window title bar: not supported.
-   - Native dialogs: not supported.
+   - Native dialogs: not supported. File open/close dialogs are especially tricky. Passing data in and out is not hard if we use HTML5 input, however, interfacing with the in-memory file system is the real problem.
 - `juce_gui_extra`: fully supported
 - `juce_opengl`: not supported
 - `juce_osc`: not supported
 - `juce_product_unlocking`: all supported except features that depend on networking.
 - `juce_video`: not supported.
 
-(note: as of late 2019, this fork only works on Chrome because it needs SharedArrayBuffer support)
-
 ## Build instructions
 
-- [Download Emscripten](http://kripken.github.io/emscripten-site/docs/getting_started/downloads.html)
+- [Download Emscripten](https://emscripten.org/docs/getting_started/downloads.html)
 - install Emscripten
 ```shell
 # Fetch the latest registry of available tools.
@@ -62,9 +63,17 @@ emmake make
 cd build
 python -m SimpleHTTPServer
 ```
-- [have a play](http://127.0.0.1:8000)
+- Goto http://127.0.0.1:8000
 
-Note: I had to modify the auto-generated Makefile to get everything to work. So be carefull when you modify and save the jucer project. In the long run, it would be nice to have a emscripten target inside the introjucer.
+Note: I had to modify the auto-generated Makefile to get everything to work. So be carefull when you modify and save the jucer project. In the long run, it would be nice to have a emscripten target inside Projucer.
+
+## Firefox support
+
+As of late 2019, stable and beta releases of Firefox have `SharedArrayBuffer` support removed due to [security concerns](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer#Browser_compatibility) (brought by Spectre/Meltdown). Nightly builds do have the support but they also require `Cross-Origin-Opener-Policy` and `Cross-Origin-Embedder-Policy` attributes being set in the HTTP header.
+
+A quick and dirty way to bypass this restriction is to go to `about:config` and set `dom.postMessage.sharedArrayBuffer.bypassCOOP_COEP.insecure.enabled` to true. However, this is a bit risky and is not the best way of doing this.
+
+The better way is to (1) set the attributes mentioned above in the server you're hosting the WASM application and (2) enable CORP/COEP flags in Firefox. See [this issue](https://github.com/emscripten-core/emscripten/issues/10014) in the Emscripten repository for detailed instructions.
 
 ## Licensing
 
