@@ -75,6 +75,12 @@ A quick and dirty way to bypass this restriction is to go to `about:config` and 
 
 The better way is to (1) set the attributes mentioned above in the server you're hosting the WASM application and (2) enable CORP/COEP flags in Firefox. See [this issue](https://github.com/emscripten-core/emscripten/issues/10014) in the Emscripten repository for detailed instructions.
 
+## Tutorial (contributed by @atsushieno)
+
+[English] https://atsushieno.github.io/2020/01/01/juce-emscripten-the-latest-juce-on-webassembly.html
+
+[Japanese] http://atsushieno.hatenablog.com/entry/2020/01/01/121050
+
 ## Licensing
 
 See JUCE licensing below.
