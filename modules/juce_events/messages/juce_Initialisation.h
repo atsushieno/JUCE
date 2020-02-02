@@ -88,16 +88,6 @@ public:
  #define START_JUCE_APPLICATION(AppClass)
 
 #else
-  #if JUCE_EMSCRIPTEN
-    #define START_JUCE_APPLICATION(AppClass) \
-   juce::JUCEApplicationBase* juce_CreateApplication() { return new AppClass(); } \
-   extern void launchApp(int argc, char* argv[]); \
-   extern "C" int main(int argc, char* argv[]) \
-   { \
-      launchApp(argc, argv); \
-      return 0; \
-   }
-  #endif
 
  #if JUCE_WINDOWS && ! defined (_CONSOLE)
   #define JUCE_MAIN_FUNCTION       int __stdcall WinMain (struct HINSTANCE__*, struct HINSTANCE__*, char*, int)
@@ -161,6 +151,17 @@ public:
   #endif
  #else
 
+  #if JUCE_EMSCRIPTEN
+    #define START_JUCE_APPLICATION(AppClass) \
+   juce::JUCEApplicationBase* juce_CreateApplication() { return new AppClass(); } \
+   extern void launchApp(int argc, char* argv[]); \
+   extern "C" int main(int argc, char* argv[]) \
+   { \
+      launchApp(argc, argv); \
+      return 0; \
+   }
+  #else
+
   #define START_JUCE_APPLICATION(AppClass) \
      JUCE_CREATE_APPLICATION_DEFINE(AppClass) \
      JUCE_MAIN_FUNCTION_DEFINITION
@@ -209,6 +210,7 @@ public:
    #define START_JUCE_APPLICATION_WITH_CUSTOM_DELEGATE(AppClass, DelegateClass) \
       JUCE_CREATE_APPLICATION_DEFINE_CUSTOM_DELEGATE(AppClass, DelegateClass) \
       JUCE_MAIN_FUNCTION_DEFINITION
+  #endif
   #endif
  #endif
 #endif
