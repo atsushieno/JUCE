@@ -128,12 +128,22 @@ public:
     juce::JUCEApplicationBase* juce_CreateApplication(); \
     juce::JUCEApplicationBase* juce_CreateApplication() { return new AppClass(); }
 
-  #define JUCE_MAIN_FUNCTION_DEFINITION \
+  #if JUCE_EMSCRIPTEN
+   #define JUCE_MAIN_FUNCTION_DEFINITION \
+   extern void launchApp(int argc, char* argv[]); \
+   extern "C" int main(int argc, char* argv[]) \
+   { \
+      launchApp(argc, argv); \
+      return 0; \
+   }
+  #else
+   #define JUCE_MAIN_FUNCTION_DEFINITION \
     extern "C" JUCE_MAIN_FUNCTION \
     { \
        juce::JUCEApplicationBase::createInstance = &juce_CreateApplication; \
        return juce::JUCEApplicationBase::main (JUCE_MAIN_FUNCTION_ARGS); \
     }
+  #endif
 
  #endif
 
@@ -150,17 +160,6 @@ public:
    #endif
   #endif
  #else
-
-  #if JUCE_EMSCRIPTEN
-    #define START_JUCE_APPLICATION(AppClass) \
-   juce::JUCEApplicationBase* juce_CreateApplication() { return new AppClass(); } \
-   extern void launchApp(int argc, char* argv[]); \
-   extern "C" int main(int argc, char* argv[]) \
-   { \
-      launchApp(argc, argv); \
-      return 0; \
-   }
-  #else
 
   #define START_JUCE_APPLICATION(AppClass) \
      JUCE_CREATE_APPLICATION_DEFINE(AppClass) \
@@ -210,7 +209,6 @@ public:
    #define START_JUCE_APPLICATION_WITH_CUSTOM_DELEGATE(AppClass, DelegateClass) \
       JUCE_CREATE_APPLICATION_DEFINE_CUSTOM_DELEGATE(AppClass, DelegateClass) \
       JUCE_MAIN_FUNCTION_DEFINITION
-  #endif
   #endif
  #endif
 #endif
