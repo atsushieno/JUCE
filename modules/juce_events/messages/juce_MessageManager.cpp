@@ -28,6 +28,7 @@ MessageManager::MessageManager() noexcept
 {
     if (JUCEApplicationBase::isStandaloneApp())
         Thread::setCurrentThreadName ("JUCE Message Thread");
+    DBG("messageThreadId " << (int)messageThreadId);
 }
 
 MessageManager::~MessageManager() noexcept
@@ -102,7 +103,7 @@ bool MessageManager::runDispatchLoopUntil (int millisecondsToRunFor)
 }
 #endif
 
-#if ! (JUCE_MAC || JUCE_IOS || JUCE_ANDROID)
+#if ! (JUCE_MAC || JUCE_IOS || JUCE_ANDROID || JUCE_EMSCRIPTEN)
 class MessageManager::QuitMessage   : public MessageManager::MessageBase
 {
 public:

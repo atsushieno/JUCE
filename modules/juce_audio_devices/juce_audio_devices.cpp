@@ -156,6 +156,12 @@
  #undef SIZEOF
 
 //==============================================================================
+#elif JUCE_EMSCRIPTEN
+ #include <emscripten.h>
+ #include <AL/al.h>
+ #include <AL/alc.h>
+
+//==============================================================================
 #elif JUCE_ANDROID
 
  #if JUCE_USE_ANDROID_OPENSLES
@@ -225,6 +231,11 @@
  #else
   #include "native/juce_linux_Midi.cpp"
  #endif
+
+//==============================================================================
+#elif JUCE_EMSCRIPTEN
+ #include "native/juce_emscripten_Audio.cpp"
+ #include "native/juce_emscripten_Midi.cpp"
 
 //==============================================================================
 #elif JUCE_ANDROID

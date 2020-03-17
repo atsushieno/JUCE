@@ -63,6 +63,8 @@
 #elif defined (JUCE_ANDROID)
   #undef        JUCE_ANDROID
   #define       JUCE_ANDROID 1
+#elif defined(__EMSCRIPTEN__)
+  #define       JUCE_EMSCRIPTEN 1
 #elif defined (__FreeBSD__) || (__OpenBSD__)
   #define       JUCE_BSD 1
 #elif defined (LINUX) || defined (__linux__)
@@ -178,6 +180,15 @@
   #elif __MMX__ || __SSE__ || __amd64__
     #define JUCE_INTEL 1
   #endif
+#endif
+
+#if JUCE_EMSCRIPTEN
+  #ifdef _DEBUG
+    #define JUCE_DEBUG 1
+  #endif
+
+  #define JUCE_LITTLE_ENDIAN 1
+  #define JUCE_32BIT 1
 #endif
 
 //==============================================================================

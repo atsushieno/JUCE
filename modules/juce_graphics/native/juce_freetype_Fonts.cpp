@@ -198,6 +198,8 @@ public:
     {
         for (auto& path : paths)
         {
+            DBG("scanFontPaths:" <<
+              File::getCurrentWorkingDirectory().getChildFile(path).getFullPathName());
             DirectoryIterator iter (File::getCurrentWorkingDirectory().getChildFile (path), true);
 
             while (iter.next())
@@ -240,6 +242,8 @@ private:
         int faceIndex = 0;
         int numFaces = 0;
 
+        DBG("got font: " << file.getFullPathName());
+
         do
         {
             FTFaceWrapper face (library, file, faceIndex);
@@ -265,12 +269,14 @@ private:
                   && (face->style.equalsIgnoreCase (style) || style.isEmpty()))
                 return face;
 
+        DBG("NO MATCHING FONT FOUND");
+
         return nullptr;
     }
 
     static bool isFaceSansSerif (const String& family)
     {
-        static const char* sansNames[] = { "Sans", "Verdana", "Arial", "Ubuntu" };
+        static const char* sansNames[] = { "Sans", "Verdana", "Arial", "Ubuntu", "Lato" };
 
         for (auto* name : sansNames)
             if (family.containsIgnoreCase (name))

@@ -80,7 +80,7 @@
  #endif
 #endif
 
-#if JUCE_LINUX
+#if JUCE_LINUX || JUCE_EMSCRIPTEN
  #include <cstring>
  #include <signal.h>
 

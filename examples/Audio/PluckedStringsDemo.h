@@ -156,7 +156,7 @@ private:
     }
 
     //==============================================================================
-    const double decay = 0.998;
+    const double decay = 0.9995;
     double amplitude = 0.0;
 
     Atomic<int> doPluckForNextBuffer;

@@ -350,6 +350,10 @@ const String& Font::getTypefaceStyle() const noexcept   { return font->typefaceS
 
 void Font::setTypefaceName (const String& faceName)
 {
+   #if JUCE_EMSCRIPTEN
+    // The wasm module may be packed with very few or no fonts.
+    if (faceName.isEmpty()) return;
+   #endif
     if (faceName != font->typefaceName)
     {
         jassert (faceName.isNotEmpty());

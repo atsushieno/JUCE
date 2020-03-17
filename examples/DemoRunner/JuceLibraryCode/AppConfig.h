@@ -50,13 +50,11 @@
 #define JUCE_PROJUCER_VERSION 0x50407
 
 //==============================================================================
-#define JUCE_MODULE_AVAILABLE_juce_analytics              1
 #define JUCE_MODULE_AVAILABLE_juce_audio_basics           1
 #define JUCE_MODULE_AVAILABLE_juce_audio_devices          1
 #define JUCE_MODULE_AVAILABLE_juce_audio_formats          1
 #define JUCE_MODULE_AVAILABLE_juce_audio_processors       1
 #define JUCE_MODULE_AVAILABLE_juce_audio_utils            1
-#define JUCE_MODULE_AVAILABLE_juce_blocks_basics          1
 #define JUCE_MODULE_AVAILABLE_juce_box2d                  1
 #define JUCE_MODULE_AVAILABLE_juce_core                   1
 #define JUCE_MODULE_AVAILABLE_juce_cryptography           1
@@ -66,10 +64,7 @@
 #define JUCE_MODULE_AVAILABLE_juce_graphics               1
 #define JUCE_MODULE_AVAILABLE_juce_gui_basics             1
 #define JUCE_MODULE_AVAILABLE_juce_gui_extra              1
-#define JUCE_MODULE_AVAILABLE_juce_opengl                 1
-#define JUCE_MODULE_AVAILABLE_juce_osc                    1
 #define JUCE_MODULE_AVAILABLE_juce_product_unlocking      1
-#define JUCE_MODULE_AVAILABLE_juce_video                  1
 
 #define JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED 1
 
@@ -197,7 +192,7 @@
 #endif
 
 #ifndef    JUCE_USE_CURL
- //#define JUCE_USE_CURL 1
+ //#define JUCE_USE_CURL 0
 #endif
 
 #ifndef    JUCE_LOAD_CURL_SYMBOLS_LAZILY
@@ -301,17 +296,6 @@
 
 #ifndef    JUCE_ENABLE_LIVE_CONSTANT_EDITOR
  //#define JUCE_ENABLE_LIVE_CONSTANT_EDITOR 0
-#endif
-
-//==============================================================================
-// juce_video flags:
-
-#ifndef    JUCE_USE_CAMERA
- #define   JUCE_USE_CAMERA 1
-#endif
-
-#ifndef    JUCE_SYNC_VIDEO_VOLUME_WITH_OS_MEDIA_VOLUME
- //#define JUCE_SYNC_VIDEO_VOLUME_WITH_OS_MEDIA_VOLUME 1
 #endif
 
 //==============================================================================

@@ -44,9 +44,9 @@
 
 #if JUCE_HAS_CONSTEXPR
  #include "../../../Audio/SimpleFFTDemo.h"
- #include "../../../BLOCKS/BlocksDrawingDemo.h"
- #include "../../../BLOCKS/BlocksMonitorDemo.h"
- #include "../../../BLOCKS/BlocksSynthDemo.h"
+//  #include "../../../BLOCKS/BlocksDrawingDemo.h"
+//  #include "../../../BLOCKS/BlocksMonitorDemo.h"
+//  #include "../../../BLOCKS/BlocksSynthDemo.h"
 
 
  #include "../../../DSP/ConvolutionDemo.h"
@@ -70,8 +70,8 @@
 #include "../../../Utilities/JavaScriptDemo.h"
 #include "../../../Utilities/LiveConstantDemo.h"
 #include "../../../Utilities/MultithreadingDemo.h"
-#include "../../../Utilities/NetworkingDemo.h"
-#include "../../../Utilities/OSCDemo.h"
+// #include "../../../Utilities/NetworkingDemo.h"
+// #include "../../../Utilities/OSCDemo.h"
 #include "../../../Utilities/SystemInfoDemo.h"
 #include "../../../Utilities/TimersAndEventsDemo.h"
 #include "../../../Utilities/UnitTestsDemo.h"
@@ -92,9 +92,9 @@ void registerDemos_One() noexcept
 
    #if JUCE_HAS_CONSTEXPR
     REGISTER_DEMO (SimpleFFTDemo,           Audio,     false)
-    REGISTER_DEMO (BlocksDrawingDemo,       BLOCKS,    false)
-    REGISTER_DEMO (BlocksMonitorDemo,       BLOCKS,    false)
-    REGISTER_DEMO (BlocksSynthDemo,         BLOCKS,    false)
+    // REGISTER_DEMO (BlocksDrawingDemo,       BLOCKS,    false)
+    // REGISTER_DEMO (BlocksMonitorDemo,       BLOCKS,    false)
+    // REGISTER_DEMO (BlocksSynthDemo,         BLOCKS,    false)
 
     REGISTER_DEMO (ConvolutionDemo,         DSP,       false)
     REGISTER_DEMO (FIRFilterDemo,           DSP,       false)
@@ -117,8 +117,8 @@ void registerDemos_One() noexcept
     REGISTER_DEMO (JavaScriptDemo,          Utilities, false)
     REGISTER_DEMO (LiveConstantDemo,        Utilities, false)
     REGISTER_DEMO (MultithreadingDemo,      Utilities, false)
-    REGISTER_DEMO (NetworkingDemo,          Utilities, false)
-    REGISTER_DEMO (OSCDemo,                 Utilities, false)
+    // REGISTER_DEMO (NetworkingDemo,          Utilities, false)
+    // REGISTER_DEMO (OSCDemo,                 Utilities, false)
     REGISTER_DEMO (SystemInfoDemo,          Utilities, false)
     REGISTER_DEMO (TimersAndEventsDemo,     Utilities, false)
     REGISTER_DEMO (UnitTestsDemo,           Utilities, false)

@@ -378,7 +378,7 @@ void MainComponent::parentHierarchyChanged()
         if (peer != nullptr)
             renderingEngines = peer->getAvailableRenderingEngines();
 
-        renderingEngines.add ("OpenGL Renderer");
+        // renderingEngines.add ("OpenGL Renderer");
 
         currentRenderingEngineIdx = renderingEngines.indexOf (previousRenderingEngine);
 
@@ -402,11 +402,11 @@ void MainComponent::updateRenderingEngine (int renderingEngineIndex)
         if (isShowingHeavyweightDemo)
             return;
 
-        openGLContext.attachTo (*getTopLevelComponent());
+        // openGLContext.attachTo (*getTopLevelComponent());
     }
     else
     {
-        openGLContext.detach();
+        // openGLContext.detach();
         peer->setCurrentRenderingEngine (renderingEngineIndex);
     }
 

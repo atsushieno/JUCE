@@ -54,6 +54,8 @@ void JUCEDemos::registerDemo (std::function<Component*()> constructorCallback, c
    #if JUCE_MAC
     auto f = File::getSpecialLocation (File::currentExecutableFile)
                   .getParentDirectory().getParentDirectory().getChildFile ("Resources");
+   #elif JUCE_EMSCRIPTEN
+    auto f = File("/");
    #else
     auto f = findExamplesDirectoryFromExecutable (File::getSpecialLocation (File::currentApplicationFile));
    #endif
@@ -83,6 +85,7 @@ File JUCEDemos::findExamplesDirectoryFromExecutable (File exec)
         return exec;
     return {};
 }
+
 
 //==============================================================================
 static String getCurrentDefaultAudioDeviceName (AudioDeviceManager& deviceManager, bool isInput)

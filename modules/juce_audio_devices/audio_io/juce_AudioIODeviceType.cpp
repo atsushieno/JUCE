@@ -86,4 +86,8 @@ AudioIODeviceType* AudioIODeviceType::createAudioIODeviceType_OpenSLES()        
 AudioIODeviceType* AudioIODeviceType::createAudioIODeviceType_Oboe()            { return nullptr; }
 #endif
 
+#if ! (JUCE_EMSCRIPTEN)
+AudioIODeviceType* AudioIODeviceType::createAudioIODeviceType_OpenAL()          { return nullptr; }
+#endif
+
 } // namespace juce

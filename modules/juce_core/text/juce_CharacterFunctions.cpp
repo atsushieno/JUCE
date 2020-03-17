@@ -261,7 +261,7 @@ public:
             STRING_DOUBLE_PAIR_COMBOS (1.23456789012345678901234567890e-111)
 
             // Limits. DBL_MAX may not exist on Linux.
-           #if ! JUCE_LINUX
+           #if ! JUCE_LINUX && ! JUCE_EMSCRIPTEN
           , STRING_DOUBLE_PAIR (DBL_MAX),
             STRING_DOUBLE_PAIR (-DBL_MAX),
             STRING_DOUBLE_PAIR (DBL_MIN)

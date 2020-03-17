@@ -93,6 +93,10 @@ namespace TimeHelpers
 
     static inline String formatString (const String& format, const std::tm* const tm)
     {
+       #if JUCE_EMSCRIPTEN
+        std::cerr << "formatString: unimplemented feature!" << std::endl;
+        return "";
+       #endif
        #if JUCE_ANDROID
         using StringType = CharPointer_UTF8;
        #elif JUCE_WINDOWS

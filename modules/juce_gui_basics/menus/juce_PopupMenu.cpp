@@ -996,6 +996,9 @@ public:
         : window (w), source (s), lastScrollTime (Time::getMillisecondCounter())
     {
         startTimerHz (20);
+       #if JUCE_EMSCRIPTEN
+        window.hasBeenOver = true;
+       #endif
     }
 
     void handleMouseEvent (const MouseEvent& e);

@@ -85,19 +85,15 @@
   #error "JUCE no longer supports targets earlier than iOS 3.2"
  #endif
 
-#elif JUCE_LINUX
+#elif JUCE_LINUX || JUCE_EMSCRIPTEN
  #ifndef JUCE_USE_FREETYPE
   #define JUCE_USE_FREETYPE 1
  #endif
 #endif
 
 #if JUCE_USE_FREETYPE
- #if JUCE_USE_FREETYPE_AMALGAMATED
-  #include "native/freetype/FreeTypeAmalgam.h"
- #else
   #include <ft2build.h>
   #include FT_FREETYPE_H
- #endif
 #endif
 
 #undef SIZEOF
@@ -157,7 +153,7 @@
   #include "native/juce_win32_Direct2DGraphicsContext.cpp"
  #endif
 
-#elif JUCE_LINUX
+#elif JUCE_LINUX || JUCE_EMSCRIPTEN
  #include "native/juce_linux_Fonts.cpp"
  #include "native/juce_linux_IconHelpers.cpp"
 

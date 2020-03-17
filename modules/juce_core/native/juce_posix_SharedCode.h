@@ -380,8 +380,10 @@ bool File::deleteFile() const
 
 bool File::moveInternal (const File& dest) const
 {
+   #if ! JUCE_EMSCRIPTEN
     if (rename (fullPath.toUTF8(), dest.getFullPathName().toUTF8()) == 0)
         return true;
+   #endif
 
     if (hasWriteAccess() && copyInternal (dest))
     {
@@ -543,6 +545,12 @@ void MemoryMappedFile::openInternal (const File& file, AccessMode mode, bool exc
         range.setStart (range.getStart() - (range.getStart() % pageSize));
     }
 
+   #if JUCE_EMSCRIPTEN
+    address = malloc(range.getLength());
+    std::cerr << "MemoryMappedFile is not implemented for emscripten."
+              << std::endl;
+   #else
+
     fileHandle = open (file.getFullPathName().toUTF8(),
                        mode == readWrite ? (O_CREAT + O_RDWR) : O_RDONLY, 00644);
 
@@ -563,21 +571,30 @@ void MemoryMappedFile::openInternal (const File& file, AccessMode mode, bool exc
             range = Range<int64>();
         }
     }
+   #endif
 }
 
 MemoryMappedFile::~MemoryMappedFile()
 {
+   #if JUCE_EMSCRIPTEN
+    if (address != nullptr)
+        free (address);
+   #else
     if (address != nullptr)
         munmap (address, (size_t) range.getLength());
 
     if (fileHandle != 0)
         close (fileHandle);
+   #endif
 }
 
 //==============================================================================
 File juce_getExecutableFile();
 File juce_getExecutableFile()
 {
+   #if JUCE_EMSCRIPTEN
+    return File("/");
+   #else
     struct DLAddrReader
     {
         static String getFilename()
@@ -592,6 +609,7 @@ File juce_getExecutableFile()
 
     static String filename = DLAddrReader::getFilename();
     return File::getCurrentWorkingDirectory().getChildFile (filename);
+   #endif
 }
 
 //==============================================================================
@@ -970,7 +988,7 @@ void JUCE_CALLTYPE Thread::yield()
    calls (the API for these has changed about quite a bit in various Linux
    versions, and a lot of distros seem to ship with obsolete versions)
 */
-#if defined (CPU_ISSET) && ! defined (SUPPORT_AFFINITIES)
+#if (! JUCE_EMSCRIPTEN) && defined (CPU_ISSET) && ! defined (SUPPORT_AFFINITIES)
  #define SUPPORT_AFFINITIES 1
 #endif
 
@@ -1031,6 +1049,9 @@ void* DynamicLibrary::getFunction (const String& functionName) noexcept
 //==============================================================================
 static inline String readPosixConfigFileValue (const char* file, const char* key)
 {
+   #if JUCE_EMSCRIPTEN
+    return {};
+   #else
     StringArray lines;
     File (file).readLines (lines);
 
@@ -1039,6 +1060,7 @@ static inline String readPosixConfigFileValue (const char* file, const char* key
             return lines[i].fromFirstOccurrenceOf (":", false, false).trim();
 
     return {};
+   #endif
 }
 
 

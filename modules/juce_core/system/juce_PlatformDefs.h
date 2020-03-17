@@ -64,6 +64,8 @@ namespace juce
       @see jassert()
   */
   #define JUCE_BREAK_IN_DEBUGGER        { ::kill (0, SIGTRAP); }
+#elif JUCE_EMSCRIPTEN
+  #define JUCE_BREAK_IN_DEBUGGER        { }
 #elif JUCE_MSVC
   #ifndef __INTEL_COMPILER
     #pragma intrinsic (__debugbreak)
@@ -298,7 +300,7 @@ namespace juce
 #endif
 
 //==============================================================================
-#if JUCE_ANDROID && ! DOXYGEN
+#if (JUCE_ANDROID || JUCE_EMSCRIPTEN) && ! DOXYGEN
  #define JUCE_MODAL_LOOPS_PERMITTED 0
 #elif ! defined (JUCE_MODAL_LOOPS_PERMITTED)
  /** Some operating environments don't provide a modal loop mechanism, so this flag can be
