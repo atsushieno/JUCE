@@ -41,7 +41,7 @@ ifeq ($(CONFIG),Debug)
 
   JUCE_CFLAGS += $(JUCE_CPPFLAGS) $(TARGET_ARCH) -O0 $(CFLAGS)
   JUCE_CXXFLAGS += $(JUCE_CFLAGS) -std=c++14 $(CXXFLAGS) -s USE_PTHREADS=1 -s USE_FREETYPE=1 -s SAFE_HEAP=1 -s ASSERTIONS=1 -s DISABLE_EXCEPTION_CATCHING=0
-  JUCE_LDFLAGS += $(TARGET_ARCH) -L$(JUCE_BINDIR) -L$(JUCE_LIBDIR) -lrt -ldl -lpthread -lopenal $(LDFLAGS) -s USE_PTHREADS=1 -s USE_FREETYPE=1 -s PROXY_TO_PTHREAD=1 -s DISABLE_EXCEPTION_CATCHING=0 -s TOTAL_MEMORY=256MB -s NO_EXIT_RUNTIME -s EXPORTED_FUNCTIONS="['_main', '_juce_animationFrameCallback', '_juce_mouseCallback', '_juce_keyboardCallback']" -s EXTRA_EXPORTED_RUNTIME_METHODS="['cwrap']" \
+  JUCE_LDFLAGS += $(TARGET_ARCH) -L$(JUCE_BINDIR) -L$(JUCE_LIBDIR) -lrt -ldl -lpthread -lopenal $(LDFLAGS) -s USE_PTHREADS=1 -s USE_FREETYPE=1 -s PROXY_TO_PTHREAD=1 -s DISABLE_EXCEPTION_CATCHING=0 -s TOTAL_MEMORY=256MB -s NO_EXIT_RUNTIME -s EXPORTED_FUNCTIONS="['_main', '_juce_animationFrameCallback', '_juce_mouseCallback', '_juce_keyboardCallback', '_juce_inputCallback']" -s EXTRA_EXPORTED_RUNTIME_METHODS="['cwrap']" \
     --preload-file ../../../usr/X11R6/lib/X11/fonts/@/usr/X11R6/lib/X11/fonts/ \
 	--preload-file ../../../Assets@/examples/Assets \
 	--preload-file ../../../GUI@/GUI \
@@ -69,7 +69,7 @@ ifeq ($(CONFIG),Release)
 
   JUCE_CFLAGS += $(JUCE_CPPFLAGS) $(TARGET_ARCH) -O3 $(CFLAGS)
   JUCE_CXXFLAGS += $(JUCE_CFLAGS) -std=c++14 $(CXXFLAGS) -s USE_PTHREADS=1 -s USE_FREETYPE=1 -s DISABLE_EXCEPTION_CATCHING=0
-  JUCE_LDFLAGS += $(TARGET_ARCH) -L$(JUCE_BINDIR) -L$(JUCE_LIBDIR) -lrt -ldl -lpthread -lopenal $(LDFLAGS) -s USE_PTHREADS=1 -s USE_FREETYPE=1 -s DISABLE_EXCEPTION_CATCHING=0 -s TOTAL_MEMORY=128MB -s NO_EXIT_RUNTIME -s EXPORTED_FUNCTIONS="['_main', '_juce_animationFrameCallback', '_juce_mouseCallback', '_juce_keyboardCallback']" -s EXTRA_EXPORTED_RUNTIME_METHODS="['cwrap']" \
+  JUCE_LDFLAGS += $(TARGET_ARCH) -L$(JUCE_BINDIR) -L$(JUCE_LIBDIR) -lrt -ldl -lpthread -lopenal $(LDFLAGS) -s USE_PTHREADS=1 -s USE_FREETYPE=1 -s DISABLE_EXCEPTION_CATCHING=0 -s TOTAL_MEMORY=128MB -s NO_EXIT_RUNTIME -s EXPORTED_FUNCTIONS="['_main', '_juce_animationFrameCallback', '_juce_mouseCallback', '_juce_keyboardCallback', '_juce_inputCallback']" -s EXTRA_EXPORTED_RUNTIME_METHODS="['cwrap']" \
     --preload-file ../../../usr/X11R6/lib/X11/fonts/@/usr/X11R6/lib/X11/fonts/ \
 	--preload-file ../../../Assets@/examples/Assets \
 	--preload-file ../../../GUI@/GUI \

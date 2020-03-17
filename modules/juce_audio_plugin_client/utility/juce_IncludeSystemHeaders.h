@@ -48,6 +48,7 @@
  #undef KeyPress
  #undef Drawable
  #undef Time
+#elif JUCE_EMSCRIPTEN
 #elif JUCE_ANDROID
 #else
  #if ! (defined (JUCE_SUPPORT_CARBON) || defined (__LP64__))

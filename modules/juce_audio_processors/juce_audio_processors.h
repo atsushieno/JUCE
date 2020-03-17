@@ -106,6 +106,11 @@
  #define JUCE_SUPPORT_LEGACY_AUDIOPROCESSOR 1
 #endif
 
+#if JUCE_EMSCRIPTEN
+  #define JUCE_PLUGINHOST_VST 0
+  #define JUCE_PLUGINHOST_LADSPA 0
+#endif
+
 //==============================================================================
 #include "processors/juce_AudioProcessorEditor.h"
 #include "processors/juce_AudioProcessorListener.h"

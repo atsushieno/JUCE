@@ -429,6 +429,7 @@ private:
         if (hostFilename.containsIgnoreCase   ("pluginval"))         return pluginval;
         if (hostFilename.containsIgnoreCase   ("AudioPluginHost"))   return JUCEPluginHost;
 
+       #elif JUCE_EMSCRIPTEN
        #elif JUCE_IOS
        #elif JUCE_ANDROID
        #else

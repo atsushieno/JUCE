@@ -41,12 +41,13 @@ static bool appIsInsideEmrun{false};
 static std::deque<MessageManager::MessageBase*> messageQueue;
 static std::deque<MessageManager::MessageBase*> eventQueue;
 static std::mutex queueMtx;
-static std::atomic<bool> quitPosted{false};
+static std::atomic<bool> quitReceived{false};
 static double timeDispatchBeginMS{0};
 
 static Thread::ThreadID messageThreadID{nullptr}; // JUCE message thread
 static Thread::ThreadID mainThreadID{nullptr};    // Javascript main thread
 
+std::unique_ptr<juce::ScopedJuceInitialiser_GUI> libraryInitialiser;
 std::vector<std::function<void()>> preDispatchLoopFuncs;
 // These callbacks are only executed if main thread isn't message thread.
 std::vector<std::function<void()>> mainThreadLoopFuncs;
@@ -162,8 +163,16 @@ static void dispatchEvents()
 
 static void dispatchLoop()
 {
-    DBG("new dispatch loop cycle");
-    // std::cerr << "new dispatch loop cycle" << std::endl;
+    if (quitReceived.load())
+    {
+        emscripten_cancel_main_loop();
+        auto* app = JUCEApplicationBase::getInstance();
+        app->shutdownApp();
+        libraryInitialiser.reset (nullptr);
+        return;
+    }
+    
+    // DBG("new dispatch loop cycle");
     timeDispatchBeginMS = Time::getMillisecondCounterHiRes();
 
     dispatchEvents();
@@ -202,12 +211,7 @@ static void dispatchLoop()
                 logArea.value = logArea.value.substring(n - 1000, n);
         });
     }
-
-    if (quitPosted)
-    {
-        emscripten_cancel_main_loop();
-    }
-    DBG("ending dispatch loop cycle");
+    // DBG("ending dispatch loop cycle");
 }
 
 bool MessageManager::postMessageToSystemQueue (MessageManager::MessageBase* const message)
@@ -231,18 +235,19 @@ void MessageManager::runDispatchLoop()
     emscripten_set_main_loop(dispatchLoop, 0, 0);
 }
 
+struct QuitCallback : public CallbackMessage
+{
+    QuitCallback() {}
+    void messageCallback() override
+    {
+        quitReceived = true;
+    }
+};
+
 void MessageManager::stopDispatchLoop()
 {
-    struct QuitCallback  : public CallbackMessage
-    {
-        QuitCallback() {}
-
-        void messageCallback() override { }
-    };
-
     (new QuitCallback())->post();
     quitMessagePosted = true;
-    quitPosted = true;
 }
 
 }

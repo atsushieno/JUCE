@@ -139,6 +139,7 @@ public:
                     method to find out what it was. Returns false if they cancelled instead.
         @see browseForFileToSave, browseForDirectory
     */
+#if JUCE_MODAL_LOOPS_PERMITTED
     bool browseForFileToOpen (FilePreviewComponent* previewComponent = nullptr);
 
     /** Same as browseForFileToOpen, but allows the user to select multiple files.
@@ -192,6 +193,7 @@ public:
         @see FileBrowserComponent::FileChooserFlags
     */
     bool showDialog (int flags, FilePreviewComponent* previewComponent);
+#endif
 
     /** Use this method to launch the file browser window asynchronously.
 

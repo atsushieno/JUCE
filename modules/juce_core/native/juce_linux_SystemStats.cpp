@@ -20,15 +20,13 @@
   ==============================================================================
 */
 
-<<<<<<< HEAD
 #if JUCE_BELA
 extern "C" int cobalt_thread_mode();
-=======
+#endif
 #if JUCE_EMSCRIPTEN
 #include <emscripten.h>
 #include <emscripten/threading.h>
 #include <deque>
->>>>>>> emscripten
 #endif
 
 namespace juce

@@ -28,6 +28,9 @@ namespace juce {
 
 extern const char* const* juce_argv;  // declared in juce_core
 extern int juce_argc;
+extern std::unique_ptr<juce::ScopedJuceInitialiser_GUI> libraryInitialiser; // from juce_emscriptenMessaging
+
+class EmscriptenComponentPeer;
 
 // A singleton class that accepts mouse and keyboard events from browser
 //   main thread and post them as messages onto the message thread.
@@ -51,6 +54,13 @@ public:
         String key;
     };
 
+    struct InputEvent : public EmscriptenEventMessage
+    {
+        EmscriptenComponentPeer* target;
+        String type;
+        String data;
+    };
+
     static MainThreadEventProxy& getInstance()
     {
         if (globalInstance == nullptr)
@@ -72,11 +82,17 @@ private:
         {
             const KeyboardEvent* e = dynamic_cast<const KeyboardEvent*>(& msg);
             handleKeyboardEvent (*e);
+        } else
+        if (dynamic_cast<const InputEvent*>(& msg))
+        {
+            const InputEvent* e = dynamic_cast<const InputEvent*>(& msg);
+            handleInputEvent (*e);
         }
     }
 
     void handleMouseEvent (const MouseEvent& e);
     void handleKeyboardEvent (const KeyboardEvent& e);
+    void handleInputEvent (const InputEvent& e);
 
     static std::unique_ptr<MainThreadEventProxy> globalInstance;
 };
@@ -110,9 +126,17 @@ extern "C" void juce_keyboardCallback(const char* type, int keyCode, const char 
     MainThreadEventProxy::getInstance().postMessage(e);
 }
 
-} // namespace juce
+extern "C" void juce_inputCallback(void* componentPeer,
+    const char* type, const char* data)
+{
+    auto* e = new MainThreadEventProxy::InputEvent();
+    e->target = static_cast<EmscriptenComponentPeer*>(componentPeer);
+    e->type = String(CharPointer_UTF8(type));
+    e->data = String(CharPointer_UTF8(data));
+    MainThreadEventProxy::getInstance().postMessage(e);
+}
 
-static std::unique_ptr<juce::ScopedJuceInitialiser_GUI> libraryInitialiser;
+} // namespace juce
 
 //==============================================================================
 void launchApp(int argc, char* argv[])
@@ -148,7 +172,6 @@ namespace juce
 extern double getTimeSpentInCurrentDispatchCycle();
 extern bool isMessageThreadProxied();
 
-class EmscriptenComponentPeer;
 static Point<int> recentMousePosition;
 static Array<EmscriptenComponentPeer*> emComponentPeerList;
 
@@ -195,11 +218,17 @@ EM_JS(void, attachEventCallbackToWindow, (),
     window.juce_keyboardCallback = Module.cwrap(
         'juce_keyboardCallback', 'void', ['string', 'number', 'string']);
     
+    // component peer pointer, event name, data
+    window.juce_inputCallback = Module.cwrap(
+        'juce_inputCallback', 'void', ['number', 'string', 'string']);
+
     window.addEventListener('keydown', function(e) {
-        window.juce_keyboardCallback('down', e.which || e.keyCode, e.key);
+        if (e.keyCode === 32)
+            e.preventDefault();
+        window.juce_keyboardCallback ('down', e.which || e.keyCode, e.key);
     });
     window.addEventListener('keyup', function(e) {
-        window.juce_keyboardCallback('up', e.which || e.keyCode, e.key);
+        window.juce_keyboardCallback ('up', e.which || e.keyCode, e.key);
     });
 
     window.juce_clipboard = "";
@@ -254,10 +283,38 @@ class EmscriptenComponentPeer : public ComponentPeer,
                 canvas.oncontextmenu = function(e) { e.preventDefault(); };
                 canvas.setAttribute('data-peer', $5);
                 canvas.addEventListener ('wheel', function(e) {
-                    if (event.ctrlKey)
-                        event.preventDefault();
+                    event.preventDefault();
                 }, true);
+                canvas._duringInput = false;
+                canvas._inputProxy = document.createElement('input');
+                canvas._inputProxy.type = 'text';
+                canvas._inputProxy.style.position = 'absolute';
+                canvas._inputProxy.style.opacity = 0;
+                canvas._inputProxy.style.zIndex = 0;
+                canvas._inputProxy.addEventListener ('compositionstart', function (e)
+                {
+                    window.juce_inputCallback($5, e.type, e.data);
+                });
+                canvas._inputProxy.addEventListener ('compositionupdate', function (e)
+                {
+                    window.juce_inputCallback($5, e.type, e.data);
+                });
+                canvas._inputProxy.addEventListener ('compositionend', function (e)
+                {
+                    window.juce_inputCallback($5, e.type, e.data);
+                    canvas._inputProxy.value = "";
+                });
+                canvas._inputProxy.addEventListener ('focus', function (e)
+                {
+                    if (! canvas._duringInput) canvas.focus();
+                });
+                canvas._inputProxy.addEventListener ('focusout', function (e)
+                {
+                    if (canvas._duringInput)
+                        canvas._inputProxy.focus();
+                });
                 document.body.appendChild(canvas);
+                document.body.appendChild(canvas._inputProxy);
             }, id.toRawUTF8(), bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight(), this, ++highestZIndex);
             
             zIndex = highestZIndex;
@@ -273,11 +330,14 @@ class EmscriptenComponentPeer : public ComponentPeer,
             emComponentPeerList.removeAllInstancesOf(this);
             MAIN_THREAD_EM_ASM({
                 var canvas = document.getElementById(UTF8ToString($0));
+                canvas.parentElement.removeChild(canvas._inputProxy);
                 canvas.parentElement.removeChild(canvas);
             }, id.toRawUTF8());
         }
 
         int getZIndex () const { return zIndex; }
+
+        String getId() const { return id; }
 
         struct ZIndexComparator
         {
@@ -429,8 +489,9 @@ class EmscriptenComponentPeer : public ComponentPeer,
 
         virtual void toFront (bool makeActive) override
         {
+            if (zIndex == highestZIndex) return;
             DBG("toFront " << id << " " << (makeActive ? "true" : "false"));
-
+            
             highestZIndex = MAIN_THREAD_EM_ASM_INT({
                 var canvas = document.getElementById(UTF8ToString($0));
                 canvas.style.zIndex = parseInt($1)+1;
@@ -511,7 +572,23 @@ class EmscriptenComponentPeer : public ComponentPeer,
 
         virtual void textInputRequired(Point< int > position, TextInputTarget &) override
         {
-            DBG("textInputRequired");
+            MAIN_THREAD_EM_ASM({
+                var canvas = document.getElementById(UTF8ToString($0));
+                var left = parseInt(canvas.style.left, 10);
+                var top = parseInt(canvas.style.top, 10);
+                canvas._duringInput = true;
+                canvas._inputProxy.style.left = (left + $1) + 'px';
+                canvas._inputProxy.style.top = (top + $2) + 'px';
+                canvas._inputProxy.focus();
+            }, id.toRawUTF8(), position.x, position.y);
+        }
+
+        virtual void dismissPendingTextInput() override
+        {
+            MAIN_THREAD_EM_ASM({
+                var canvas = document.getElementById(UTF8ToString($0));
+                canvas._duringInput = false;
+            }, id.toRawUTF8());
         }
 
         virtual void repaint (const Rectangle<int>& area) override
@@ -599,7 +676,7 @@ class EmscriptenComponentPeer : public ComponentPeer,
 
         void internalRepaint (const Rectangle<int> &area)
         {
-            DBG("repaint: " << area.toString());
+            // DBG("repaint: " << area.toString());
 
             Image temp(Image::ARGB, area.getWidth(), area.getHeight(), true);
             LowLevelGraphicsSoftwareRenderer g(temp);
@@ -733,12 +810,42 @@ void MainThreadEventProxy::handleKeyboardEvent (const KeyboardEvent& e)
     for (int i = emComponentPeerList.size() - 1; i >= 0; i --)
     {
         EmscriptenComponentPeer* peer = emComponentPeerList[i];
+
+        if (! peer->isVisible()) continue;
+        if (! peer->isFocused()) continue;
+
         if (changedModifier != ModifierKeys::noModifiers)
             peer->handleModifierKeysChange();
         peer->handleKeyUpOrDown(isDown);
         if (isDown)
             peer->handleKeyPress(KeyPress(keyCode, mods, keyChar));
     }
+}
+
+void MainThreadEventProxy::handleInputEvent (const InputEvent& e)
+{
+    TextInputTarget* input = e.target->findCurrentTextInputTarget();
+    // DBG("handleInputEvent " << e.type << " " << e.data);
+    if (e.type == "compositionstart" || e.type == "compositionupdate")
+    {
+        Component* inputComponent = dynamic_cast<Component*>(input);
+        if (inputComponent)
+        {
+            auto bounds = inputComponent->getScreenBounds();
+            auto caret = input->getCaretRectangle();
+            int x = bounds.getX() + caret.getX();
+            int y = bounds.getY() + caret.getY();
+            MAIN_THREAD_EM_ASM({
+                var canvas = document.getElementById(UTF8ToString($0));
+                canvas._duringInput = true;
+                canvas._inputProxy.style.left = $1 + 'px';
+                canvas._inputProxy.style.top = $2 + 'px';
+                canvas._inputProxy.focus();
+            }, e.target->getId().toRawUTF8(), x, y);
+        }
+    } else
+    if (e.type == "compositionend" && e.data.length() > 0)
+        input->insertTextAtCaret (e.data);
 }
 
 //==============================================================================
@@ -847,12 +954,41 @@ Image juce_createIconForFile (const File& file)
 }
 
 //==============================================================================
-void* CustomMouseCursorInfo::create() const                                                     { return nullptr; }
-void* MouseCursor::createStandardMouseCursor (const MouseCursor::StandardCursorType)            { return nullptr; }
+void *dummy_cursor_info = (void*) 1;
+void* CustomMouseCursorInfo::create() const                                                     { return dummy_cursor_info; }
+void* MouseCursor::createStandardMouseCursor (const MouseCursor::StandardCursorType type)            { return (void*) (int*) type; }
 void MouseCursor::deleteMouseCursor (void* const /*cursorHandle*/, const bool /*isStandard*/)   {}
 
+std::map<enum MouseCursor::StandardCursorType, String> cursorNames = {
+    {MouseCursor::StandardCursorType::NoCursor, String("none")},
+    {MouseCursor::StandardCursorType::NormalCursor, String("default")},
+    {MouseCursor::StandardCursorType::WaitCursor, String("wait")},
+    {MouseCursor::StandardCursorType::IBeamCursor, String("text")},
+    {MouseCursor::StandardCursorType::CrosshairCursor, String("crosshair")},
+    {MouseCursor::StandardCursorType::CopyingCursor, String("copy")},
+    {MouseCursor::StandardCursorType::PointingHandCursor, String("pointer")},
+    {MouseCursor::StandardCursorType::DraggingHandCursor, String("move")},
+    {MouseCursor::StandardCursorType::LeftRightResizeCursor, String("ew-resize")},
+    {MouseCursor::StandardCursorType::UpDownResizeCursor, String("ns-resize")},
+    {MouseCursor::StandardCursorType::UpDownLeftRightResizeCursor, String("nwse-resize")},
+    {MouseCursor::StandardCursorType::TopEdgeResizeCursor, String("n-resize")},
+    {MouseCursor::StandardCursorType::BottomEdgeResizeCursor, String("s-resize")},
+    {MouseCursor::StandardCursorType::LeftEdgeResizeCursor, String("w-resize")},
+    {MouseCursor::StandardCursorType::RightEdgeResizeCursor, String("e-resize")},
+    {MouseCursor::StandardCursorType::TopLeftCornerResizeCursor, String("nw-resize")},
+    {MouseCursor::StandardCursorType::TopRightCornerResizeCursor, String("ne-resize")},
+    {MouseCursor::StandardCursorType::BottomLeftCornerResizeCursor, String("sw-resize")},
+    {MouseCursor::StandardCursorType::BottomRightCornerResizeCursor, String("se-resize")}
+    };
+
 //==============================================================================
-void MouseCursor::showInWindow (ComponentPeer*) const   {}
+void MouseCursor::showInWindow (ComponentPeer* peer) const   {
+    auto type = (MouseCursor::StandardCursorType) (int) getHandle();
+    const char *css = cursorNames[type].toRawUTF8();
+    MAIN_THREAD_EM_ASM({
+        document.body.style.cursor = UTF8ToString($0);
+    }, css);
+}
 
 //==============================================================================
 void LookAndFeel::playAlertSound()
@@ -902,7 +1038,7 @@ String SystemClipboard::getTextFromClipboard()
     const char* data = (const char*)
         emscripten_sync_run_in_main_runtime_thread(
             EM_FUNC_SIG_I, emscriptenGetClipboard);
-    String ret(data);
+    String ret = String::fromUTF8(data);
     free((void*)data);
     return ret;
 }
