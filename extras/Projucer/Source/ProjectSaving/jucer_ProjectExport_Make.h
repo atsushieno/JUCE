@@ -36,6 +36,7 @@ protected:
     public:
         MakeBuildConfiguration (Project& p, const ValueTree& settings, const ProjectExporter& e)
             : BuildConfiguration (p, settings, e),
+              isEmscripten              (config, Ids::isEmscripten, getUndoManager(), false)
               architectureTypeValue     (config, Ids::linuxArchitecture,          getUndoManager(), String()),
               pluginBinaryCopyStepValue (config, Ids::enablePluginBinaryCopyStep, getUndoManager(), true),
               vstBinaryLocation         (config, Ids::vstBinaryLocation,          getUndoManager(), "$(HOME)/.vst"),
@@ -106,7 +107,12 @@ protected:
 
     private:
         //==============================================================================
+<<<<<<< HEAD
         ValueWithDefault architectureTypeValue, pluginBinaryCopyStepValue, vstBinaryLocation, vst3BinaryLocation, unityPluginBinaryLocation;
+=======
+        ValueWithDefault architectureTypeValue;
+        ValueWithDefault isEmscripten;
+>>>>>>> acc05f465... [emscripten][projucer] Add basic Emscripten export stuff in Makefile exporter.
     };
 
     BuildConfiguration::Ptr createBuildConfig (const ValueTree& tree) const override
@@ -146,6 +152,19 @@ public:
 
                 if (getTargetFileType() == pluginBundle)
                     result.add ("-Wl,--no-undefined");
+            }
+
+            if (owner.isEmscripten) {
+                result.add ("-lopenal");
+                result.add ("-s USE_PTHREADS=1");
+                result.add ("-s USE_FREETYPE=1");
+                result.add ("-s DISABLE_EXCEPTION_CATCHING=0");
+                result.add ("-s PROXY_TO_PTHREAD=1");
+                result.add ("-s PTHREAD_POOL_SIZE=20");
+                result.add ("-s TOTAL_MEMORY=256MB");
+                result.add ("-s NO_EXIT_RUNTIME");
+                result.add ("-s EXPORTED_FUNCTIONS=\"['_main', '_juce_animationFrameCallback', '_juce_mouseCallback', '_juce_keyboardCallback']\"");
+                result.add ("-s EXTRA_EXPORTED_RUNTIME_METHODS=\"['ccall', 'cwrap']\"");
             }
 
             return result;
@@ -210,6 +229,7 @@ public:
 
             s.add ("JUCE_TARGET_" + getTargetVarName() + String (" := ") + escapeSpaces (targetName));
 
+<<<<<<< HEAD
             if (config.isPluginBinaryCopyStepEnabled() && (type == VST3PlugIn || type == VSTPlugIn || type == UnityPlugIn))
             {
                 String copyCmd ("JUCE_COPYCMD_" + getTargetVarName() + String (" := $(JUCE_OUTDIR)/"));
@@ -229,6 +249,9 @@ public:
                     s.add ("JUCE_UNITYDESTDIR := " + config.getUnityPluginBinaryLocationString());
                     s.add (copyCmd + "$(JUCE_UNITYDIR)/. $(JUCE_UNITYDESTDIR)");
                 }
+=======
+            if (config.isEmscripten.get()) {
+>>>>>>> acc05f465... [emscripten][projucer] Add basic Emscripten export stuff in Makefile exporter.
             }
 
             return s;
@@ -241,6 +264,9 @@ public:
 
             if (type == SharedCodeTarget || type == StaticLibrary)
                 return ".a";
+
+            if (owner.isEmscripten)
+                return ".html";
 
             return {};
         }
@@ -302,7 +328,7 @@ public:
 
             out << newLine;
 
-            if (! packages.isEmpty())
+            if (! packages.isEmpty() && !owner.isEmscripten)
             {
                 out << "\t@command -v pkg-config >/dev/null 2>&1 || { echo >&2 \"pkg-config not installed. Please, install it.\"; exit 1; }" << newLine
                     << "\t@pkg-config --print-errors";
@@ -375,9 +401,19 @@ public:
     };
 
     //==============================================================================
+<<<<<<< HEAD
     static String getDisplayName()        { return "Linux Makefile"; }
     static String getValueTreeTypeName()  { return "LINUX_MAKE"; }
     static String getTargetFolderName()   { return "LinuxMakefile"; }
+=======
+    static const char* getNameLinux()           { return "Linux Makefile"; }
+    static const char* getNameWasm()            { return "Emscripten Makefile"; }
+    static const char* getValueTreeTypeName()   { return "LINUX_MAKE"; }
+
+    bool isEmscripten{false};
+
+    String getExtraPkgConfigString() const      { return extraPkgConfigValue.get(); }
+>>>>>>> acc05f465... [emscripten][projucer] Add basic Emscripten export stuff in Makefile exporter.
 
     static MakefileProjectExporter* createForSettings (Project& projectToUse, const ValueTree& settingsToUse)
     {
@@ -392,8 +428,15 @@ public:
         : ProjectExporter (p, t),
           extraPkgConfigValue (settings, Ids::linuxExtraPkgConfig, getUndoManager())
     {
+<<<<<<< HEAD
         name = getDisplayName();
         targetLocationValue.setDefault (getDefaultBuildsRootFolder() + getTargetFolderName());
+=======
+        isEmscripten = t.getProperty(Ids::isEmscripten);
+        name = isEmscripten ? getNameWasm() : getNameLinux();
+
+        targetLocationValue.setDefault (getDefaultBuildsRootFolder() + getTargetFolderForExporter (getValueTreeTypeName()));
+>>>>>>> acc05f465... [emscripten][projucer] Add basic Emscripten export stuff in Makefile exporter.
     }
 
     //==============================================================================
@@ -557,8 +600,13 @@ private:
     {
         auto compilePackages = getCompilePackages();
 
+<<<<<<< HEAD
         if (compilePackages.size() > 0)
             return "$(shell pkg-config --cflags " + compilePackages.joinIntoString (" ") + ")";
+=======
+        if (packages.size() > 0 && !isEmscripten)
+            return "$(shell pkg-config --cflags " + packages.joinIntoString (" ") + ")";
+>>>>>>> acc05f465... [emscripten][projucer] Add basic Emscripten export stuff in Makefile exporter.
 
         return {};
     }
@@ -567,8 +615,13 @@ private:
     {
         auto linkPackages = getLinkPackages();
 
+<<<<<<< HEAD
         if (linkPackages.size() > 0)
             return "$(shell pkg-config --libs " + linkPackages.joinIntoString (" ") + ")";
+=======
+        if (packages.size() > 0 && isEmscripten)
+            return "$(shell pkg-config --libs " + packages.joinIntoString (" ") + ")";
+>>>>>>> acc05f465... [emscripten][projucer] Add basic Emscripten export stuff in Makefile exporter.
 
         return {};
     }
@@ -624,6 +677,12 @@ private:
         cppStandard = "-std=" + String (shouldUseGNUExtensions() ? "gnu++" : "c++") + cppStandard;
 
         result.add (cppStandard);
+
+        if (isEmscripten) {
+            result.add("-s USE_PTHREADS=1");
+            result.add("-s USE_FREETYPE=1");
+            result.add("-s DISABLE_EXCEPTION_CATCHING=0");
+        }
 
         return result;
     }
