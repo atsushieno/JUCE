@@ -37,7 +37,8 @@ protected:
     public:
         MakeBuildConfiguration (Project& p, const ValueTree& settings, const ProjectExporter& e)
             : BuildConfiguration (p, settings, e),
-              architectureTypeValue (config, Ids::linuxArchitecture, getUndoManager(), String())
+              architectureTypeValue (config, Ids::linuxArchitecture, getUndoManager(), String()),
+              isEmscripten (config, Ids::isEmscripten, getUndoManager(), false)
         {
             linkTimeOptimisationValue.setDefault (false);
             optimisationLevelValue.setDefault (isDebug() ? gccO0 : gccO3);
@@ -75,6 +76,7 @@ protected:
 
         //==============================================================================
         ValueWithDefault architectureTypeValue;
+        ValueWithDefault isEmscripten;
     };
 
     BuildConfiguration::Ptr createBuildConfig (const ValueTree& tree) const override
@@ -114,6 +116,19 @@ public:
 
                 if (getTargetFileType() == pluginBundle)
                     result.add ("-Wl,--no-undefined");
+            }
+
+            if (owner.isEmscripten) {
+                result.add ("-lopenal");
+                result.add ("-s USE_PTHREADS=1");
+                result.add ("-s USE_FREETYPE=1");
+                result.add ("-s DISABLE_EXCEPTION_CATCHING=0");
+                result.add ("-s PROXY_TO_PTHREAD=1");
+                result.add ("-s PTHREAD_POOL_SIZE=20");
+                result.add ("-s TOTAL_MEMORY=256MB");
+                result.add ("-s NO_EXIT_RUNTIME");
+                result.add ("-s EXPORTED_FUNCTIONS=\"['_main', '_juce_animationFrameCallback', '_juce_mouseCallback', '_juce_keyboardCallback']\"");
+                result.add ("-s EXTRA_EXPORTED_RUNTIME_METHODS=\"['ccall', 'cwrap']\"");
             }
 
             return result;
@@ -170,6 +185,9 @@ public:
 
             s.add ("JUCE_TARGET_" + getTargetVarName() + String (" := ") + escapeSpaces (targetName));
 
+            if (config.isEmscripten.get()) {
+            }
+
             return s;
         }
 
@@ -184,6 +202,9 @@ public:
                 case StaticLibrary:         return ".a";
                 default:                    break;
             }
+
+            if (owner.isEmscripten)
+                return ".html";
 
             return {};
         }
@@ -244,7 +265,7 @@ public:
 
             out << newLine;
 
-            if (! packages.isEmpty())
+            if (! packages.isEmpty() && !owner.isEmscripten)
             {
                 out << "\t@command -v pkg-config >/dev/null 2>&1 || { echo >&2 \"pkg-config not installed. Please, install it.\"; exit 1; }" << newLine
                     << "\t@pkg-config --print-errors";
@@ -301,7 +322,10 @@ public:
 
     //==============================================================================
     static const char* getNameLinux()           { return "Linux Makefile"; }
+    static const char* getNameWasm()            { return "Emscripten Makefile"; }
     static const char* getValueTreeTypeName()   { return "LINUX_MAKE"; }
+
+    bool isEmscripten{false};
 
     String getExtraPkgConfigString() const      { return extraPkgConfigValue.get(); }
 
@@ -318,7 +342,8 @@ public:
         : ProjectExporter (p, t),
           extraPkgConfigValue (settings, Ids::linuxExtraPkgConfig, getUndoManager())
     {
-        name = getNameLinux();
+        isEmscripten = t.getProperty(Ids::isEmscripten);
+        name = isEmscripten ? getNameWasm() : getNameLinux();
 
         targetLocationValue.setDefault (getDefaultBuildsRootFolder() + getTargetFolderForExporter (getValueTreeTypeName()));
     }
@@ -473,7 +498,7 @@ private:
     {
         auto packages = getPackages();
 
-        if (packages.size() > 0)
+        if (packages.size() > 0 && !isEmscripten)
             return "$(shell pkg-config --cflags " + packages.joinIntoString (" ") + ")";
 
         return {};
@@ -483,7 +508,7 @@ private:
     {
         auto packages = getPackages();
 
-        if (packages.size() > 0)
+        if (packages.size() > 0 && isEmscripten)
             return "$(shell pkg-config --libs " + packages.joinIntoString (" ") + ")";
 
         return {};
@@ -540,6 +565,12 @@ private:
         cppStandard = "-std=" + String (shouldUseGNUExtensions() ? "gnu++" : "c++") + cppStandard;
 
         result.add (cppStandard);
+
+        if (isEmscripten) {
+            result.add("-s USE_PTHREADS=1");
+            result.add("-s USE_FREETYPE=1");
+            result.add("-s DISABLE_EXCEPTION_CATCHING=0");
+        }
 
         return result;
     }

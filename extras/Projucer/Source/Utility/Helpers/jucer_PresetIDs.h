@@ -140,6 +140,7 @@ namespace Ids
     DECLARE_ID (msvcManifestFile);
     DECLARE_ID (warningsAreErrors);
     DECLARE_ID (linuxArchitecture);
+    DECLARE_ID (isEmscripten);
     DECLARE_ID (linuxCodeBlocksArchitecture);
     DECLARE_ID (windowsCodeBlocksArchitecture);
     DECLARE_ID (codeBlocksWindowsTarget);
