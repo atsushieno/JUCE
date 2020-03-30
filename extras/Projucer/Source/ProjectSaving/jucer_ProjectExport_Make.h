@@ -107,12 +107,8 @@ protected:
 
     private:
         //==============================================================================
-<<<<<<< HEAD
         ValueWithDefault architectureTypeValue, pluginBinaryCopyStepValue, vstBinaryLocation, vst3BinaryLocation, unityPluginBinaryLocation;
-=======
-        ValueWithDefault architectureTypeValue;
         ValueWithDefault isEmscripten;
->>>>>>> acc05f465... [emscripten][projucer] Add basic Emscripten export stuff in Makefile exporter.
     };
 
     BuildConfiguration::Ptr createBuildConfig (const ValueTree& tree) const override
@@ -229,7 +225,6 @@ public:
 
             s.add ("JUCE_TARGET_" + getTargetVarName() + String (" := ") + escapeSpaces (targetName));
 
-<<<<<<< HEAD
             if (config.isPluginBinaryCopyStepEnabled() && (type == VST3PlugIn || type == VSTPlugIn || type == UnityPlugIn))
             {
                 String copyCmd ("JUCE_COPYCMD_" + getTargetVarName() + String (" := $(JUCE_OUTDIR)/"));
@@ -249,9 +244,6 @@ public:
                     s.add ("JUCE_UNITYDESTDIR := " + config.getUnityPluginBinaryLocationString());
                     s.add (copyCmd + "$(JUCE_UNITYDIR)/. $(JUCE_UNITYDESTDIR)");
                 }
-=======
-            if (config.isEmscripten.get()) {
->>>>>>> acc05f465... [emscripten][projucer] Add basic Emscripten export stuff in Makefile exporter.
             }
 
             return s;
@@ -616,10 +608,14 @@ private:
         auto linkPackages = getLinkPackages();
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         if (linkPackages.size() > 0)
             return "$(shell pkg-config --libs " + linkPackages.joinIntoString (" ") + ")";
 =======
         if (packages.size() > 0 && isEmscripten)
+=======
+        if (packages.size() > 0 && !isEmscripten)
+>>>>>>> 5d57ff578... Fix bogus ldflags output that broke Linux (not emscripten) build.
             return "$(shell pkg-config --libs " + packages.joinIntoString (" ") + ")";
 >>>>>>> acc05f465... [emscripten][projucer] Add basic Emscripten export stuff in Makefile exporter.
 
