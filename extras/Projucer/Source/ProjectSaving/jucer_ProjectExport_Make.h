@@ -508,7 +508,7 @@ private:
     {
         auto packages = getPackages();
 
-        if (packages.size() > 0 && isEmscripten)
+        if (packages.size() > 0 && !isEmscripten)
             return "$(shell pkg-config --libs " + packages.joinIntoString (" ") + ")";
 
         return {};
