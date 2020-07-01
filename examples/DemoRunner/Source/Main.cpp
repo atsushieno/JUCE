@@ -31,6 +31,7 @@
 //==============================================================================
 #if JUCE_WINDOWS || JUCE_LINUX || JUCE_MAC
  // Just add a simple icon to the Window system tray area or Mac menu bar..
+/*
  struct DemoTaskbarComponent  : public SystemTrayIconComponent,
                                 private Timer
  {
@@ -71,6 +72,7 @@
                           ModalCallbackFunction::forComponent (menuInvocationCallback, this));
      }
  };
+ */
 #endif
 
 std::unique_ptr<AudioDeviceManager> sharedAudioDeviceManager;
@@ -123,8 +125,8 @@ private:
                                                           .findColour (ResizableWindow::backgroundColourId),
                               DocumentWindow::allButtons)
         {
-            setUsingNativeTitleBar (true);
-            setResizable (true, false);
+            setUsingNativeTitleBar (false);
+            setResizable (true, true);
             setResizeLimits (400, 400, 10000, 10000);
 
            #if JUCE_IOS || JUCE_ANDROID
@@ -141,7 +143,7 @@ private:
             setVisible (true);
 
            #if JUCE_WINDOWS || JUCE_LINUX || JUCE_MAC
-            taskbarIcon.reset (new DemoTaskbarComponent());
+            // taskbarIcon.reset (new DemoTaskbarComponent());
            #endif
         }
 

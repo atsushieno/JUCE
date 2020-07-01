@@ -278,4 +278,8 @@ namespace juce
   #include "native/juce_android_ContentSharer.cpp"
  #endif
 
+#elif JUCE_EMSCRIPTEN
+ #include "native/juce_emscripten_Windowing.cpp"
+ #include "native/juce_emscripten_FileChooser.cpp"
+
 #endif

@@ -95,4 +95,7 @@
 #elif JUCE_ANDROID
  #include "native/juce_android_Messaging.cpp"
 
+#elif JUCE_EMSCRIPTEN
+ #include "native/juce_emscripten_Messaging.cpp"
+
 #endif

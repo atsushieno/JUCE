@@ -45,7 +45,9 @@
 #include "../../../GUI/FlexBoxDemo.h"
 #include "../../../GUI/FontsDemo.h"
 #include "../../../GUI/GraphicsDemo.h"
-#include "../../../GUI/GridDemo.h"
+#if JUCE_HAS_CONSTEXPR
+ #include "../../../GUI/GridDemo.h"
+#endif
 #include "../../../GUI/ImagesDemo.h"
 #include "../../../GUI/KeyMappingsDemo.h"
 #include "../../../GUI/LookAndFeelDemo.h"
@@ -59,9 +61,9 @@
 #endif
 #include "../../../GUI/PropertiesDemo.h"
 #if ! JUCE_LINUX
- #include "../../../GUI/VideoDemo.h"
+//  #include "../../../GUI/VideoDemo.h"
 #endif
-#include "../../../GUI/WebBrowserDemo.h"
+// #include "../../../GUI/WebBrowserDemo.h"
 #include "../../../GUI/WidgetsDemo.h"
 #include "../../../GUI/WindowsDemo.h"
 
@@ -82,7 +84,9 @@ void registerDemos_Two() noexcept
     REGISTER_DEMO (FlexBoxDemo,               GUI, false)
     REGISTER_DEMO (FontsDemo,                 GUI, false)
     REGISTER_DEMO (GraphicsDemo,              GUI, false)
+   #if JUCE_HAS_CONSTEXPR
     REGISTER_DEMO (GridDemo,                  GUI, false)
+   #endif
     REGISTER_DEMO (ImagesDemo,                GUI, false)
     REGISTER_DEMO (KeyMappingsDemo,           GUI, false)
     REGISTER_DEMO (LookAndFeelDemo,           GUI, false)
@@ -90,15 +94,15 @@ void registerDemos_Two() noexcept
     REGISTER_DEMO (MenusDemo,                 GUI, false)
     REGISTER_DEMO (MultiTouchDemo,            GUI, false)
    #if JUCE_OPENGL
-    REGISTER_DEMO (OpenGLAppDemo,             GUI, true)
-    REGISTER_DEMO (OpenGLDemo2D,              GUI, true)
-    REGISTER_DEMO (OpenGLDemo,                GUI, true)
+    // REGISTER_DEMO (OpenGLAppDemo,             GUI, true)
+    // REGISTER_DEMO (OpenGLDemo2D,              GUI, true)
+    // REGISTER_DEMO (OpenGLDemo,                GUI, true)
    #endif
     REGISTER_DEMO (PropertiesDemo,            GUI, false)
    #if ! JUCE_LINUX
-    REGISTER_DEMO (VideoDemo,                 GUI, true)
+    // REGISTER_DEMO (VideoDemo,                 GUI, true)
    #endif
-    REGISTER_DEMO (WebBrowserDemo,            GUI, true)
+    // REGISTER_DEMO (WebBrowserDemo,            GUI, true)
     REGISTER_DEMO (WidgetsDemo,               GUI, false)
     REGISTER_DEMO (WindowsDemo,               GUI, false)
 }

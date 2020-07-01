@@ -84,7 +84,7 @@ JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4514 4245 4100)
  #endif
 #endif
 
-#if JUCE_LINUX
+#if JUCE_LINUX || JUCE_EMSCRIPTEN
  #include <cstring>
  #include <signal.h>
 

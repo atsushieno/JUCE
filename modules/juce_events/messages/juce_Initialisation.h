@@ -86,7 +86,9 @@ public:
 */
 #ifdef DOXYGEN
  #define START_JUCE_APPLICATION(AppClass)
+
 #else
+
  #if JUCE_WINDOWS && ! defined (_CONSOLE)
   #define JUCE_MAIN_FUNCTION       int __stdcall WinMain (struct HINSTANCE__*, struct HINSTANCE__*, char*, int)
   #define JUCE_MAIN_FUNCTION_ARGS
@@ -126,12 +128,22 @@ public:
     juce::JUCEApplicationBase* juce_CreateApplication(); \
     juce::JUCEApplicationBase* juce_CreateApplication() { return new AppClass(); }
 
-  #define JUCE_MAIN_FUNCTION_DEFINITION \
+  #if JUCE_EMSCRIPTEN
+   #define JUCE_MAIN_FUNCTION_DEFINITION \
+   extern void launchApp(int argc, char* argv[]); \
+   extern "C" int main(int argc, char* argv[]) \
+   { \
+      launchApp(argc, argv); \
+      return 0; \
+   }
+  #else
+   #define JUCE_MAIN_FUNCTION_DEFINITION \
     extern "C" JUCE_MAIN_FUNCTION \
     { \
        juce::JUCEApplicationBase::createInstance = &juce_CreateApplication; \
        return juce::JUCEApplicationBase::main (JUCE_MAIN_FUNCTION_ARGS); \
     }
+  #endif
 
  #endif
 

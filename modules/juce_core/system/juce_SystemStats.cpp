@@ -138,7 +138,7 @@ String SystemStats::getStackBacktrace()
 {
     String result;
 
-   #if JUCE_ANDROID || JUCE_MINGW
+   #if JUCE_ANDROID || JUCE_MINGW || JUCE_EMSCRIPTEN
     jassertfalse; // sorry, not implemented yet!
 
    #elif JUCE_WINDOWS
@@ -195,6 +195,12 @@ static LONG WINAPI handleCrash (LPEXCEPTION_POINTERS ep)
     globalCrashHandler (ep);
     return EXCEPTION_EXECUTE_HANDLER;
 }
+#elif defined(JUCE_EMSCRIPTEN)
+static void handleCrash (int ptr)
+{
+    globalCrashHandler((void*) (pointer_sized_int) ptr);
+    //kill (getpid(), SIGKILL);
+}
 #else
 static void handleCrash (int signum)
 {
@@ -212,6 +218,8 @@ void SystemStats::setApplicationCrashHandler (CrashHandlerFunction handler)
 
    #if JUCE_WINDOWS
     SetUnhandledExceptionFilter (handleCrash);
+   #elif defined(JUCE_EMSCRIPTEN)
+    // TODO: DO IT
    #else
     const int signals[] = { SIGFPE, SIGILL, SIGSEGV, SIGBUS, SIGABRT, SIGSYS };
 

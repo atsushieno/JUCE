@@ -39,6 +39,7 @@ struct TargetOS
         windows = 0,
         osx,
         linux,
+        wasm,
         unknown
     };
 
