@@ -1,11 +1,3 @@
-/*
-  ==============================================================================
-
-    This file was auto-generated!
-
-  ==============================================================================
-*/
-
 #pragma once
 
 %%include_juce%%
@@ -15,7 +7,7 @@
     This component lives inside our window, and this is where you should put all
     your controls and content.
 */
-class %%content_component_class%%   : public AudioAppComponent
+class %%content_component_class%%  : public juce::AudioAppComponent
 {
 public:
     //==============================================================================
@@ -25,11 +17,21 @@ public:
         // you add any child components.
         setSize (800, 600);
 
-        // specify the number of input and output channels that we want to open
-        setAudioChannels (2, 2);
+        // Some platforms require permissions to open input channels so request that here
+        if (juce::RuntimePermissions::isRequired (juce::RuntimePermissions::recordAudio)
+            && ! juce::RuntimePermissions::isGranted (juce::RuntimePermissions::recordAudio))
+        {
+            juce::RuntimePermissions::request (juce::RuntimePermissions::recordAudio,
+                                               [&] (bool granted) { setAudioChannels (granted ? 2 : 0, 2); });
+        }
+        else
+        {
+            // Specify the number of input and output channels that we want to open
+            setAudioChannels (2, 2);
+        }
     }
 
-    ~%%content_component_class%%()
+    ~%%content_component_class%%() override
     {
         // This shuts down the audio device and clears the audio source.
         shutdownAudio();
@@ -47,7 +49,7 @@ public:
         // For more details, see the help for AudioProcessor::prepareToPlay()
     }
 
-    void getNextAudioBlock (const AudioSourceChannelInfo& bufferToFill) override
+    void getNextAudioBlock (const juce::AudioSourceChannelInfo& bufferToFill) override
     {
         // Your audio-processing code goes here!
 
@@ -67,10 +69,10 @@ public:
     }
 
     //==============================================================================
-    void paint (Graphics& g) override
+    void paint (juce::Graphics& g) override
     {
         // (Our component is opaque, so we must completely fill the background with a solid colour)
-        g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
+        g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
 
         // You can add your drawing code here!
     }

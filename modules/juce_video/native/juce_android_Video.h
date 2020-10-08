@@ -2,28 +2,100 @@
   ==============================================================================
 
    This file is part of the JUCE library.
-   Copyright (c) 2018 - ROLI Ltd.
+   Copyright (c) 2020 - Raw Material Software Limited
 
-   Permission is granted to use this software under the terms of either:
-   a) the GPL v2 (or any later version)
-   b) the Affero GPL v3
+   JUCE is an open source library subject to commercial or open-source
+   licensing.
 
-   Details of these licenses can be found at: www.gnu.org/licenses
+   By using JUCE, you agree to the terms of both the JUCE 6 End-User License
+   Agreement and JUCE Privacy Policy (both effective as of the 16th June 2020).
 
-   JUCE is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-   A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+   End User License Agreement: www.juce.com/juce-6-licence
+   Privacy Policy: www.juce.com/juce-privacy-policy
 
-   ------------------------------------------------------------------------------
+   Or: You may also use this code under the terms of the GPL v3 (see
+   www.gnu.org/licenses).
 
-   To release a closed-source product which uses JUCE, commercial licenses are
-   available: visit www.juce.com for more information.
+   JUCE IS PROVIDED "AS IS" WITHOUT ANY WARRANTY, AND ALL WARRANTIES, WHETHER
+   EXPRESSED OR IMPLIED, INCLUDING MERCHANTABILITY AND FITNESS FOR PURPOSE, ARE
+   DISCLAIMED.
 
   ==============================================================================
 */
 
-#if __ANDROID_API__ >= 21
-#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD) \
+//==============================================================================
+// This byte-code is generated from:
+//
+// native/java/com/rmsl/juce/MediaControllerCallback.java
+// native/java/com/rmsl/juce/MediaSessionCallback.java
+// native/java/com/rmsl/juce/SystemVolumeObserver.java
+//
+// files with min sdk version 21
+// See juce_core/native/java/README.txt on how to generate this byte-code.
+static const unsigned char MediaSessionByteCode[] =
+{ 31,139,8,8,247,108,161,94,0,3,77,101,100,105,97,83,101,115,115,105,111,110,66,121,116,101,67,111,100,101,46,100,101,120,0,149,
+152,127,108,28,71,21,199,223,236,253,180,207,190,95,254,221,186,169,211,56,137,19,234,220,145,26,226,228,28,99,199,216,196,233,
+249,71,125,182,107,76,168,187,246,109,236,77,238,118,143,221,189,171,45,132,168,170,32,21,209,63,144,74,165,170,82,81,144,64,
+128,20,36,74,37,132,80,69,35,126,75,32,160,82,36,130,64,80,16,8,138,42,126,41,17,21,164,130,239,204,206,158,239,46,14,42,151,
+124,246,189,121,239,205,236,155,55,51,231,219,205,107,219,205,233,135,222,67,219,115,149,223,125,253,83,63,120,252,139,71,187,
+47,68,78,252,118,237,250,194,183,191,251,151,175,254,243,214,229,4,81,137,136,182,151,135,146,36,63,215,226,68,27,228,218,187,
+192,109,230,202,21,133,40,0,89,240,17,13,64,126,6,18,255,233,186,159,104,190,133,104,8,206,199,194,68,42,200,131,2,176,192,199,
+193,83,224,19,224,69,112,13,252,18,220,2,61,77,68,195,224,34,184,2,126,10,254,3,14,53,19,157,4,179,32,15,158,6,47,129,159,131,
+183,65,111,132,40,13,198,65,14,60,7,94,6,63,1,111,128,55,193,223,192,45,240,47,64,200,207,15,154,64,20,180,131,110,112,31,232,
+3,253,224,24,56,13,52,80,4,151,193,243,224,179,224,203,224,43,224,101,240,125,240,71,16,106,37,122,16,204,128,101,160,131,143,
+130,231,193,85,240,45,240,27,240,6,120,27,132,162,68,157,224,40,56,13,166,192,44,80,193,14,248,36,120,22,188,8,94,2,175,130,
+215,192,239,193,155,224,239,224,45,144,136,33,111,112,4,156,2,83,96,6,228,192,135,193,54,248,88,204,93,171,16,64,153,9,37,37,148,
+141,100,41,8,233,16,134,34,132,17,182,0,241,197,111,3,237,160,3,116,202,181,239,6,61,224,30,208,11,246,131,7,65,16,40,114,191,
+112,221,87,163,183,73,125,191,28,139,127,30,144,250,53,36,116,64,234,63,132,222,47,245,159,213,232,55,106,244,215,161,31,148,
+250,159,160,31,150,250,77,232,135,164,126,187,70,247,135,119,245,150,26,189,29,250,17,169,247,214,216,7,194,238,94,230,122,186,
+198,62,12,253,168,212,199,160,191,75,234,103,161,15,202,250,204,215,232,43,97,94,207,8,249,101,77,135,64,92,202,4,49,58,38,
+235,204,219,12,255,142,139,250,197,104,69,200,8,61,46,107,248,16,241,117,139,139,218,134,96,81,196,218,185,50,130,235,154,24,
+223,47,218,49,68,156,20,50,72,167,132,12,83,70,250,71,132,108,165,73,33,91,104,90,200,40,205,8,153,164,89,33,125,244,136,200,
+211,29,143,203,81,41,223,39,100,19,141,9,25,160,113,105,63,35,164,143,62,32,100,7,157,149,237,115,82,62,44,100,130,178,178,61,
+39,251,205,203,246,130,148,57,105,95,148,237,37,81,159,102,145,71,2,246,9,33,219,105,74,200,54,90,21,251,170,147,206,203,250,
+50,114,247,54,255,236,3,95,66,227,72,220,109,199,165,191,73,250,239,151,242,131,210,159,144,254,128,180,247,73,249,5,233,231,
+190,30,232,126,228,197,245,203,49,119,95,151,226,1,180,87,147,12,117,228,21,227,107,253,140,244,229,250,24,149,198,154,72,121,
+247,174,239,217,58,95,115,157,239,133,58,95,68,248,20,121,162,62,23,115,115,136,138,61,193,196,190,184,90,27,159,110,33,133,69,
+171,249,125,173,154,95,80,228,167,160,39,19,30,162,111,214,141,229,142,255,106,204,61,187,201,120,172,58,254,247,170,227,43,
+24,191,77,140,239,249,126,84,231,107,23,190,0,60,188,126,175,213,250,22,59,196,60,188,123,255,162,230,222,65,25,255,107,47,62,
+141,248,165,78,242,141,239,198,255,161,38,222,179,253,185,46,127,247,91,230,175,123,212,231,86,93,142,93,34,199,160,220,215,
+255,142,185,123,33,73,165,62,110,249,208,1,31,173,246,251,69,255,128,28,53,16,119,191,3,141,120,8,189,90,232,30,150,38,163,239,
+48,246,82,51,13,99,167,229,208,179,148,238,151,115,119,215,48,26,119,191,227,134,253,109,180,152,246,161,47,207,174,5,210,39,
+228,58,146,76,38,141,49,70,241,227,209,61,35,12,100,155,166,129,127,80,245,195,104,119,15,243,191,167,94,91,169,147,65,41,195,
+82,54,203,202,180,137,239,118,69,142,227,237,113,70,110,109,24,185,127,11,24,185,127,11,120,159,8,206,148,23,211,42,251,242,
+81,120,187,93,218,59,165,189,19,209,188,237,151,246,54,98,3,196,70,40,56,162,27,186,51,74,254,209,204,145,101,138,76,204,205,
+46,78,206,46,174,45,45,76,19,59,71,44,75,157,89,213,200,91,166,158,79,169,165,82,106,124,195,209,43,186,179,147,161,253,85,251,
+134,105,56,154,225,164,38,92,185,160,217,102,161,162,89,25,234,217,59,100,219,201,80,247,29,174,105,33,50,244,64,213,147,87,29,
+117,93,181,53,111,224,185,117,91,179,196,192,247,85,99,138,90,94,87,83,51,252,58,163,57,42,239,146,161,116,131,219,214,108,
+91,55,13,55,140,15,102,153,133,130,102,245,79,168,133,194,186,186,113,41,67,67,239,176,199,124,65,221,225,61,166,141,11,102,
+134,6,255,87,175,156,219,168,185,201,177,119,18,254,72,89,43,107,211,142,86,204,208,193,187,196,123,73,228,28,213,209,50,148,168,
+134,25,154,147,90,178,244,12,181,85,77,166,157,58,83,54,242,5,196,181,215,26,207,170,220,104,213,150,187,100,153,21,61,175,89,
+169,156,230,56,186,177,105,247,231,118,108,145,200,225,236,134,89,76,89,69,187,144,186,88,222,208,26,171,178,59,195,254,189,
+2,229,204,238,30,229,222,102,217,44,148,139,90,237,26,231,213,66,69,191,148,82,13,195,196,76,249,204,115,250,166,161,58,101,
+11,179,73,102,47,170,21,53,85,80,141,205,84,206,177,144,111,134,98,174,173,236,232,133,84,86,183,29,138,55,24,50,52,214,96,25,
+249,255,214,100,52,67,189,119,153,253,49,62,48,245,236,53,101,233,218,107,158,174,139,45,147,178,124,142,124,203,231,196,37,75,
+126,92,178,176,101,209,204,114,91,150,219,178,171,220,182,138,38,20,182,74,10,68,88,149,39,146,90,61,109,209,92,178,53,58,36,
+15,214,169,20,38,229,46,104,202,22,25,164,42,34,133,181,98,217,214,55,40,136,243,104,169,54,117,108,106,206,120,169,84,208,55,
+68,173,229,73,165,36,204,13,7,155,252,91,38,138,219,196,175,238,189,20,61,79,126,29,103,130,18,162,140,103,202,142,99,26,238,
+137,166,251,139,245,5,27,47,231,117,147,31,160,137,45,44,158,150,167,125,13,1,222,65,246,252,7,26,252,117,251,223,11,106,188,
+139,92,130,247,107,54,12,59,8,8,137,128,233,188,76,81,250,231,213,50,242,143,215,153,48,60,221,219,104,153,178,204,226,140,28,
+33,89,235,204,105,218,165,69,179,126,136,156,99,150,100,70,158,165,102,237,189,148,195,69,57,81,74,154,198,29,85,9,99,13,132,
+74,173,166,49,165,218,206,148,105,61,161,90,121,30,60,179,91,228,201,10,175,113,130,219,234,171,22,242,38,23,148,83,74,220,57,
+145,78,215,116,71,49,163,166,33,246,124,77,46,11,218,19,186,33,52,57,225,36,215,26,106,220,2,219,37,189,180,104,206,242,173,19,
+247,90,243,150,86,209,205,178,205,83,112,45,213,19,197,179,19,213,242,149,76,155,2,31,225,118,234,178,180,77,156,77,156,173,
+250,47,126,106,182,181,194,5,89,21,232,206,164,161,174,23,112,223,152,189,101,150,11,249,51,154,103,104,182,29,213,114,236,71,
+117,103,139,2,54,159,26,249,157,45,221,166,176,99,186,223,22,212,83,54,238,118,27,95,217,210,41,80,81,11,200,101,144,189,55,
+20,29,25,164,33,54,28,138,174,210,41,54,201,197,24,123,140,139,41,70,126,182,210,177,15,15,135,15,19,55,164,101,116,142,63,47,
+174,176,147,184,158,16,142,211,226,58,161,140,30,231,242,60,119,79,179,71,185,190,198,245,117,126,209,216,9,92,231,68,228,128,
+146,198,72,217,193,65,58,169,172,174,135,162,223,225,99,159,15,69,7,89,60,209,75,74,146,173,247,6,186,168,235,222,46,214,21,239,
+194,239,168,64,128,41,225,39,159,244,191,210,204,158,82,168,150,86,118,163,153,177,155,224,211,17,198,174,130,107,248,37,16,
+140,40,74,18,241,191,138,52,198,115,186,217,91,136,123,166,133,177,43,224,21,112,3,220,4,79,183,50,246,121,240,13,240,99,240,
+122,43,41,138,226,83,152,114,0,163,221,110,229,189,15,178,43,81,70,215,163,20,111,248,93,196,165,247,110,130,255,38,241,222,79,
+248,104,247,29,133,159,118,223,83,112,233,189,171,240,158,83,249,251,10,95,220,29,75,252,198,234,115,159,237,70,160,7,251,92,59,
+127,158,96,113,247,89,150,63,179,42,125,238,125,249,251,13,159,140,231,207,5,254,190,221,231,5,254,32,193,199,23,207,33,114,
+124,254,46,229,191,60,5,16,96,132,17,0,0,0,0 };
+
+#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD, CALLBACK)    \
  METHOD (getPlaybackInfo,      "getPlaybackInfo",      "()Landroid/media/session/MediaController$PlaybackInfo;") \
  METHOD (getPlaybackState,     "getPlaybackState",     "()Landroid/media/session/PlaybackState;") \
  METHOD (getTransportControls, "getTransportControls", "()Landroid/media/session/MediaController$TransportControls;") \
@@ -31,34 +103,28 @@
  METHOD (setVolumeTo,          "setVolumeTo",          "(II)V") \
  METHOD (unregisterCallback,   "unregisterCallback",   "(Landroid/media/session/MediaController$Callback;)V")
 
-DECLARE_JNI_CLASS (AndroidMediaController, "android/media/session/MediaController")
+DECLARE_JNI_CLASS_WITH_MIN_SDK (AndroidMediaController, "android/media/session/MediaController", 21)
 #undef JNI_CLASS_MEMBERS
 
-#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD) \
- METHOD (constructor, "<init>", "(L" JUCE_ANDROID_ACTIVITY_CLASSPATH ";J)V") \
-
-DECLARE_JNI_CLASS (AndroidMediaControllerCallback, JUCE_ANDROID_ACTIVITY_CLASSPATH "$MediaControllerCallback")
-#undef JNI_CLASS_MEMBERS
-
-#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD) \
+#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD, CALLBACK) \
  METHOD (getAudioAttributes, "getAudioAttributes", "()Landroid/media/AudioAttributes;") \
  METHOD (getCurrentVolume,   "getCurrentVolume",   "()I") \
  METHOD (getMaxVolume,       "getMaxVolume",       "()I")
 
-DECLARE_JNI_CLASS (AndroidMediaControllerPlaybackInfo, "android/media/session/MediaController$PlaybackInfo")
+DECLARE_JNI_CLASS_WITH_MIN_SDK (AndroidMediaControllerPlaybackInfo, "android/media/session/MediaController$PlaybackInfo", 21)
 #undef JNI_CLASS_MEMBERS
 
-#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD) \
+#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD, CALLBACK) \
  METHOD (pause,           "pause",           "()V") \
  METHOD (play,            "play",            "()V") \
  METHOD (playFromMediaId, "playFromMediaId", "(Ljava/lang/String;Landroid/os/Bundle;)V") \
  METHOD (seekTo,          "seekTo",          "(J)V") \
  METHOD (stop,            "stop",            "()V")
 
-DECLARE_JNI_CLASS (AndroidMediaControllerTransportControls, "android/media/session/MediaController$TransportControls")
+DECLARE_JNI_CLASS_WITH_MIN_SDK (AndroidMediaControllerTransportControls, "android/media/session/MediaController$TransportControls", 21)
 #undef JNI_CLASS_MEMBERS
 
-#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD) \
+#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD, CALLBACK) \
  METHOD (constructor,                  "<init>",                       "()V") \
  METHOD (getCurrentPosition,           "getCurrentPosition",           "()I") \
  METHOD (getDuration,                  "getDuration",                  "()I") \
@@ -84,10 +150,10 @@ DECLARE_JNI_CLASS (AndroidMediaControllerTransportControls, "android/media/sessi
  METHOD (start,                        "start",                        "()V") \
  METHOD (stop,                         "stop",                         "()V")
 
-DECLARE_JNI_CLASS (AndroidMediaPlayer, "android/media/MediaPlayer")
+DECLARE_JNI_CLASS_WITH_MIN_SDK (AndroidMediaPlayer, "android/media/MediaPlayer", 21)
 #undef JNI_CLASS_MEMBERS
 
-#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD) \
+#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD, CALLBACK) \
  METHOD (constructor,            "<init>",                 "(Landroid/content/Context;Ljava/lang/String;)V") \
  METHOD (getController,          "getController",          "()Landroid/media/session/MediaController;") \
  METHOD (release,                "release",                "()V") \
@@ -99,58 +165,43 @@ DECLARE_JNI_CLASS (AndroidMediaPlayer, "android/media/MediaPlayer")
  METHOD (setPlaybackState,       "setPlaybackState",       "(Landroid/media/session/PlaybackState;)V") \
  METHOD (setPlaybackToLocal,     "setPlaybackToLocal",     "(Landroid/media/AudioAttributes;)V")
 
-DECLARE_JNI_CLASS (AndroidMediaSession, "android/media/session/MediaSession")
+DECLARE_JNI_CLASS_WITH_MIN_SDK (AndroidMediaSession, "android/media/session/MediaSession", 21)
 #undef JNI_CLASS_MEMBERS
 
-#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD) \
- METHOD (constructor, "<init>", "(L" JUCE_ANDROID_ACTIVITY_CLASSPATH ";J)V") \
-
-DECLARE_JNI_CLASS (AndroidMediaSessionCallback, JUCE_ANDROID_ACTIVITY_CLASSPATH "$MediaSessionCallback")
-#undef JNI_CLASS_MEMBERS
-
-#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD) \
+#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD, CALLBACK) \
  METHOD (build,       "build",   "()Landroid/media/MediaMetadata;") \
  METHOD (constructor, "<init>",  "()V") \
  METHOD (putLong,     "putLong", "(Ljava/lang/String;J)Landroid/media/MediaMetadata$Builder;")
 
-DECLARE_JNI_CLASS (AndroidMediaMetadataBuilder, "android/media/MediaMetadata$Builder")
+DECLARE_JNI_CLASS_WITH_MIN_SDK (AndroidMediaMetadataBuilder, "android/media/MediaMetadata$Builder", 21)
 #undef JNI_CLASS_MEMBERS
 
-#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD) \
+#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD, CALLBACK) \
  METHOD (getSpeed, "getSpeed", "()F") \
  METHOD (setSpeed, "setSpeed", "(F)Landroid/media/PlaybackParams;")
 
-DECLARE_JNI_CLASS (AndroidPlaybackParams, "android/media/PlaybackParams")
+DECLARE_JNI_CLASS_WITH_MIN_SDK (AndroidPlaybackParams, "android/media/PlaybackParams", 21)
 #undef JNI_CLASS_MEMBERS
 
-#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD) \
+#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD, CALLBACK) \
  METHOD (getActions,       "getActions",       "()J") \
  METHOD (getErrorMessage,  "getErrorMessage",  "()Ljava/lang/CharSequence;") \
  METHOD (getPlaybackSpeed, "getPlaybackSpeed", "()F") \
  METHOD (getPosition,      "getPosition",      "()J") \
  METHOD (getState,         "getState",         "()I")
 
-DECLARE_JNI_CLASS (AndroidPlaybackState, "android/media/session/PlaybackState")
+DECLARE_JNI_CLASS_WITH_MIN_SDK (AndroidPlaybackState, "android/media/session/PlaybackState", 21)
 #undef JNI_CLASS_MEMBERS
 
-#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD) \
+#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD, CALLBACK) \
  METHOD (build,           "build",           "()Landroid/media/session/PlaybackState;") \
  METHOD (constructor,     "<init>",          "()V") \
  METHOD (setActions,      "setActions",      "(J)Landroid/media/session/PlaybackState$Builder;") \
  METHOD (setErrorMessage, "setErrorMessage", "(Ljava/lang/CharSequence;)Landroid/media/session/PlaybackState$Builder;") \
  METHOD (setState,        "setState",        "(IJF)Landroid/media/session/PlaybackState$Builder;")
 
-DECLARE_JNI_CLASS (AndroidPlaybackStateBuilder, "android/media/session/PlaybackState$Builder")
+DECLARE_JNI_CLASS_WITH_MIN_SDK (AndroidPlaybackStateBuilder, "android/media/session/PlaybackState$Builder", 21)
 #undef JNI_CLASS_MEMBERS
-
-#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD) \
- METHOD (constructor, "<init>",     "(L" JUCE_ANDROID_ACTIVITY_CLASSPATH ";Landroid/app/Activity;J)V") \
- METHOD (setEnabled,  "setEnabled", "(Z)V")
-
-DECLARE_JNI_CLASS (SystemVolumeObserver, JUCE_ANDROID_ACTIVITY_CLASSPATH "$SystemVolumeObserver")
-#undef JNI_CLASS_MEMBERS
-
-#endif
 
 //==============================================================================
 class MediaPlayerListener  : public AndroidInterfaceImplementer
@@ -285,66 +336,70 @@ private:
 
 //==============================================================================
 struct VideoComponent::Pimpl
-    : public AndroidViewComponent
-#if __ANDROID_API__ >= 21
-    , private AppPausedResumedListener::Owner
-#endif
+    : public AndroidViewComponent, private ActivityLifecycleCallbacks, private SurfaceHolderCallback
 {
     Pimpl (VideoComponent& ownerToUse, bool)
-       #if __ANDROID_API__ >= 21
         : owner (ownerToUse),
-          mediaSession (*this),
-          appPausedResumedListener (*this),
-          appPausedResumedListenerNative (CreateJavaInterface (&appPausedResumedListener,
-                                                               JUCE_ANDROID_ACTIVITY_CLASSPATH "$AppPausedResumedListener").get())
+          mediaSession (*this)
        #if JUCE_SYNC_VIDEO_VOLUME_WITH_OS_MEDIA_VOLUME
         , systemVolumeListener (*this)
        #endif
-       #endif
     {
-       #if __ANDROID_API__ >= 21
+        // Video requires SDK version 21 or higher
+        jassert (getAndroidSDKVersion() >= 21);
+
         setVisible (true);
 
         auto* env = getEnv();
 
-        setView (LocalRef<jobject> (env->CallObjectMethod (android.activity.get(),
-                                                           JuceAppActivity.createNativeSurfaceView,
-                                                           reinterpret_cast<jlong> (this),
-                                                           true)));
+        LocalRef<jobject> appContext (getAppContext());
 
-        env->CallVoidMethod (android.activity, JuceAppActivity.addAppPausedResumedListener,
-                             appPausedResumedListenerNative.get(), reinterpret_cast<jlong> (this));
-       #endif
+        if (appContext != nullptr)
+        {
+            ActivityLifecycleCallbacks* callbacks = dynamic_cast<ActivityLifecycleCallbacks*> (this);
+
+            activityLifeListener = GlobalRef (CreateJavaInterface (callbacks, "android/app/Application$ActivityLifecycleCallbacks"));
+            env->CallVoidMethod (appContext.get(), AndroidApplication.registerActivityLifecycleCallbacks, activityLifeListener.get());
+        }
+
+        {
+            LocalRef<jobject> surfaceView (env->NewObject (AndroidSurfaceView, AndroidSurfaceView.constructor, getAppContext().get()));
+            LocalRef<jobject> holder (env->CallObjectMethod (surfaceView.get(), AndroidSurfaceView.getHolder));
+
+            SurfaceHolderCallback* callbacks = dynamic_cast<SurfaceHolderCallback*> (this);
+            surfaceHolderCallback = GlobalRef (CreateJavaInterface (callbacks, "android/view/SurfaceHolder$Callback"));
+            env->CallVoidMethod (holder, AndroidSurfaceHolder.addCallback, surfaceHolderCallback.get());
+
+            setView (surfaceView.get());
+        }
     }
 
-    ~Pimpl()
+    ~Pimpl() override
     {
-       #if __ANDROID_API__ >= 21
-        getEnv()->CallVoidMethod (android.activity, JuceAppActivity.removeAppPausedResumedListener,
-                                  appPausedResumedListenerNative.get(), reinterpret_cast<jlong>(this));
-       #endif
+        auto* env = getEnv();
+
+        if (surfaceHolderCallback != nullptr)
+        {
+            jobject view = reinterpret_cast<jobject> (getView());
+
+            if (view != nullptr)
+            {
+                LocalRef <jobject> holder (env->CallObjectMethod (view, AndroidSurfaceView.getHolder));
+
+                env->CallVoidMethod (holder, AndroidSurfaceHolder.removeCallback, surfaceHolderCallback.get());
+                SurfaceHolderCallback::clear();
+                surfaceHolderCallback.clear();
+            }
+        }
+
+        if (activityLifeListener != nullptr)
+        {
+            env->CallVoidMethod (getAppContext().get(), AndroidApplication.unregisterActivityLifecycleCallbacks, activityLifeListener.get());
+            ActivityLifecycleCallbacks::clear();
+            activityLifeListener.clear();
+        }
     }
 
-   #if __ANDROID_API__ < 21
-    // Dummy implementations for unsupported API levels.
-    void loadAsync (const URL&, std::function<void (const URL&, Result)>) {}
-    void close()                          {}
-    bool isOpen() const noexcept          { return false; }
-    bool isPlaying() const noexcept       { return false; }
-    void play()                           {}
-    void stop()                           {}
-    void setPosition (double)             {}
-    void setSpeed (double)                {}
-    void setVolume (float)                {}
-    float getVolume() const               { return 0.0f; }
-    double getPosition() const            { return 0.0; }
-    double getSpeed() const               { return 0.0; }
-    Rectangle<int> getNativeSize() const  { return {}; }
-    double getDuration() const            { return 0.0; }
-
-    File currentFile;
-    URL currentURL;
-   #else
     void loadAsync (const URL& url, std::function<void (const URL&, Result)> callback)
     {
         close();
@@ -358,10 +413,7 @@ struct VideoComponent::Pimpl
 
         if (! url.isLocalFile())
         {
-            auto granted = android.activity.callBooleanMethod (JuceAppActivity.isPermissionDeclaredInManifestString,
-                                                               javaString ("android.permission.INTERNET").get()) != 0;
-
-            if (! granted)
+            if (! isPermissionDeclaredInManifest ("android.permission.INTERNET"))
             {
                 // In order to access videos from the Internet, the Internet permission has to be specified in
                 // Android Manifest.
@@ -422,25 +474,23 @@ private:
     public:
         MediaSession (Pimpl& ownerToUse)
             : owner (ownerToUse),
-              sdkVersion (getEnv()->CallStaticIntMethod (JuceAppActivity, JuceAppActivity.getAndroidSDKVersion)),
+              sdkVersion (getAndroidSDKVersion()),
               audioAttributes (getAudioAttributes()),
               nativeMediaSession (LocalRef<jobject> (getEnv()->NewObject (AndroidMediaSession,
                                                                           AndroidMediaSession.constructor,
-                                                                          android.activity.get(),
+                                                                          getAppContext().get(),
                                                                           javaString ("JuceVideoMediaSession").get()))),
-              mediaSessionCallback (LocalRef<jobject> (getEnv()->NewObject (AndroidMediaSessionCallback,
-                                                                            AndroidMediaSessionCallback.constructor,
-                                                                            android.activity.get(),
-                                                                            reinterpret_cast<jlong> (this)))),
+              mediaSessionCallback (createCallbackObject()),
               playbackStateBuilder (LocalRef<jobject> (getEnv()->NewObject (AndroidPlaybackStateBuilder,
                                                                             AndroidPlaybackStateBuilder.constructor))),
-              controller (*this, getEnv()->CallObjectMethod (nativeMediaSession,
-                                                             AndroidMediaSession.getController)),
+              controller (*this, LocalRef<jobject> (getEnv()->CallObjectMethod (nativeMediaSession,
+                                                                                AndroidMediaSession.getController))),
               player (*this),
-              audioManager (android.activity.callObjectMethod (JuceAppActivity.getSystemService, javaString ("audio").get())),
+              audioManager (LocalRef<jobject> (getEnv()->CallObjectMethod (getAppContext().get(), AndroidContext.getSystemService,
+                                                                           javaString ("audio").get()))),
               audioFocusChangeListener (*this),
               nativeAudioFocusChangeListener (GlobalRef (CreateJavaInterface (&audioFocusChangeListener,
-                                                                              "android/media/AudioManager$OnAudioFocusChangeListener").get())),
+                                                                              "android/media/AudioManager$OnAudioFocusChangeListener"))),
               audioFocusRequest (createAudioFocusRequestIfNecessary (sdkVersion, audioAttributes,
                                                                      nativeAudioFocusChangeListener))
         {
@@ -451,7 +501,7 @@ private:
             env->CallVoidMethod (nativeMediaSession, AndroidMediaSession.setCallback, mediaSessionCallback.get());
         }
 
-        ~MediaSession()
+        ~MediaSession() override
         {
             auto* env = getEnv();
 
@@ -472,7 +522,7 @@ private:
             controller.closeVideo();
         }
 
-        void setDisplay (jobject surfaceHolder) { player.setDisplay (surfaceHolder); }
+        void setDisplay (const LocalRef<jobject>& surfaceHolder) { player.setDisplay (surfaceHolder); }
 
         void play() { controller.play(); }
         void stop() { controller.stop(); }
@@ -575,15 +625,12 @@ private:
         class Controller
         {
         public:
-            Controller (MediaSession& ownerToUse, jobject nativeControllerToUse)
+            Controller (MediaSession& ownerToUse, const LocalRef<jobject>& nativeControllerToUse)
                 : owner (ownerToUse),
                   nativeController (GlobalRef (nativeControllerToUse)),
-                  controllerTransportControls (LocalRef<jobject> (getEnv()->CallObjectMethod (nativeController,
+                  controllerTransportControls (LocalRef<jobject> (getEnv()->CallObjectMethod (nativeControllerToUse,
                                                                                               AndroidMediaController.getTransportControls))),
-                  controllerCallback (LocalRef<jobject> (getEnv()->NewObject (AndroidMediaControllerCallback,
-                                                                              AndroidMediaControllerCallback.constructor,
-                                                                              android.activity.get(),
-                                                                              reinterpret_cast<jlong> (this))))
+                  controllerCallback (createControllerCallbacks())
             {
                 auto* env = getEnv();
 
@@ -686,21 +733,7 @@ private:
             bool wasPaused = true;
 
             //==============================================================================
-            // MediaSessionController callbacks
-
-            void audioInfoChanged (jobject info)
-            {
-                JUCE_VIDEO_LOG ("MediaSessionController::audioInfoChanged()");
-                ignoreUnused (info);
-            }
-
-            void metadataChanged (jobject metadata)
-            {
-                JUCE_VIDEO_LOG ("MediaSessionController::metadataChanged()");
-                ignoreUnused (metadata);
-            }
-
-            void playbackStateChanged (jobject playbackState)
+            void stateChanged (jobject playbackState)
             {
                 JUCE_VIDEO_LOG ("MediaSessionController::playbackStateChanged()");
 
@@ -721,15 +754,55 @@ private:
                 wasPaused  = state == statePaused;
             }
 
-            void sessionDestroyed()
+            //==============================================================================
+            #define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD, CALLBACK) \
+                METHOD (constructor, "<init>", "(J)V")                  \
+                CALLBACK (audioInfoChanged,     "mediaControllerAudioInfoChanged",      "(JLandroid/media/session/MediaController$PlaybackInfo;)V") \
+                CALLBACK (metadataChanged,      "mediaControllerMetadataChanged",       "(JLandroid/media/MediaMetadata;)V") \
+                CALLBACK (playbackStateChanged, "mediaControllerPlaybackStateChanged",  "(JLandroid/media/session/PlaybackState;)V") \
+                CALLBACK (sessionDestroyed,     "mediaControllerSessionDestroyed",      "(J)V")
+
+            DECLARE_JNI_CLASS_WITH_BYTECODE (AndroidMediaControllerCallback, "com/rmsl/juce/MediaControllerCallback", 21, MediaSessionByteCode, sizeof (MediaSessionByteCode))
+           #undef JNI_CLASS_MEMBERS
+
+            LocalRef<jobject> createControllerCallbacks()
             {
-                JUCE_VIDEO_LOG ("MediaSessionController::sessionDestroyed()");
+                return LocalRef<jobject> (getEnv()->NewObject (AndroidMediaControllerCallback,
+                                                               AndroidMediaControllerCallback.constructor,
+                                                               reinterpret_cast<jlong> (this)));
             }
 
-            friend void juce_mediaControllerAudioInfoChanged (int64, void*);
-            friend void juce_mediaControllerMetadataChanged (int64, void*);
-            friend void juce_mediaControllerPlaybackStateChanged (int64, void*);
-            friend void juce_mediaControllerSessionDestroyed (int64);
+            //==============================================================================
+            // MediaSessionController callbacks
+            static void audioInfoChanged (JNIEnv*, jobject, jlong host, jobject playbackInfo)
+            {
+                if (auto* myself = reinterpret_cast<VideoComponent::Pimpl::MediaSession::Controller*> (host))
+                {
+                    ignoreUnused (playbackInfo);
+                    JUCE_VIDEO_LOG ("MediaSessionController::audioInfoChanged()");
+                }
+            }
+
+            static void metadataChanged (JNIEnv*, jobject, jlong host, jobject metadata)
+            {
+                if (auto* myself = reinterpret_cast<VideoComponent::Pimpl::MediaSession::Controller*> (host))
+                {
+                    ignoreUnused (metadata);
+                    JUCE_VIDEO_LOG ("MediaSessionController::metadataChanged()");
+                }
+            }
+
+            static void playbackStateChanged (JNIEnv*, jobject, jlong host, jobject state)
+            {
+                if (auto* myself = reinterpret_cast<VideoComponent::Pimpl::MediaSession::Controller*> (host))
+                    myself->stateChanged (state);
+            }
+
+            static void sessionDestroyed (JNIEnv*, jobject, jlong host)
+            {
+                if (auto* myself = reinterpret_cast<VideoComponent::Pimpl::MediaSession::Controller*> (host))
+                    JUCE_VIDEO_LOG ("MediaSessionController::sessionDestroyed()");
+            }
         };
 
         //==============================================================================
@@ -744,7 +817,7 @@ private:
 
             {}
 
-            void setDisplay (jobject surfaceHolder)
+            void setDisplay (const LocalRef<jobject>& surfaceHolder)
             {
                 if (surfaceHolder == nullptr)
                 {
@@ -762,7 +835,7 @@ private:
                     getEnv()->CallVoidMethod (nativeMediaPlayer, AndroidMediaPlayer.setDisplay, videoSurfaceHolder.get());
             }
 
-            void load (jstring mediaId, jobject extras)
+            void load (const LocalRef<jstring>& mediaId, const LocalRef<jobject>& extras)
             {
                 ignoreUnused (extras);
 
@@ -774,8 +847,8 @@ private:
 
                 currentState = State::idle;
 
-                auto uri = LocalRef<jobject> (env->CallStaticObjectMethod (AndroidUri, AndroidUri.parse, mediaId));
-                env->CallVoidMethod (nativeMediaPlayer, AndroidMediaPlayer.setDataSource, android.activity.get(), uri.get());
+                auto uri = LocalRef<jobject> (env->CallStaticObjectMethod (AndroidUri, AndroidUri.parse, mediaId.get()));
+                env->CallVoidMethod (nativeMediaPlayer, AndroidMediaPlayer.setDataSource, getAppContext().get(), uri.get());
 
                 if (jniCheckHasExceptionOccurredAndClear())
                 {
@@ -958,7 +1031,7 @@ private:
             }
 
         private:
-            //=============================================================================
+            //==============================================================================
             struct StateInfo
             {
                 int playbackStateFlag = 0, allowedActions = 0;
@@ -1193,7 +1266,6 @@ private:
 
         //==============================================================================
         Pimpl& owner;
-
         int sdkVersion;
 
         GlobalRef audioAttributes;
@@ -1221,68 +1293,98 @@ private:
         bool hasAudioFocus = false;
 
         //==============================================================================
+        #define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD, CALLBACK) \
+            METHOD (constructor, "<init>", "(J)V")                      \
+            CALLBACK (pauseCallback,           "mediaSessionPause",           "(J)V") \
+            CALLBACK (playCallback,            "mediaSessionPlay",            "(J)V") \
+            CALLBACK (playFromMediaIdCallback, "mediaSessionPlayFromMediaId", "(JLjava/lang/String;Landroid/os/Bundle;)V") \
+            CALLBACK (seekToCallback,          "mediaSessionSeekTo",          "(JJ)V") \
+            CALLBACK (stopCallback,            "mediaSessionStop",            "(J)V")
+
+        DECLARE_JNI_CLASS_WITH_MIN_SDK (AndroidMediaSessionCallback, "com/rmsl/juce/MediaSessionCallback", 21)
+        #undef JNI_CLASS_MEMBERS
+
+        LocalRef<jobject> createCallbackObject()
+        {
+            return LocalRef<jobject> (getEnv()->NewObject (AndroidMediaSessionCallback,
+                                                           AndroidMediaSessionCallback.constructor,
+                                                           reinterpret_cast<jlong> (this)));
+        }
+
+        //==============================================================================
         // MediaSession callbacks
-
-        void pauseCallback()
+        static void pauseCallback (JNIEnv*, jobject, jlong host)
         {
-            JUCE_VIDEO_LOG ("MediaSession::pauseCallback()");
-
-            player.pause();
-            updatePlaybackState();
-
-            abandonAudioFocus();
-        }
-
-        void playCallback()
-        {
-            JUCE_VIDEO_LOG ("MediaSession::playCallback()");
-
-            requestAudioFocus();
-
-            if (! hasAudioFocus)
+            if (auto* myself = reinterpret_cast<VideoComponent::Pimpl::MediaSession*> (host))
             {
-                errorOccurred ("Application has been denied audio focus. Try again later.");
-                return;
+                JUCE_VIDEO_LOG ("MediaSession::pauseCallback()");
+                myself->player.pause();
+                myself->updatePlaybackState();
+
+                myself->abandonAudioFocus();
             }
-
-            getEnv()->CallVoidMethod (nativeMediaSession, AndroidMediaSession.setActive, true);
-
-            player.play();
-            setSpeed (playSpeedMult);
-            updatePlaybackState();
         }
 
-        void playFromMediaIdCallback (jstring mediaId, jobject extras)
+        static void playCallback (JNIEnv*, jobject, jlong host)
         {
-            JUCE_VIDEO_LOG ("MediaSession::playFromMediaIdCallback()");
+            if (auto* myself = reinterpret_cast<VideoComponent::Pimpl::MediaSession*> (host))
+            {
+                JUCE_VIDEO_LOG ("MediaSession::playCallback()");
 
-            player.load (mediaId, extras);
-            updatePlaybackState();
+                myself->requestAudioFocus();
+
+                if (! myself->hasAudioFocus)
+                {
+                    myself->errorOccurred ("Application has been denied audio focus. Try again later.");
+                    return;
+                }
+
+                getEnv()->CallVoidMethod (myself->nativeMediaSession, AndroidMediaSession.setActive, true);
+
+                myself->player.play();
+                myself->setSpeed (myself->playSpeedMult);
+                myself->updatePlaybackState();
+            }
         }
 
-        void seekToCallback (jlong pos)
+        static void playFromMediaIdCallback (JNIEnv* env, jobject, jlong host, jstring mediaId, jobject extras)
         {
-            JUCE_VIDEO_LOG ("MediaSession::seekToCallback()");
+            if (auto* myself = reinterpret_cast<VideoComponent::Pimpl::MediaSession*> (host))
+            {
+                JUCE_VIDEO_LOG ("MediaSession::playFromMediaIdCallback()");
 
-            pendingSeekRequest = true;
-            player.setPlayPosition ((jint) pos);
-            updatePlaybackState();
+                myself->player.load (LocalRef<jstring> ((jstring) env->NewLocalRef(mediaId)), LocalRef<jobject> (env->NewLocalRef(extras)));
+                myself->updatePlaybackState();
+            }
         }
 
-        void stopCallback()
+        static void seekToCallback (JNIEnv* /*env*/, jobject, jlong host, jlong pos)
         {
-            JUCE_VIDEO_LOG ("MediaSession::stopCallback()");
+            if (auto* myself = reinterpret_cast<VideoComponent::Pimpl::MediaSession*> (host))
+            {
+                JUCE_VIDEO_LOG ("MediaSession::seekToCallback()");
 
-            auto* env = getEnv();
+                myself->pendingSeekRequest = true;
+                myself->player.setPlayPosition ((jint) pos);
+                myself->updatePlaybackState();
+            }
+        }
 
-            env->CallVoidMethod (nativeMediaSession, AndroidMediaSession.setActive, false);
+        static void stopCallback(JNIEnv* env, jobject, jlong host)
+        {
+            if (auto* myself = reinterpret_cast<VideoComponent::Pimpl::MediaSession*> (host))
+            {
+                JUCE_VIDEO_LOG ("MediaSession::stopCallback()");
 
-            player.closeVideo();
-            updatePlaybackState();
+                env->CallVoidMethod (myself->nativeMediaSession, AndroidMediaSession.setActive, false);
 
-            abandonAudioFocus();
+                myself->player.closeVideo();
+                myself->updatePlaybackState();
 
-            owner.closeVideoFinished();
+                myself->abandonAudioFocus();
+
+                myself->owner.closeVideoFinished();
+            }
         }
 
         //==============================================================================
@@ -1302,7 +1404,7 @@ private:
 
             auto playPos = player.getPlayPosition();
             auto durationMs = player.getVideoDuration();
-            auto playPosPercent = (int) (100 * playPos / static_cast<double> (durationMs));
+            auto playPosPercent = (int) (100.0 * playPos / static_cast<double> (durationMs));
 
             // NB: assuming the playback will start roughly when there is 5% of content loaded...
             return ! bufferedRegions.containsRange (Range<int> (playPosPercent, jmin (101, playPosPercent + 5)));
@@ -1310,10 +1412,10 @@ private:
 
         void updatePlaybackState()
         {
-            getEnv()->CallVoidMethod (nativeMediaSession, AndroidMediaSession.setPlaybackState, getCurrentPlaybackState());
+            getEnv()->CallVoidMethod (nativeMediaSession, AndroidMediaSession.setPlaybackState, getCurrentPlaybackState().get());
         }
 
-        jobject getCurrentPlaybackState()
+        LocalRef<jobject> getCurrentPlaybackState()
         {
             static constexpr int bufferingState = 6;
 
@@ -1329,7 +1431,7 @@ private:
 
             LocalRef<jobject> (env->CallObjectMethod (playbackStateBuilder, AndroidPlaybackStateBuilder.setActions, (jint) allowedActions));
 
-            return env->CallObjectMethod (playbackStateBuilder, AndroidPlaybackStateBuilder.build);
+            return LocalRef<jobject> (env->CallObjectMethod (playbackStateBuilder, AndroidPlaybackStateBuilder.build));
         }
 
         //==============================================================================
@@ -1353,7 +1455,7 @@ private:
 
             auto playPos = player.getPlayPosition();
             auto durationMs = player.getVideoDuration();
-            auto playPosPercent = (int) (100 * playPos / static_cast<double> (durationMs));
+            auto playPosPercent = (int) (100.0 * playPos / static_cast<double> (durationMs));
 
             bufferedRegions.addRange (Range<int> (playPosPercent, progress + 1));
 
@@ -1373,8 +1475,12 @@ private:
 
         void playerPlaybackCompleted()
         {
-            pauseCallback();
-            seekToCallback ((jlong) 0);
+            player.pause();
+            abandonAudioFocus();
+
+            pendingSeekRequest = true;
+            player.setPlayPosition (0);
+            updatePlaybackState();
         }
 
         void updateMetadata()
@@ -1418,11 +1524,11 @@ private:
         }
 
         //==============================================================================
-        static jobject createAudioFocusRequestIfNecessary (int sdkVersion, const GlobalRef& audioAttributes,
-                                                           const GlobalRef& nativeAudioFocusChangeListener)
+        static LocalRef<jobject> createAudioFocusRequestIfNecessary (int sdkVersion, const GlobalRef& audioAttributes,
+                                                                     const GlobalRef& nativeAudioFocusChangeListener)
         {
             if (sdkVersion < 26)
-                return nullptr;
+                return LocalRef<jobject>();
 
             auto* env = getEnv();
 
@@ -1441,7 +1547,7 @@ private:
             LocalRef<jobject> (env->CallObjectMethod (requestBuilder, setAudioAttributesMethod, audioAttributes.get()));
             LocalRef<jobject> (env->CallObjectMethod (requestBuilder, setOnAudioFocusChangeListenerMethod, nativeAudioFocusChangeListener.get()));
 
-            return env->CallObjectMethod (requestBuilder, buildMethod);
+            return LocalRef<jobject> (env->CallObjectMethod (requestBuilder, buildMethod));
         }
 
         void requestAudioFocus()
@@ -1540,8 +1646,11 @@ private:
         }
 
         //==============================================================================
-        static jobject getAudioAttributes()
+        static LocalRef<jobject> getAudioAttributes()
         {
+            // Video requires SDK version 21 or higher
+            jassert (getAndroidSDKVersion() >= 21);
+
             auto* env = getEnv();
 
             auto audioAttribsBuilder = LocalRef<jobject> (env->NewObject (AndroidAudioAttributesBuilder,
@@ -1552,19 +1661,8 @@ private:
             LocalRef<jobject> (env->CallObjectMethod (audioAttribsBuilder, AndroidAudioAttributesBuilder.setContentType, contentTypeMovie));
             LocalRef<jobject> (env->CallObjectMethod (audioAttribsBuilder, AndroidAudioAttributesBuilder.setUsage, usageMedia));
 
-            return env->CallObjectMethod (audioAttribsBuilder, AndroidAudioAttributesBuilder.build);
+            return LocalRef<jobject> (env->CallObjectMethod (audioAttribsBuilder, AndroidAudioAttributesBuilder.build));
         }
-
-        friend void juce_mediaSessionPause (int64);
-        friend void juce_mediaSessionPlay (int64);
-        friend void juce_mediaSessionPlayFromMediaId (int64, void*, void*);
-        friend void juce_mediaSessionSeekTo (int64, int64);
-        friend void juce_mediaSessionStop (int64);
-
-        friend void juce_mediaControllerAudioInfoChanged (int64, void*);
-        friend void juce_mediaControllerMetadataChanged (int64, void*);
-        friend void juce_mediaControllerPlaybackStateChanged (int64, void*);
-        friend void juce_mediaControllerSessionDestroyed (int64);
     };
 
    #if JUCE_SYNC_VIDEO_VOLUME_WITH_OS_MEDIA_VOLUME
@@ -1574,11 +1672,7 @@ private:
     public:
         SystemVolumeListener (Pimpl& ownerToUse)
             : owner (ownerToUse),
-              nativeObserver (LocalRef<jobject> (getEnv()->NewObject (SystemVolumeObserver,
-                                                                      SystemVolumeObserver.constructor,
-                                                                      android.activity.get(),
-                                                                      android.activity.get(),
-                                                                      reinterpret_cast<jlong> (this))))
+              nativeObserver (createCallbackObject())
         {
             setEnabled (true);
         }
@@ -1587,7 +1681,28 @@ private:
         {
             setEnabled (false);
         }
+    private:
+        Pimpl& owner;
+        GlobalRef nativeObserver;
 
+        //==============================================================================
+        #define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD, CALLBACK) \
+            METHOD (constructor, "<init>",     "(Landroid/app/Activity;J)V") \
+            METHOD (setEnabled,  "setEnabled", "(Z)V")                  \
+            CALLBACK (systemVolumeChangedCallback, "mediaSessionSystemVolumeChanged", "(J)V")
+
+        DECLARE_JNI_CLASS_WITH_MIN_SDK (SystemVolumeObserver, "com/rmsl/juce/SystemVolumeObserver", 21)
+        #undef JNI_CLASS_MEMBERS
+
+
+        LocalRef<jobject> createCallbackObject()
+        {
+            return LocalRef<jobject> (getEnv()->NewObject (SystemVolumeObserver,
+                                                           SystemVolumeObserver.constructor,
+                                                           getCurrentActivity().get(),
+                                                           reinterpret_cast<jlong> (this)));
+        }
+    public:
         void setEnabled (bool shouldBeEnabled)
         {
             getEnv()->CallVoidMethod (nativeObserver, SystemVolumeObserver.setEnabled, shouldBeEnabled);
@@ -1598,9 +1713,7 @@ private:
         }
 
     private:
-        Pimpl& owner;
-        GlobalRef nativeObserver;
-
+        //==============================================================================
         void systemVolumeChanged()
         {
             WeakReference<SystemVolumeListener> weakThis (this);
@@ -1613,23 +1726,28 @@ private:
                                            if (weakThis->owner.owner.onGlobalMediaVolumeChanged != nullptr)
                                                weakThis->owner.owner.onGlobalMediaVolumeChanged();
                                        });
+
         }
 
-        friend void juce_mediaSessionSystemVolumeChanged (int64);
+        //==============================================================================
+        static void systemVolumeChangedCallback (JNIEnv*, jobject, jlong host)
+        {
+            if (auto* myself = reinterpret_cast<VideoComponent::Pimpl::SystemVolumeListener*> (host))
+                myself->systemVolumeChanged();
+        }
 
         JUCE_DECLARE_WEAK_REFERENCEABLE (SystemVolumeListener)
     };
-   #endif
 
     //==============================================================================
     VideoComponent& owner;
 
     MediaSession mediaSession;
-    AppPausedResumedListener appPausedResumedListener;
-    GlobalRef appPausedResumedListenerNative;
+    GlobalRef activityLifeListener;
    #if JUCE_SYNC_VIDEO_VOLUME_WITH_OS_MEDIA_VOLUME
     SystemVolumeListener systemVolumeListener;
    #endif
+    GlobalRef surfaceHolderCallback;
 
     std::function<void (const URL&, Result)> loadFinishedCallback;
 
@@ -1670,18 +1788,23 @@ private:
             owner.onPlaybackStopped();
     }
 
-    void videoSurfaceChanged (jobject surfaceHolder)
+    //==============================================================================
+    void surfaceChanged (LocalRef<jobject> holder, int /*format*/, int /*width*/, int /*height*/) override
     {
-        mediaSession.setDisplay (surfaceHolder);
+        mediaSession.setDisplay (holder);
     }
 
-    void videoSurfaceDestroyed (jobject /*surfaceHolder*/)
+    void surfaceDestroyed (LocalRef<jobject> /*holder*/) override
     {
-        mediaSession.setDisplay (nullptr);
+        mediaSession.setDisplay (LocalRef<jobject>());
+    }
+
+    void surfaceCreated (LocalRef<jobject> /*holder*/) override
+    {
     }
 
     //==============================================================================
-    void appPaused() override
+    void onActivityPaused (jobject) override
     {
         wasOpen = isOpen();
 
@@ -1698,14 +1821,14 @@ private:
        #endif
     }
 
-    void appResumed() override
+    void onActivityResumed (jobject) override
     {
         if (! wasOpen)
             return;
 
         JUCE_VIDEO_LOG ("App resumed, restoring media player...");
 
-        loadAsync (currentURL, [this](const URL&, Result r)
+        loadAsync (currentURL, [this] (const URL&, Result r)
                    {
                        if (r.wasOk())
                            mediaSession.restoreState();
@@ -1717,202 +1840,15 @@ private:
     }
 
     //==============================================================================
-    friend void juce_surfaceChangedNativeVideo (int64, void*);
-    friend void juce_surfaceDestroyedNativeVideo (int64, void*);
-
-    friend void juce_mediaSessionPause (int64);
-    friend void juce_mediaSessionPlay (int64);
-    friend void juce_mediaSessionPlayFromMediaId (int64, void*, void*);
-    friend void juce_mediaSessionSeekTo (int64, int64);
-    friend void juce_mediaSessionStop (int64);
-
-    friend void juce_mediaControllerAudioInfoChanged (int64, void*);
-    friend void juce_mediaControllerMetadataChanged (int64, void*);
-    friend void juce_mediaControllerPlaybackStateChanged (int64, void*);
-    friend void juce_mediaControllerSessionDestroyed (int64);
-
-    friend void juce_mediaSessionSystemVolumeChanged (int64);
    #endif
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Pimpl)
 };
 
-#if __ANDROID_API__ >= 21
-//==============================================================================
-void juce_surfaceChangedNativeVideo (int64 host, void* surfaceHolder)
-{
-    reinterpret_cast<VideoComponent::Pimpl*> (host)->videoSurfaceChanged (static_cast<jobject> (surfaceHolder));
-}
-
-void juce_surfaceDestroyedNativeVideo (int64 host, void* surfaceHolder)
-{
-    reinterpret_cast<VideoComponent::Pimpl*> (host)->videoSurfaceDestroyed (static_cast<jobject> (surfaceHolder));
-}
-
-JUCE_JNI_CALLBACK (JUCE_JOIN_MACRO (JUCE_ANDROID_ACTIVITY_CLASSNAME, _00024NativeSurfaceView), dispatchDrawNativeVideo,
-                   void, (JNIEnv* env, jobject nativeView, jlong host, jobject canvas))
-{
-    ignoreUnused (nativeView, host, canvas);
-    setEnv (env);
-}
-
-JUCE_JNI_CALLBACK (JUCE_JOIN_MACRO (JUCE_ANDROID_ACTIVITY_CLASSNAME, _00024NativeSurfaceView), surfaceChangedNativeVideo,
-                   void, (JNIEnv* env, jobject nativeView, jlong host, jobject holder, jint format, jint width, jint height))
-{
-    ignoreUnused (nativeView, format, width, height);
-    setEnv (env);
-
-    JUCE_VIDEO_LOG ("video surface changed");
-
-    juce_surfaceChangedNativeVideo (host, holder);
-}
-
-JUCE_JNI_CALLBACK (JUCE_JOIN_MACRO (JUCE_ANDROID_ACTIVITY_CLASSNAME, _00024NativeSurfaceView), surfaceCreatedNativeVideo,
-                   void, (JNIEnv* env, jobject nativeView, jlong host, jobject holder))
-{
-    ignoreUnused (nativeView, host, holder);
-    setEnv (env);
-
-    JUCE_VIDEO_LOG ("video surface created");
-}
-
-JUCE_JNI_CALLBACK (JUCE_JOIN_MACRO (JUCE_ANDROID_ACTIVITY_CLASSNAME, _00024NativeSurfaceView), surfaceDestroyedNativeVideo,
-                   void, (JNIEnv* env, jobject nativeView, jlong host, jobject holder))
-{
-    ignoreUnused (nativeView, host, holder);
-    setEnv (env);
-
-    JUCE_VIDEO_LOG ("video surface destroyed");
-    juce_surfaceDestroyedNativeVideo (host, holder);
-}
-
-//==============================================================================
-void juce_mediaSessionPause (int64 host)
-{
-    reinterpret_cast<VideoComponent::Pimpl::MediaSession*> (host)->pauseCallback();
-}
-
-void juce_mediaSessionPlay (int64 host)
-{
-    reinterpret_cast<VideoComponent::Pimpl::MediaSession*> (host)->playCallback();
-}
-
-void juce_mediaSessionPlayFromMediaId (int64 host, void* mediaId, void* extras)
-{
-    reinterpret_cast<VideoComponent::Pimpl::MediaSession*> (host)->playFromMediaIdCallback ((jstring) mediaId, (jobject) extras);
-}
-
-void juce_mediaSessionSeekTo (int64 host, int64 pos)
-{
-    reinterpret_cast<VideoComponent::Pimpl::MediaSession*> (host)->seekToCallback (pos);
-}
-
-void juce_mediaSessionStop (int64 host)
-{
-    reinterpret_cast<VideoComponent::Pimpl::MediaSession*> (host)->stopCallback();
-}
-
-JUCE_JNI_CALLBACK (JUCE_JOIN_MACRO (JUCE_ANDROID_ACTIVITY_CLASSNAME, _00024MediaSessionCallback), mediaSessionPause,
-                   void, (JNIEnv* env, jobject /*mediaSessionCallback*/, jlong host))
-{
-    setEnv (env);
-    juce_mediaSessionPause (host);
-}
-
-JUCE_JNI_CALLBACK (JUCE_JOIN_MACRO (JUCE_ANDROID_ACTIVITY_CLASSNAME, _00024MediaSessionCallback), mediaSessionPlay,
-                   void, (JNIEnv* env, jobject /*mediaSessionCallback*/, jlong host))
-{
-    setEnv (env);
-    juce_mediaSessionPlay (host);
-}
-
-JUCE_JNI_CALLBACK (JUCE_JOIN_MACRO (JUCE_ANDROID_ACTIVITY_CLASSNAME, _00024MediaSessionCallback), mediaSessionPlayFromMediaId,
-                   void, (JNIEnv* env, jobject /*mediaSessionCallback*/, jlong host, jobject mediaId, jobject extras))
-{
-    setEnv (env);
-    juce_mediaSessionPlayFromMediaId (host, mediaId, extras);
-}
-
-JUCE_JNI_CALLBACK (JUCE_JOIN_MACRO (JUCE_ANDROID_ACTIVITY_CLASSNAME, _00024MediaSessionCallback), mediaSessionSeekTo,
-                   void, (JNIEnv* env, jobject /*mediaSessionCallback*/, jlong host, jlong pos))
-{
-    setEnv (env);
-    juce_mediaSessionSeekTo (host, pos);
-}
-
-JUCE_JNI_CALLBACK (JUCE_JOIN_MACRO (JUCE_ANDROID_ACTIVITY_CLASSNAME, _00024MediaSessionCallback), mediaSessionStop,
-                   void, (JNIEnv* env, jobject /*mediaSessionCallback*/, jlong host))
-{
-    setEnv (env);
-    juce_mediaSessionStop (host);
-}
-
-//==============================================================================
-void juce_mediaControllerAudioInfoChanged (int64 host, void* info)
-{
-    reinterpret_cast<VideoComponent::Pimpl::MediaSession::Controller*> (host)->audioInfoChanged ((jobject) info);
-}
-
-void juce_mediaControllerMetadataChanged (int64 host, void* metadata)
-{
-    reinterpret_cast<VideoComponent::Pimpl::MediaSession::Controller*> (host)->metadataChanged ((jobject) metadata);
-}
-
-void juce_mediaControllerPlaybackStateChanged (int64 host, void* state)
-{
-    reinterpret_cast<VideoComponent::Pimpl::MediaSession::Controller*> (host)->playbackStateChanged ((jobject) state);
-}
-
-void juce_mediaControllerSessionDestroyed (int64 host)
-{
-    reinterpret_cast<VideoComponent::Pimpl::MediaSession::Controller*> (host)->sessionDestroyed();
-}
-
-JUCE_JNI_CALLBACK (JUCE_JOIN_MACRO (JUCE_ANDROID_ACTIVITY_CLASSNAME, _00024MediaControllerCallback), mediaControllerAudioInfoChanged,
-                   void, (JNIEnv* env, jobject /*mediaControllerCallback*/, jlong host, jobject playbackInfo))
-{
-    setEnv (env);
-    juce_mediaControllerAudioInfoChanged (host, playbackInfo);
-}
-
-JUCE_JNI_CALLBACK (JUCE_JOIN_MACRO (JUCE_ANDROID_ACTIVITY_CLASSNAME, _00024MediaControllerCallback), mediaControllerMetadataChanged,
-                   void, (JNIEnv* env, jobject /*mediaControllerCallback*/, jlong host, jobject metadata))
-{
-    setEnv (env);
-    juce_mediaControllerMetadataChanged (host, metadata);
-}
-
-JUCE_JNI_CALLBACK (JUCE_JOIN_MACRO (JUCE_ANDROID_ACTIVITY_CLASSNAME, _00024MediaControllerCallback), mediaControllerPlaybackStateChanged,
-                   void, (JNIEnv* env, jobject /*mediaControllerCallback*/, jlong host, jobject playbackState))
-{
-    setEnv (env);
-    juce_mediaControllerPlaybackStateChanged (host, playbackState);
-}
-
-JUCE_JNI_CALLBACK (JUCE_JOIN_MACRO (JUCE_ANDROID_ACTIVITY_CLASSNAME, _00024MediaControllerCallback), mediaControllerSessionDestroyed,
-                   void, (JNIEnv* env, jobject /*mediaControllerCallback*/, jlong host))
-{
-    setEnv (env);
-    juce_mediaControllerSessionDestroyed (host);
-}
-
-//==============================================================================
-void juce_mediaSessionSystemVolumeChanged (int64 host)
-{
-   #if JUCE_SYNC_VIDEO_VOLUME_WITH_OS_MEDIA_VOLUME
-    reinterpret_cast<VideoComponent::Pimpl::SystemVolumeListener*> (host)->systemVolumeChanged();
-   #else
-    ignoreUnused (host);
-   #endif
-}
-
-JUCE_JNI_CALLBACK (JUCE_JOIN_MACRO (JUCE_ANDROID_ACTIVITY_CLASSNAME, _00024SystemVolumeObserver), mediaSessionSystemVolumeChanged,
-                   void, (JNIEnv* env, jobject /*systemSettingsObserver*/, jlong host))
-{
-    setEnv (env);
-    juce_mediaSessionSystemVolumeChanged (host);
-}
-
 //==============================================================================
 constexpr VideoComponent::Pimpl::MediaSession::Player::StateInfo VideoComponent::Pimpl::MediaSession::Player::stateInfos[];
-#endif
+
+//==============================================================================
+VideoComponent::Pimpl::MediaSession::AndroidMediaSessionCallback_Class VideoComponent::Pimpl::MediaSession::AndroidMediaSessionCallback;
+VideoComponent::Pimpl::MediaSession::Controller::AndroidMediaControllerCallback_Class VideoComponent::Pimpl::MediaSession::Controller::AndroidMediaControllerCallback;
+VideoComponent::Pimpl::SystemVolumeListener::SystemVolumeObserver_Class VideoComponent::Pimpl::SystemVolumeListener::SystemVolumeObserver;

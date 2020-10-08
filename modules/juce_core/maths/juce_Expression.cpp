@@ -2,7 +2,7 @@
   ==============================================================================
 
    This file is part of the JUCE library.
-   Copyright (c) 2017 - ROLI Ltd.
+   Copyright (c) 2020 - Raw Material Software Limited
 
    JUCE is an open source library subject to commercial or open-source
    licensing.
@@ -133,7 +133,7 @@ struct Expression::Helpers
     class BinaryTerm  : public Term
     {
     public:
-        BinaryTerm (TermPtr l, TermPtr r) : left (static_cast<TermPtr&&> (l)), right (static_cast<TermPtr&&> (r))
+        BinaryTerm (TermPtr l, TermPtr r) : left (std::move (l)), right (std::move (r))
         {
             jassert (left != nullptr && right != nullptr);
         }
@@ -681,7 +681,7 @@ struct Expression::Helpers
         }
 
         //==============================================================================
-        static inline bool isDecimalDigit (const juce_wchar c) noexcept
+        static bool isDecimalDigit (const juce_wchar c) noexcept
         {
             return c >= '0' && c <= '9';
         }
@@ -951,13 +951,13 @@ Expression& Expression::operator= (const Expression& other)
 }
 
 Expression::Expression (Expression&& other) noexcept
-    : term (static_cast<ReferenceCountedObjectPtr<Term>&&> (other.term))
+    : term (std::move (other.term))
 {
 }
 
 Expression& Expression::operator= (Expression&& other) noexcept
 {
-    term = static_cast<ReferenceCountedObjectPtr<Term>&&> (other.term);
+    term = std::move (other.term);
     return *this;
 }
 

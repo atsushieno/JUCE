@@ -2,17 +2,16 @@
   ==============================================================================
 
    This file is part of the JUCE library.
-   Copyright (c) 2017 - ROLI Ltd.
+   Copyright (c) 2020 - Raw Material Software Limited
 
    JUCE is an open source library subject to commercial or open-source
    licensing.
 
-   By using JUCE, you agree to the terms of both the JUCE 5 End-User License
-   Agreement and JUCE 5 Privacy Policy (both updated and effective as of the
-   27th April 2017).
+   By using JUCE, you agree to the terms of both the JUCE 6 End-User License
+   Agreement and JUCE Privacy Policy (both effective as of the 16th June 2020).
 
-   End User License Agreement: www.juce.com/juce-5-licence
-   Privacy Policy: www.juce.com/juce-5-privacy-policy
+   End User License Agreement: www.juce.com/juce-6-licence
+   Privacy Policy: www.juce.com/juce-privacy-policy
 
    Or: You may also use this code under the terms of the GPL v3 (see
    www.gnu.org/licenses).
@@ -26,10 +25,6 @@
 
 // NB: this must come first, *before* the header-guard.
 #ifdef JUCE_VSTINTERFACE_H_INCLUDED
-
-#if !defined(JucePlugin_VST2SDK)
- #define JucePlugin_VST2SDK 0
-#endif
 
 namespace juce
 {
@@ -65,28 +60,19 @@ public:
             events->numEvents = 0;
     }
 
-    void addEvent (const void* const midiData, const int numBytes, const int frameOffset)
+    void addEvent (const void* const midiData, int numBytes, int frameOffset)
     {
-        Vst2::VstMidiEvent* const e = (Vst2::VstMidiEvent*) (events->events [numEventsUsed]);
-
-#if !JucePlugin_VST2SDK
-        if (numBytes > 4)
-            return;
-        e->type = Vst2::kVstMidiType;
-#endif
-
         ensureSize (numEventsUsed + 1);
 
+        void* const ptr = (Vst2::VstMidiEvent*) (events->events [numEventsUsed]);
+        auto* const e = (Vst2::VstMidiEvent*) ptr;
         events->numEvents = ++numEventsUsed;
 
-#if JucePlugin_VST2SDK
         if (numBytes <= 4)
-#endif
         {
-#if JucePlugin_VST2SDK
             if (e->type == Vst2::kVstSysExType)
             {
-                delete[] (((Vst2::VstMidiSysexEvent*) e)->sysexDump);
+                delete[] (((Vst2::VstMidiSysexEvent*) ptr)->sysexDump);
                 e->type = Vst2::kVstMidiType;
                 e->byteSize = sizeof (Vst2::VstMidiEvent);
                 e->noteLength = 0;
@@ -94,15 +80,13 @@ public:
                 e->detune = 0;
                 e->noteOffVelocity = 0;
             }
-#endif
 
             e->deltaFrames = frameOffset;
             memcpy (e->midiData, midiData, (size_t) numBytes);
         }
-#if JucePlugin_VST2SDK
         else
         {
-            Vst2::VstMidiSysexEvent* const se = (Vst2::VstMidiSysexEvent*) e;
+            auto* const se = (Vst2::VstMidiSysexEvent*) ptr;
 
             if (se->type == Vst2::kVstSysExType)
                 delete[] se->sysexDump;
@@ -118,7 +102,6 @@ public:
             se->resvd1 = 0;
             se->resvd2 = 0;
         }
-#endif
     }
 
     //==============================================================================
@@ -132,21 +115,20 @@ public:
 
             if (e != nullptr)
             {
-                int type = ((const Vst2::VstMidiEvent*) e)->type;
+                const void* const ptr = events->events[i];
 
-                if (type == Vst2::kVstMidiType)
+                if (e->type == Vst2::kVstMidiType)
                 {
-                    dest.addEvent ((const juce::uint8*) ((const Vst2::VstMidiEvent*) e)->midiData,
-                                   4, ((const Vst2::VstMidiEvent*) e)->deltaFrames);
+                    dest.addEvent ((const juce::uint8*) ((const Vst2::VstMidiEvent*) ptr)->midiData,
+                                   4, e->deltaFrames);
                 }
-#if JucePlugin_VST2SDK
-                else if (type == Vst2::kVstSysExType)
+                else if (e->type == Vst2::kVstSysExType)
                 {
-                    dest.addEvent ((const juce::uint8*) ((const Vst2::VstMidiSysexEvent*) e)->sysexDump,
-                                   (int) ((const Vst2::VstMidiSysexEvent*) e)->dumpBytes,
+                    const auto* se = (const Vst2::VstMidiSysexEvent*) ptr;
+                    dest.addEvent ((const juce::uint8*) se->sysexDump,
+                                   (int) se->dumpBytes,
                                    e->deltaFrames);
                 }
-#endif
             }
         }
     }
@@ -158,7 +140,7 @@ public:
         {
             numEventsNeeded = (numEventsNeeded + 32) & ~31;
 
-            const size_t size = 20 + sizeof (Vst2::VstEvent*) * (size_t) numEventsNeeded;
+            const size_t size = 20 + (size_t) numEventsNeeded * sizeof (Vst2::VstEvent*);
 
             if (events == nullptr)
                 events.calloc (size, 1);
@@ -193,23 +175,20 @@ private:
 
     static Vst2::VstEvent* allocateVSTEvent()
     {
-#if JucePlugin_VST2SDK
         auto e = (Vst2::VstEvent*) std::calloc (1, sizeof (Vst2::VstMidiEvent) > sizeof (Vst2::VstMidiSysexEvent) ? sizeof (Vst2::VstMidiEvent)
                                                                                             : sizeof (Vst2::VstMidiSysexEvent));
-#else
-        auto e = (Vst2::VstMidiEvent*) std::calloc (1, sizeof (Vst2::VstMidiEvent));
-#endif
         e->type = Vst2::kVstMidiType;
         e->byteSize = sizeof (Vst2::VstMidiEvent);
-        return (Vst2::VstEvent*) e;
+        return e;
     }
 
     static void freeVSTEvent (Vst2::VstEvent* e)
     {
-#if JucePlugin_VST2SDK
         if (e->type == Vst2::kVstSysExType)
-            delete[] (((Vst2::VstMidiSysexEvent*) e)->sysexDump);
-#endif
+        {
+            delete[] (reinterpret_cast<Vst2::VstMidiSysexEvent*> (e)->sysexDump);
+        }
+
         std::free (e);
     }
 };
@@ -217,3 +196,4 @@ private:
 } // namespace juce
 
 #endif // JUCE_VSTINTERFACE_H_INCLUDED
+

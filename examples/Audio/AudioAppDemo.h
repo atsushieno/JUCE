@@ -2,7 +2,7 @@
   ==============================================================================
 
    This file is part of the JUCE examples.
-   Copyright (c) 2017 - ROLI Ltd.
+   Copyright (c) 2020 - Raw Material Software Limited
 
    The code included in this file is provided under the terms of the ISC license
    http://www.isc.org/downloads/software-support-policy/isc-license. Permission
@@ -33,7 +33,7 @@
                    juce_audio_processors, juce_audio_utils, juce_core,
                    juce_data_structures, juce_events, juce_graphics,
                    juce_gui_basics, juce_gui_extra
- exporters:        xcode_mac, vs2017, xcode_iphone
+ exporters:        xcode_mac, vs2019, linux_make, androidstudio, xcode_iphone
 
  moduleFlags:      JUCE_STRICT_REFCOUNTEDPOINTER=1
 
@@ -59,17 +59,12 @@ public:
         : AudioAppComponent (getSharedAudioDeviceManager (0, 2))
        #endif
     {
+        setAudioChannels (0, 2);
+
         setSize (800, 600);
-
-        auto audioDevice = deviceManager.getCurrentAudioDevice();
-        auto numInputChannels  = (audioDevice != nullptr ? audioDevice->getActiveInputChannels() .countNumberOfSetBits() : 0);
-        auto numOutputChannels = jmax (audioDevice != nullptr ? audioDevice->getActiveOutputChannels().countNumberOfSetBits() : 2, 2);
-
-        // Specify the number of input and output channels that we want to open
-        setAudioChannels (numInputChannels, numOutputChannels);
     }
 
-    ~AudioAppDemo()
+    ~AudioAppDemo() override
     {
         shutdownAudio();
     }
@@ -119,21 +114,25 @@ public:
         // (Our component is opaque, so we must completely fill the background with a solid colour)
         g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
 
-        auto centreY = getHeight() / 2.0f;
+        auto centreY = (float) getHeight() / 2.0f;
         auto radius = amplitude * 200.0f;
 
-        // Draw an ellipse based on the mouse position and audio volume
-        g.setColour (Colours::lightgreen);
-        g.fillEllipse  (jmax (0.0f, lastMousePosition.x) - radius / 2.0f,
-                        jmax (0.0f, lastMousePosition.y) - radius / 2.0f,
-                        radius, radius);
+        if (radius >= 0.0f)
+        {
+            // Draw an ellipse based on the mouse position and audio volume
+            g.setColour (Colours::lightgreen);
+
+            g.fillEllipse (jmax (0.0f, lastMousePosition.x) - radius / 2.0f,
+                           jmax (0.0f, lastMousePosition.y) - radius / 2.0f,
+                           radius, radius);
+        }
 
         // Draw a representative sine wave.
         Path wavePath;
         wavePath.startNewSubPath (0, centreY);
 
-        for (auto x = 1.0f; x < getWidth(); ++x)
-            wavePath.lineTo (x, centreY + amplitude * getHeight() * 2.0f
+        for (auto x = 1.0f; x < (float) getWidth(); ++x)
+            wavePath.lineTo (x, centreY + amplitude * (float) getHeight() * 2.0f
                                             * std::sin (x * frequency * 0.0001f));
 
         g.setColour (getLookAndFeel().findColour (Slider::thumbColourId));
@@ -150,8 +149,8 @@ public:
     {
         lastMousePosition = e.position;
 
-        frequency = (getHeight() - e.y) * 10.0f;
-        amplitude = jmin (0.9f, 0.2f * e.position.x / getWidth());
+        frequency = (float) (getHeight() - e.y) * 10.0f;
+        amplitude = jmin (0.9f, 0.2f * e.position.x / (float) getWidth());
 
         phaseDelta = (float) (MathConstants<double>::twoPi * frequency / sampleRate);
 

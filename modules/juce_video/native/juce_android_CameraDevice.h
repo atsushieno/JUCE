@@ -2,17 +2,16 @@
   ==============================================================================
 
    This file is part of the JUCE library.
-   Copyright (c) 2017 - ROLI Ltd.
+   Copyright (c) 2020 - Raw Material Software Limited
 
    JUCE is an open source library subject to commercial or open-source
    licensing.
 
-   By using JUCE, you agree to the terms of both the JUCE 5 End-User License
-   Agreement and JUCE 5 Privacy Policy (both updated and effective as of the
-   27th April 2017).
+   By using JUCE, you agree to the terms of both the JUCE 6 End-User License
+   Agreement and JUCE Privacy Policy (both effective as of the 16th June 2020).
 
-   End User License Agreement: www.juce.com/juce-5-licence
-   Privacy Policy: www.juce.com/juce-5-privacy-policy
+   End User License Agreement: www.juce.com/juce-6-licence
+   Privacy Policy: www.juce.com/juce-privacy-policy
 
    Or: You may also use this code under the terms of the GPL v3 (see
    www.gnu.org/licenses).
@@ -24,45 +23,112 @@
   ==============================================================================
 */
 
-#if __ANDROID_API__ >= 21
-#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD) \
+//==============================================================================
+// This byte-code is generated from:
+//
+// native/java/com/rmsl/juce/CameraCaptureSessionCaptureCallback.java
+// native/java/com/rmsl/juce/CameraCaptureSessionStateCallback.java
+// native/java/com/rmsl/juce/CameraDeviceStateCallback.java
+// native/java/com/rmsl/juce/JuceOrientationEventListener.java
+//
+// files with min sdk version 21
+// See juce_core/native/java/README.txt on how to generate this byte-code.
+static const uint8 CameraSupportByteCode[] =
+{31,139,8,8,187,110,161,94,0,3,67,97,109,101,114,97,83,117,112,112,111,114,116,66,121,116,101,67,111,100,101,46,100,101,120,0,
+149,152,93,108,28,213,21,199,207,157,157,221,89,239,174,215,227,181,243,217,36,56,95,182,3,113,54,137,227,40,101,29,59,198,113,
+192,102,133,169,215,182,34,3,45,147,221,73,188,176,222,89,102,215,139,171,86,37,68,84,208,151,42,80,90,168,4,136,170,20,181,15,
+84,110,9,132,7,30,82,21,149,240,0,10,136,190,165,18,84,133,7,154,7,132,42,20,85,60,244,127,63,198,158,93,175,93,99,233,183,
+255,51,115,206,61,247,222,115,239,140,103,38,103,47,68,14,246,246,209,213,103,22,174,255,247,133,96,249,25,246,233,195,151,255,
+18,189,241,193,31,255,57,248,226,196,252,238,238,4,81,137,136,22,166,143,192,146,127,79,181,18,157,38,121,190,13,92,99,68,91,
+160,219,52,162,32,244,174,0,81,55,247,67,117,232,34,126,110,198,136,14,194,249,86,152,232,10,248,2,36,154,136,14,131,62,112,12,
+220,7,170,224,50,248,26,116,69,136,190,15,158,4,127,6,255,0,70,148,232,40,248,1,120,22,188,11,190,2,29,200,191,27,116,129,219,
+120,95,160,15,164,192,9,112,39,24,7,167,193,131,32,7,242,192,1,85,240,99,240,24,120,18,252,22,188,7,110,128,182,102,162,65,48,7,
+158,6,175,129,143,192,87,160,57,78,212,9,70,192,3,160,10,30,3,191,6,47,131,63,128,55,193,219,224,93,240,33,248,12,124,13,162,
+45,68,123,193,16,200,128,7,64,9,252,4,252,28,60,7,126,3,46,131,43,224,125,112,29,124,6,254,13,254,3,190,1,97,147,168,21,236,2,
+221,166,172,55,95,3,3,160,196,132,50,18,202,70,40,17,97,58,132,97,19,186,39,52,37,132,19,150,146,18,106,29,219,193,6,176,17,
+116,42,109,85,107,190,73,217,139,72,188,89,217,111,25,114,221,185,125,5,246,119,148,125,21,246,86,101,127,236,179,175,251,98,
+254,5,123,155,178,191,132,189,93,217,55,97,239,80,182,142,9,220,162,236,118,216,29,202,222,227,179,143,248,236,147,176,119,41,
+123,18,246,78,101,223,239,59,159,131,189,91,217,5,216,123,148,189,0,123,175,178,159,240,217,23,125,246,11,190,156,191,247,229,
+92,12,243,186,50,234,23,245,77,208,184,168,177,60,110,81,106,42,13,168,122,234,74,67,74,99,98,69,120,251,176,210,56,237,19,26,
+163,91,133,54,211,109,66,155,104,191,208,8,245,8,141,210,1,161,27,105,80,104,59,157,16,186,129,134,132,182,210,29,106,92,195,66,
+219,232,164,24,159,38,250,137,99,183,116,43,77,42,61,168,244,144,210,195,66,77,26,80,58,162,244,148,210,59,149,166,197,124,
+101,222,22,204,172,87,233,17,161,6,245,169,227,163,66,55,137,60,92,239,18,186,153,70,213,241,152,168,151,172,144,137,138,29,83,
+245,187,155,228,254,101,190,58,50,165,31,155,164,230,35,207,121,245,213,148,38,212,70,110,81,126,175,238,94,158,83,202,111,
+42,127,172,110,125,92,229,15,34,51,247,247,154,242,250,42,153,60,126,6,151,208,253,237,12,189,199,224,231,215,222,113,83,230,
+200,92,32,154,122,130,145,241,184,241,75,227,85,227,114,213,8,146,63,238,212,170,113,161,154,184,241,85,227,12,17,23,193,76,248,
+88,79,155,242,90,207,184,136,171,32,238,17,227,167,236,87,213,80,88,68,201,245,228,227,126,208,203,247,52,226,126,129,184,139,
+198,43,236,13,253,111,213,112,147,136,74,160,87,126,223,200,155,178,166,153,63,33,238,117,196,45,26,239,24,127,215,63,15,226,
+198,83,141,68,68,172,142,190,121,77,202,166,172,87,201,100,162,38,154,240,105,98,45,126,164,124,153,14,141,74,39,18,164,29,90,
+246,93,168,241,181,213,248,126,86,227,107,175,241,93,172,241,109,168,241,61,87,227,219,168,124,114,156,47,45,141,83,19,227,12,
+248,198,249,234,82,187,0,218,109,175,201,249,90,141,111,135,240,5,145,147,223,111,47,249,125,147,183,212,180,123,187,166,93,
+135,240,133,68,75,162,191,122,99,57,24,160,161,224,76,66,247,141,229,253,165,118,58,218,117,138,118,222,126,103,10,205,119,61,
+48,181,219,229,185,160,82,67,249,12,159,47,33,242,115,13,146,252,127,225,217,222,181,33,143,155,136,137,76,203,199,225,154,248,
+38,177,71,252,199,81,213,135,55,174,160,178,131,106,140,94,31,242,255,148,204,31,80,118,120,41,70,230,245,236,168,106,99,168,
+92,92,67,253,249,98,190,50,64,221,195,214,156,237,90,195,86,169,50,239,218,25,187,92,206,59,69,117,52,108,21,10,103,172,236,195,
+7,30,178,170,22,117,54,138,204,84,172,74,93,220,14,25,119,210,174,230,179,118,3,63,27,37,54,70,59,199,230,179,246,184,155,
+183,139,136,64,162,145,42,172,116,190,92,177,139,182,43,3,183,164,173,98,206,117,242,185,100,214,41,226,124,37,57,204,117,161,
+146,162,193,37,215,172,229,230,30,181,92,59,153,21,189,30,78,54,26,229,158,186,9,165,232,248,183,76,80,51,143,20,37,191,93,243,
+20,245,253,191,6,178,92,245,253,116,173,175,89,138,246,173,21,40,134,114,202,202,23,32,235,9,157,176,31,153,183,203,40,115,247,
+58,66,203,243,5,68,246,172,30,57,233,84,172,66,93,248,242,188,170,121,251,209,228,106,251,32,69,189,233,172,51,151,116,231,
+202,133,228,67,216,48,13,171,187,98,113,15,173,163,81,93,161,247,53,108,210,96,15,167,104,127,93,232,90,27,57,69,108,154,180,
+233,81,48,70,129,233,177,81,254,147,38,29,63,194,156,161,32,126,96,135,132,140,145,193,53,61,54,38,79,164,211,104,152,70,32,34,
+244,105,238,15,78,11,47,14,224,99,51,20,146,85,166,173,217,6,115,28,202,86,242,85,155,246,52,242,121,69,115,230,74,5,187,98,231,
+104,231,26,81,124,239,32,100,239,26,33,247,186,206,57,23,103,16,118,235,26,97,25,190,181,138,89,123,232,140,227,242,94,247,
+175,35,118,121,140,187,214,138,174,88,34,99,195,74,12,23,28,62,178,221,13,125,78,241,108,254,220,242,44,119,172,25,148,163,45,
+141,252,19,182,149,251,33,109,202,174,216,54,178,227,237,43,28,39,243,101,220,213,138,118,150,143,121,227,10,247,136,235,58,
+110,131,124,227,37,108,171,28,25,89,121,39,164,205,57,225,243,237,191,225,89,171,120,14,33,65,91,164,48,206,202,235,158,162,103,
+93,36,187,103,126,238,140,237,146,62,235,148,43,212,196,127,39,157,169,178,77,225,165,221,146,104,176,55,90,234,119,66,91,
+163,117,223,188,234,42,111,93,99,77,205,21,43,24,94,90,175,214,149,171,19,171,89,139,184,83,172,41,164,129,235,79,76,27,57,84,
+169,218,97,173,172,142,225,45,89,212,89,118,82,115,9,35,200,91,5,121,155,34,163,228,218,252,254,68,186,139,210,147,225,202,251,
+34,133,92,233,143,148,213,108,70,145,176,44,55,2,181,148,103,157,249,66,238,14,84,70,53,174,204,230,203,212,84,201,207,161,173,
+53,87,162,30,109,96,218,136,247,247,244,208,209,192,212,68,198,136,95,162,126,24,41,110,12,195,24,231,198,168,54,53,105,196,
+127,71,227,129,169,201,126,126,98,90,159,154,56,13,235,35,218,207,6,120,115,234,101,83,70,124,134,190,43,101,80,202,136,148,187,
+165,116,169,208,3,172,155,31,30,145,114,187,214,125,59,215,19,242,176,51,48,112,236,123,70,252,56,15,187,135,159,32,13,15,
+207,26,211,244,243,231,245,197,8,187,128,167,188,6,68,217,181,8,99,55,193,203,81,198,174,130,47,193,243,49,98,161,160,166,181,
+162,237,59,177,70,237,54,177,79,98,140,125,3,158,111,102,236,18,184,134,151,191,160,30,208,182,161,205,141,230,250,248,157,236,
+169,56,99,175,128,43,224,58,30,225,52,166,107,123,31,63,175,223,140,115,127,23,123,182,69,190,215,120,207,117,158,122,223,88,
+248,51,143,247,157,133,63,19,121,223,90,188,119,125,254,189,133,171,247,205,37,68,203,223,93,88,135,124,175,231,223,94,152,41,
+223,221,249,59,188,214,33,243,243,239,49,1,21,195,223,105,248,203,52,111,43,222,167,76,57,14,254,189,231,127,249,28,121,55,40,18,
+0,0,0,0};
+
+#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD, CALLBACK)    \
  STATICMETHOD (valueOf, "valueOf", "(Ljava/lang/String;)Landroid/graphics/Bitmap$CompressFormat;")
 
-DECLARE_JNI_CLASS (AndroidBitmapCompressFormat, "android/graphics/Bitmap$CompressFormat")
+DECLARE_JNI_CLASS_WITH_MIN_SDK (AndroidBitmapCompressFormat, "android/graphics/Bitmap$CompressFormat", 21)
 #undef JNI_CLASS_MEMBERS
 
-#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD) \
+#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD, CALLBACK) \
  METHOD (close,                "close",                "()V") \
  METHOD (createCaptureRequest, "createCaptureRequest", "(I)Landroid/hardware/camera2/CaptureRequest$Builder;") \
  METHOD (createCaptureSession, "createCaptureSession", "(Ljava/util/List;Landroid/hardware/camera2/CameraCaptureSession$StateCallback;Landroid/os/Handler;)V")
 
-DECLARE_JNI_CLASS (AndroidCameraDevice, "android/hardware/camera2/CameraDevice")
+DECLARE_JNI_CLASS_WITH_MIN_SDK (AndroidCameraDevice, "android/hardware/camera2/CameraDevice", 21)
 #undef JNI_CLASS_MEMBERS
 
-#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD) \
+#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD, CALLBACK) \
  METHOD (close,     "close",     "()V") \
  METHOD (getPlanes, "getPlanes", "()[Landroid/media/Image$Plane;")
 
-DECLARE_JNI_CLASS (AndroidImage, "android/media/Image")
+DECLARE_JNI_CLASS_WITH_MIN_SDK (AndroidImage, "android/media/Image", 21)
 #undef JNI_CLASS_MEMBERS
 
-#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD) \
+#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD, CALLBACK) \
  METHOD (getBuffer, "getBuffer", "()Ljava/nio/ByteBuffer;")
 
-DECLARE_JNI_CLASS (AndroidImagePlane, "android/media/Image$Plane")
+DECLARE_JNI_CLASS_WITH_MIN_SDK (AndroidImagePlane, "android/media/Image$Plane", 21)
 #undef JNI_CLASS_MEMBERS
 
-#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD) \
+#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD, CALLBACK) \
  METHOD (acquireLatestImage,          "acquireLatestImage",          "()Landroid/media/Image;") \
  METHOD (close,                       "close",                       "()V") \
  METHOD (getSurface,                  "getSurface",                  "()Landroid/view/Surface;") \
  METHOD (setOnImageAvailableListener, "setOnImageAvailableListener", "(Landroid/media/ImageReader$OnImageAvailableListener;Landroid/os/Handler;)V") \
  STATICMETHOD (newInstance, "newInstance", "(IIII)Landroid/media/ImageReader;")
 
-DECLARE_JNI_CLASS (AndroidImageReader, "android/media/ImageReader")
+DECLARE_JNI_CLASS_WITH_MIN_SDK (AndroidImageReader, "android/media/ImageReader", 21)
 #undef JNI_CLASS_MEMBERS
 
-#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD) \
+#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD, CALLBACK) \
  METHOD (constructor,             "<init>",                  "()V") \
  METHOD (getSurface,              "getSurface",              "()Landroid/view/Surface;") \
  METHOD (prepare,                 "prepare",                 "()V") \
@@ -82,71 +148,59 @@ DECLARE_JNI_CLASS (AndroidImageReader, "android/media/ImageReader")
  METHOD (start,                   "start",                   "()V") \
  METHOD (stop,                    "stop",                    "()V")
 
-DECLARE_JNI_CLASS (AndroidMediaRecorder, "android/media/MediaRecorder")
+DECLARE_JNI_CLASS_WITH_MIN_SDK (AndroidMediaRecorder, "android/media/MediaRecorder", 21)
 #undef JNI_CLASS_MEMBERS
 
-#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD) \
+#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD, CALLBACK) \
  METHOD (constructor,               "<init>",                    "(Landroid/content/Context;)V") \
  METHOD (getSurfaceTexture,         "getSurfaceTexture",         "()Landroid/graphics/SurfaceTexture;") \
  METHOD (isAvailable,               "isAvailable",               "()Z") \
  METHOD (setSurfaceTextureListener, "setSurfaceTextureListener", "(Landroid/view/TextureView$SurfaceTextureListener;)V") \
  METHOD (setTransform,              "setTransform",              "(Landroid/graphics/Matrix;)V")
 
-DECLARE_JNI_CLASS (AndroidTextureView, "android/view/TextureView")
+DECLARE_JNI_CLASS_WITH_MIN_SDK (AndroidTextureView, "android/view/TextureView", 21)
 #undef JNI_CLASS_MEMBERS
 
-#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD) \
+#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD, CALLBACK) \
  METHOD (constructor, "<init>", "(Landroid/graphics/SurfaceTexture;)V")
 
-DECLARE_JNI_CLASS (AndroidSurface, "android/view/Surface")
+DECLARE_JNI_CLASS_WITH_MIN_SDK (AndroidSurface, "android/view/Surface", 21)
 #undef JNI_CLASS_MEMBERS
 
-#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD) \
+#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD, CALLBACK) \
  METHOD (setDefaultBufferSize, "setDefaultBufferSize", "(II)V")
 
-DECLARE_JNI_CLASS (AndroidSurfaceTexture, "android/graphics/SurfaceTexture")
+DECLARE_JNI_CLASS_WITH_MIN_SDK (AndroidSurfaceTexture, "android/graphics/SurfaceTexture", 21)
 #undef JNI_CLASS_MEMBERS
 
-#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD) \
+#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD, CALLBACK) \
  METHOD (getOutputSizesForClass,      "getOutputSizes",       "(Ljava/lang/Class;)[Landroid/util/Size;") \
  METHOD (getOutputSizesForFormat,     "getOutputSizes",       "(I)[Landroid/util/Size;") \
  METHOD (isOutputSupportedFor,        "isOutputSupportedFor", "(I)Z") \
  METHOD (isOutputSupportedForSurface, "isOutputSupportedFor", "(Landroid/view/Surface;)Z")
 
-DECLARE_JNI_CLASS (AndroidStreamConfigurationMap, "android/hardware/camera2/params/StreamConfigurationMap")
+DECLARE_JNI_CLASS_WITH_MIN_SDK (AndroidStreamConfigurationMap, "android/hardware/camera2/params/StreamConfigurationMap", 21)
 #undef JNI_CLASS_MEMBERS
 
-#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD) \
+#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD, CALLBACK) \
  METHOD (constructor, "<init>",      "()V") \
  METHOD (toByteArray, "toByteArray", "()[B") \
  METHOD (size,        "size",        "()I")
 
-DECLARE_JNI_CLASS (ByteArrayOutputStream, "java/io/ByteArrayOutputStream")
+DECLARE_JNI_CLASS_WITH_MIN_SDK (ByteArrayOutputStream, "java/io/ByteArrayOutputStream", 21)
 #undef JNI_CLASS_MEMBERS
 
-#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD) \
+#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD, CALLBACK) \
  METHOD (abortCaptures,       "abortCaptures",       "()V") \
  METHOD (capture,             "capture",             "(Landroid/hardware/camera2/CaptureRequest;Landroid/hardware/camera2/CameraCaptureSession$CaptureCallback;Landroid/os/Handler;)I") \
  METHOD (close,               "close",               "()V") \
  METHOD (setRepeatingRequest, "setRepeatingRequest", "(Landroid/hardware/camera2/CaptureRequest;Landroid/hardware/camera2/CameraCaptureSession$CaptureCallback;Landroid/os/Handler;)I") \
  METHOD (stopRepeating,       "stopRepeating",       "()V")
 
-DECLARE_JNI_CLASS (CameraCaptureSession, "android/hardware/camera2/CameraCaptureSession")
+DECLARE_JNI_CLASS_WITH_MIN_SDK (CameraCaptureSession, "android/hardware/camera2/CameraCaptureSession", 21)
 #undef JNI_CLASS_MEMBERS
 
-#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD) \
- METHOD (constructor, "<init>", "(L" JUCE_ANDROID_ACTIVITY_CLASSPATH ";JZ)V")
-
-DECLARE_JNI_CLASS (CameraCaptureSessionCaptureCallback, JUCE_ANDROID_ACTIVITY_CLASSPATH "$CameraCaptureSessionCaptureCallback")
-#undef JNI_CLASS_MEMBERS
-
-#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD) \
- METHOD (constructor, "<init>", "(L" JUCE_ANDROID_ACTIVITY_CLASSPATH ";J)V")
-
-DECLARE_JNI_CLASS (CameraCaptureSessionStateCallback, JUCE_ANDROID_ACTIVITY_CLASSPATH "$CameraCaptureSessionStateCallback")
-#undef JNI_CLASS_MEMBERS
-
-#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD) \
+#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD, CALLBACK) \
  METHOD (get,     "get",     "(Landroid/hardware/camera2/CameraCharacteristics$Key;)Ljava/lang/Object;") \
  METHOD (getKeys, "getKeys", "()Ljava/util/List;") \
  STATICFIELD (CONTROL_AF_AVAILABLE_MODES,      "CONTROL_AF_AVAILABLE_MODES",      "Landroid/hardware/camera2/CameraCharacteristics$Key;") \
@@ -154,63 +208,47 @@ DECLARE_JNI_CLASS (CameraCaptureSessionStateCallback, JUCE_ANDROID_ACTIVITY_CLAS
  STATICFIELD (SCALER_STREAM_CONFIGURATION_MAP, "SCALER_STREAM_CONFIGURATION_MAP", "Landroid/hardware/camera2/CameraCharacteristics$Key;") \
  STATICFIELD (SENSOR_ORIENTATION,              "SENSOR_ORIENTATION",              "Landroid/hardware/camera2/CameraCharacteristics$Key;")
 
-DECLARE_JNI_CLASS (CameraCharacteristics, "android/hardware/camera2/CameraCharacteristics")
+DECLARE_JNI_CLASS_WITH_MIN_SDK (CameraCharacteristics, "android/hardware/camera2/CameraCharacteristics", 21)
 #undef JNI_CLASS_MEMBERS
 
-#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD) \
+#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD, CALLBACK) \
  METHOD (getName, "getName", "()Ljava/lang/String;")
 
-DECLARE_JNI_CLASS (CameraCharacteristicsKey, "android/hardware/camera2/CameraCharacteristics$Key")
+DECLARE_JNI_CLASS_WITH_MIN_SDK (CameraCharacteristicsKey, "android/hardware/camera2/CameraCharacteristics$Key", 21)
 #undef JNI_CLASS_MEMBERS
 
-#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD) \
- METHOD (constructor, "<init>", "(L" JUCE_ANDROID_ACTIVITY_CLASSPATH ";J)V")
-
-DECLARE_JNI_CLASS (CameraDeviceStateCallback, JUCE_ANDROID_ACTIVITY_CLASSPATH "$CameraDeviceStateCallback")
-#undef JNI_CLASS_MEMBERS
-
-#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD) \
+#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD, CALLBACK) \
  METHOD (getCameraCharacteristics, "getCameraCharacteristics", "(Ljava/lang/String;)Landroid/hardware/camera2/CameraCharacteristics;") \
  METHOD (getCameraIdList,          "getCameraIdList",          "()[Ljava/lang/String;") \
  METHOD (openCamera,               "openCamera",               "(Ljava/lang/String;Landroid/hardware/camera2/CameraDevice$StateCallback;Landroid/os/Handler;)V")
 
-DECLARE_JNI_CLASS (CameraManager, "android/hardware/camera2/CameraManager")
+DECLARE_JNI_CLASS_WITH_MIN_SDK (CameraManager, "android/hardware/camera2/CameraManager", 21)
 #undef JNI_CLASS_MEMBERS
 
-#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD) \
+#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD, CALLBACK) \
  STATICFIELD (CONTROL_AE_PRECAPTURE_TRIGGER, "CONTROL_AE_PRECAPTURE_TRIGGER", "Landroid/hardware/camera2/CaptureRequest$Key;") \
  STATICFIELD (CONTROL_AF_MODE,               "CONTROL_AF_MODE",               "Landroid/hardware/camera2/CaptureRequest$Key;") \
  STATICFIELD (CONTROL_AF_TRIGGER,            "CONTROL_AF_TRIGGER",            "Landroid/hardware/camera2/CaptureRequest$Key;") \
  STATICFIELD (CONTROL_MODE,                  "CONTROL_MODE",                  "Landroid/hardware/camera2/CaptureRequest$Key;")
 
-DECLARE_JNI_CLASS (CaptureRequest, "android/hardware/camera2/CaptureRequest")
+DECLARE_JNI_CLASS_WITH_MIN_SDK (CaptureRequest, "android/hardware/camera2/CaptureRequest", 21)
 #undef JNI_CLASS_MEMBERS
 
-#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD) \
+#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD, CALLBACK) \
  METHOD (addTarget, "addTarget", "(Landroid/view/Surface;)V") \
  METHOD (build,     "build",     "()Landroid/hardware/camera2/CaptureRequest;") \
  METHOD (set,       "set",       "(Landroid/hardware/camera2/CaptureRequest$Key;Ljava/lang/Object;)V")
 
-DECLARE_JNI_CLASS (CaptureRequestBuilder, "android/hardware/camera2/CaptureRequest$Builder")
+DECLARE_JNI_CLASS_WITH_MIN_SDK (CaptureRequestBuilder, "android/hardware/camera2/CaptureRequest$Builder", 21)
 #undef JNI_CLASS_MEMBERS
 
-#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD) \
+#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD, CALLBACK) \
  METHOD (get, "get", "(Landroid/hardware/camera2/CaptureResult$Key;)Ljava/lang/Object;") \
  STATICFIELD (CONTROL_AE_STATE, "CONTROL_AE_STATE", "Landroid/hardware/camera2/CaptureResult$Key;") \
  STATICFIELD (CONTROL_AF_STATE, "CONTROL_AF_STATE", "Landroid/hardware/camera2/CaptureResult$Key;")
 
-DECLARE_JNI_CLASS (CaptureResult, "android/hardware/camera2/CaptureResult")
+DECLARE_JNI_CLASS_WITH_MIN_SDK (CaptureResult, "android/hardware/camera2/CaptureResult", 21)
 #undef JNI_CLASS_MEMBERS
-
-#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD) \
- METHOD (canDetectOrientation, "canDetectOrientation", "()Z") \
- METHOD (constructor,          "<init>",               "(L" JUCE_ANDROID_ACTIVITY_CLASSPATH ";JLandroid/content/Context;I)V") \
- METHOD (disable,              "disable",              "()V") \
- METHOD (enable,               "enable",               "()V")
-
-DECLARE_JNI_CLASS (OrientationEventListener, JUCE_ANDROID_ACTIVITY_CLASSPATH "$JuceOrientationEventListener")
-#undef JNI_CLASS_MEMBERS
-#endif
 
 //==============================================================================
 class AndroidRunnable  : public juce::AndroidInterfaceImplementer
@@ -444,72 +482,44 @@ private:
 
 //==============================================================================
 struct CameraDevice::Pimpl
-#if __ANDROID_API__ >= 21
-    : private AppPausedResumedListener::Owner
-#endif
+    : private ActivityLifecycleCallbacks
 {
     using InternalOpenCameraResultCallback = std::function<void (const String& /*cameraId*/, const String& /*error*/)>;
 
     Pimpl (CameraDevice& ownerToUse, const String& cameraIdToUse, int /*index*/,
            int minWidthToUse, int minHeightToUse, int maxWidthToUse, int maxHeightToUse,
            bool /*useHighQuality*/)
-         #if __ANDROID_API__ >= 21
         : owner (ownerToUse),
           minWidth (minWidthToUse),
           minHeight (minHeightToUse),
           maxWidth (maxWidthToUse),
           maxHeight (maxHeightToUse),
           cameraId (cameraIdToUse),
-          appPausedResumedListener (*this),
-          appPausedResumedListenerNative (CreateJavaInterface (&appPausedResumedListener,
-                                                               JUCE_ANDROID_ACTIVITY_CLASSPATH "$AppPausedResumedListener").get()),
+          activityLifeListener (CreateJavaInterface (this, "android/app/Application$ActivityLifecycleCallbacks")),
           cameraManager (initialiseCameraManager()),
           cameraCharacteristics (initialiseCameraCharacteristics (cameraManager, cameraId)),
           streamConfigurationMap (cameraCharacteristics),
           previewDisplay (streamConfigurationMap.getPreviewBufferSize()),
           deviceOrientationChangeListener (previewDisplay)
-         #endif
     {
-       #if __ANDROID_API__ >= 21
         startBackgroundThread();
-       #endif
     }
 
-    ~Pimpl()
+    ~Pimpl() override
     {
-       #if __ANDROID_API__ >= 21
-        getEnv()->CallVoidMethod (android.activity, JuceAppActivity.removeAppPausedResumedListener,
-                                  appPausedResumedListenerNative.get(), reinterpret_cast<jlong>(this));
-       #endif
+        auto* env = getEnv();
+
+        env->CallVoidMethod (getAppContext().get(), AndroidApplication.unregisterActivityLifecycleCallbacks, activityLifeListener.get());
+        activityLifeListener.clear();
     }
 
-   #if __ANDROID_API__ < 21
-    // Dummy implementations for unsupported API levels.
-    void open (InternalOpenCameraResultCallback) {}
-    void takeStillPicture (std::function<void (const Image&)>) {}
-    void startRecordingToFile (const File&, int) {}
-    void stopRecording() {}
-
-    void addListener (CameraDevice::Listener*) {}
-    void removeListener (CameraDevice::Listener*) {}
-
-    String getCameraId() const noexcept      { return {}; }
-    bool openedOk() const noexcept           { return false; }
-    Time getTimeOfFirstRecordedFrame() const { return {}; }
-    static StringArray getAvailableDevices()
-    {
-        // Camera on Android requires API 21 or above.
-        jassertfalse;
-        return {};
-    }
-   #else
     JUCE_DECLARE_WEAK_REFERENCEABLE (Pimpl)
 
     String getCameraId() const noexcept { return cameraId; }
 
     void open (InternalOpenCameraResultCallback cameraOpenCallbackToUse)
     {
-        cameraOpenCallback = static_cast<InternalOpenCameraResultCallback&&> (cameraOpenCallbackToUse);
+        cameraOpenCallback = std::move (cameraOpenCallbackToUse);
 
         // A valid camera open callback must be passed.
         jassert (cameraOpenCallback != nullptr);
@@ -530,15 +540,21 @@ struct CameraDevice::Pimpl
 
     void continueOpenRequest (bool granted)
     {
-        if (granted)
+        if (getAndroidSDKVersion() >= 21)
         {
-            getEnv()->CallVoidMethod (android.activity, JuceAppActivity.addAppPausedResumedListener,
-                                      appPausedResumedListenerNative.get(), reinterpret_cast<jlong> (this));
-            scopedCameraDevice.reset (new ScopedCameraDevice (*this, cameraId, cameraManager, handler, getAutoFocusModeToUse()));
+            if (granted)
+            {
+                getEnv()->CallVoidMethod (getAppContext().get(), AndroidApplication.registerActivityLifecycleCallbacks, activityLifeListener.get());
+                scopedCameraDevice.reset (new ScopedCameraDevice (*this, cameraId, cameraManager, handler, getAutoFocusModeToUse()));
+            }
+            else
+            {
+                invokeCameraOpenCallback ("Camera permission not granted");
+            }
         }
         else
         {
-            invokeCameraOpenCallback ("Camera permission not granted");
+            invokeCameraOpenCallback ("Camera requires android sdk version 21 or greater");
         }
     }
 
@@ -546,7 +562,7 @@ struct CameraDevice::Pimpl
 
     void takeStillPicture (std::function<void (const Image&)> pictureTakenCallbackToUse)
     {
-        if (pictureTakenCallbackToUse == nullptr)
+        if (pictureTakenCallbackToUse == nullptr || currentCaptureSessionMode == nullptr)
         {
             jassertfalse;
             return;
@@ -559,7 +575,7 @@ struct CameraDevice::Pimpl
             return;
         }
 
-        pictureTakenCallback = static_cast<std::function<void (const Image&)>&&> (pictureTakenCallbackToUse);
+        pictureTakenCallback = std::move (pictureTakenCallbackToUse);
 
         triggerStillPictureCapture();
     }
@@ -611,6 +627,9 @@ struct CameraDevice::Pimpl
 
     static StringArray getAvailableDevices()
     {
+        if (getAndroidSDKVersion() < 21)
+            return StringArray(); // Camera requires SDK version 21 or later
+
         StringArray results;
 
         auto* env = getEnv();
@@ -667,7 +686,7 @@ private:
 
     static LocalRef<jobject> initialiseCameraManager()
     {
-        return LocalRef<jobject> (getEnv()->CallObjectMethod (android.activity, JuceAppActivity.getSystemService,
+        return LocalRef<jobject> (getEnv()->CallObjectMethod (getAppContext().get(), AndroidContext.getSystemService,
                                                               javaString ("camera").get()));
     }
 
@@ -692,9 +711,9 @@ private:
 
         JUCE_CAMERA_LOG ("Camera id: " + cameraId + ", characteristics keys num: " + String (size));
 
-        for (int ikey = 0; ikey < size; ++ikey)
+        for (int i = 0; i < size; ++i)
         {
-            auto key = LocalRef<jobject> (env->CallObjectMethod (keysList, JavaList.get, ikey));
+            auto key = LocalRef<jobject> (env->CallObjectMethod (keysList, JavaList.get, i));
             auto jKeyName = LocalRef<jstring> ((jstring) env->CallObjectMethod (key, CameraCharacteristicsKey.getName));
             auto keyName = juceString (jKeyName);
 
@@ -710,7 +729,7 @@ private:
             }
             else if (kvs.startsWith ("[Landroid.util.Range"))
             {
-                printRangeArrayElements (keyValue);
+                printRangeArrayElements (keyValue, keyName);
             }
             else
             {
@@ -720,8 +739,8 @@ private:
                 {
                     JUCE_CAMERA_LOG ("Key: " + keyName);
 
-                    for (int i = 0, j = 1; i < keyValueString.length(); i += chunkSize, ++j)
-                        JUCE_CAMERA_LOG ("value part " + String (j) + ": " + keyValueString.substring (i, i + chunkSize));
+                    for (int j = 0, k = 1; j < keyValueString.length(); j += chunkSize, ++k)
+                        JUCE_CAMERA_LOG ("value part " + String (k) + ": " + keyValueString.substring (j, k + chunkSize));
                 }
                 else
                 {
@@ -742,18 +761,18 @@ private:
 
         auto* env = getEnv();
 
-        #define PRINT_ELEMENTS(elem_type, array_type, fun_name_middle)                                        \
-        {                                                                                                     \
-            elem_type* elements = env->Get##fun_name_middle##ArrayElements ((array_type) keyValue.get(), 0);  \
-            int size = env->GetArrayLength ((array_type) keyValue.get());                                     \
-                                                                                                              \
-            for (int i = 0; i < size - 1; ++i)                                                                \
-                result << String (elements[i]) << " ";                                                        \
-                                                                                                              \
-            if (size > 0)                                                                                     \
-                result << String (elements[size - 1]);                                                        \
-                                                                                                              \
-            env->Release##fun_name_middle##ArrayElements ((array_type) keyValue.get(), elements, 0);          \
+        #define PRINT_ELEMENTS(elem_type, array_type, fun_name_middle)                                              \
+        {                                                                                                           \
+            elem_type* elements = env->Get##fun_name_middle##ArrayElements ((array_type) keyValue.get(), nullptr);  \
+            int size = env->GetArrayLength ((array_type) keyValue.get());                                           \
+                                                                                                                    \
+            for (int i = 0; i < size - 1; ++i)                                                                      \
+                result << String (elements[i]) << " ";                                                              \
+                                                                                                                    \
+            if (size > 0)                                                                                           \
+                result << String (elements[size - 1]);                                                              \
+                                                                                                                    \
+            env->Release##fun_name_middle##ArrayElements ((array_type) keyValue.get(), elements, 0);                \
         }
 
         if (keyValueString.startsWith ("[I"))
@@ -771,7 +790,7 @@ private:
         JUCE_CAMERA_LOG ("Key: " + keyName + ", value: " + result);
     }
 
-    static void printRangeArrayElements (const LocalRef<jobject>& rangeArray)
+    static void printRangeArrayElements (const LocalRef<jobject>& rangeArray, const String& keyName)
     {
         auto* env = getEnv();
 
@@ -790,6 +809,7 @@ private:
             result << juceString (jRangeString) << " ";
         }
 
+        ignoreUnused (keyName);
         JUCE_CAMERA_LOG ("Key: " + keyName + ", value: " + result);
     }
 
@@ -797,8 +817,8 @@ private:
     class StreamConfigurationMap
     {
     public:
-        StreamConfigurationMap (const GlobalRef& characteristics)
-            : scalerStreamConfigurationMap (getStreamConfigurationMap (characteristics)),
+        StreamConfigurationMap (const GlobalRef& cameraCharacteristicsToUse)
+            : scalerStreamConfigurationMap (getStreamConfigurationMap (cameraCharacteristicsToUse)),
               supportedPreviewOutputSizes (retrieveOutputSizes (scalerStreamConfigurationMap,
                                                                 getClassForName ("android.graphics.SurfaceTexture"),
                                                                 -1)),
@@ -838,14 +858,14 @@ private:
         Array<Rectangle<int>> supportedVideoRecordingOutputSizes;
         Rectangle<int> defaultPreviewSize, previewBufferSize;
 
-        GlobalRef getStreamConfigurationMap (const GlobalRef& characteristics)
+        GlobalRef getStreamConfigurationMap (const GlobalRef& cameraCharacteristicsToUse)
         {
             auto* env = getEnv();
 
             auto scalerStreamConfigurationMapKey = LocalRef<jobject> (env->GetStaticObjectField (CameraCharacteristics,
                                                                                                  CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP));
 
-            return GlobalRef (LocalRef<jobject> (env->CallObjectMethod (characteristics,
+            return GlobalRef (LocalRef<jobject> (env->CallObjectMethod (cameraCharacteristicsToUse,
                                                                         CameraCharacteristics.get,
                                                                         scalerStreamConfigurationMapKey.get())));
         }
@@ -960,8 +980,8 @@ private:
 
         PreviewDisplay (Rectangle<int> bufferSize)
             : textureViewSurfaceTextureListener (*this),
-              textureView (getEnv()->NewObject (AndroidTextureView, AndroidTextureView.constructor,
-                                                android.activity.get())),
+              textureView (LocalRef<jobject> (getEnv()->NewObject (AndroidTextureView, AndroidTextureView.constructor,
+                                                                   getAppContext().get()))),
               bufferWidth (bufferSize.getWidth()),
               bufferHeight (bufferSize.getHeight())
         {
@@ -973,7 +993,7 @@ private:
                                                           "android/view/TextureView$SurfaceTextureListener").get());
         }
 
-        ~PreviewDisplay()
+        ~PreviewDisplay() override
         {
             getEnv()->CallVoidMethod (textureView, AndroidTextureView.setSurfaceTextureListener, nullptr);
         }
@@ -1036,7 +1056,7 @@ private:
         {
             auto* env = getEnv();
 
-            auto windowManager = LocalRef<jobject> (env->CallObjectMethod (android.activity, JuceAppActivity.getWindowManager));
+            auto windowManager = LocalRef<jobject> (env->CallObjectMethod (getAppContext(), AndroidContext.getSystemService, javaString ("window").get()));
             auto display = LocalRef<jobject> (env->CallObjectMethod (windowManager, AndroidWindowManager.getDefaultDisplay));
             auto rotation = env->CallIntMethod (display, AndroidDisplay.getRotation);
 
@@ -1110,9 +1130,9 @@ private:
                      int imageWidth, int imageHeight, int cameraSensorOrientationToUse)
             : owner (ownerToUse),
               cameraSensorOrientation (cameraSensorOrientationToUse),
-              imageReader (getEnv()->CallStaticObjectMethod (AndroidImageReader, AndroidImageReader.newInstance,
-                                                             imageWidth, imageHeight, StreamConfigurationMap::jpegImageFormat,
-                                                             numImagesToKeep)),
+              imageReader (LocalRef<jobject> (getEnv()->CallStaticObjectMethod (AndroidImageReader, AndroidImageReader.newInstance,
+                                                                                imageWidth, imageHeight, StreamConfigurationMap::jpegImageFormat,
+                                                                                numImagesToKeep))),
               onImageAvailableListener (*this)
         {
             getEnv()->CallVoidMethod (imageReader, AndroidImageReader.setOnImageAvailableListener,
@@ -1121,7 +1141,7 @@ private:
                                       handlerToUse.get());
         }
 
-        ~ImageReader()
+        ~ImageReader() override
         {
             getEnv()->CallVoidMethod (imageReader, AndroidImageReader.close);
         }
@@ -1235,6 +1255,12 @@ private:
                                                                               AndroidBitmapFactory.decodeByteArray,
                                                                               byteArray.get(), (jint) 0, (jint) bufferSize));
 
+            if (origBitmap == nullptr)
+            {
+                // Nothing to do, just get the bytes
+                return { byteArray, bufferSize };
+            }
+
             auto correctedBitmap = getBitmapWithCorrectOrientationFrom (origBitmap, rotationAngle);
 
             auto byteArrayOutputStream = LocalRef<jobject> (env->NewObject (ByteArrayOutputStream,
@@ -1296,6 +1322,7 @@ private:
                             return (cameraSensorOrientation + 180) % 360;
                     }
                     break;
+                case Desktop::allOrientations:
                 default:
                     return 0;
             }
@@ -1376,7 +1403,7 @@ private:
             getEnv()->CallVoidMethod (mediaRecorder, AndroidMediaRecorder.prepare);
         }
 
-        ~MediaRecorder()
+        ~MediaRecorder() override
         {
             getEnv()->CallVoidMethod (mediaRecorder, AndroidMediaRecorder.release);
         }
@@ -1518,7 +1545,7 @@ private:
         {
             auto* env = getEnv();
 
-            auto windowManager = LocalRef<jobject> (env->CallObjectMethod (android.activity, JuceAppActivity.getWindowManager));
+            auto windowManager = LocalRef<jobject> (env->CallObjectMethod (getAppContext(), AndroidContext.getSystemService, javaString ("window").get()));
             auto display = LocalRef<jobject> (env->CallObjectMethod (windowManager, AndroidWindowManager.getDefaultDisplay));
             auto rotation = env->CallIntMethod (display, AndroidDisplay.getRotation);
 
@@ -1579,7 +1606,7 @@ private:
 
                 // When exception occurs, CameraCaptureSession.close will never finish, so
                 // we should not wait for it. For fatal error an exception does occur, but
-                // it is catched internally in Java...
+                // it is caught internally in Java...
                 if (jniCheckHasExceptionOccurredAndClear() || scopedCameraDevice.fatalErrorOccurred.get())
                 {
                     JUCE_CAMERA_LOG ("Exception or fatal error occurred while closing Capture Session, closing by force");
@@ -1613,7 +1640,7 @@ private:
                     env->CallVoidMethod (captureRequestBuilder, CaptureRequestBuilder.addTarget, surface.get());
                 }
 
-                previewCaptureRequest = GlobalRef (env->CallObjectMethod (captureRequestBuilder, CaptureRequestBuilder.build));
+                previewCaptureRequest = GlobalRef (LocalRef<jobject>(env->CallObjectMethod (captureRequestBuilder, CaptureRequestBuilder.build)));
 
                 env->CallIntMethod (captureSession, CameraCaptureSession.setRepeatingRequest,
                                     previewCaptureRequest.get(), nullptr, handlerToUse.get());
@@ -1639,11 +1666,11 @@ private:
 
                 env->CallVoidMethod (builder, CaptureRequestBuilder.addTarget, targetSurface);
 
-                setCaptureRequestBuilderIntegerKey (builder.get(), CaptureRequest.CONTROL_AF_MODE, autoFocusMode);
+                setCaptureRequestBuilderIntegerKey (builder, CaptureRequest.CONTROL_AF_MODE, autoFocusMode);
 
                 auto stillPictureCaptureRequest = LocalRef<jobject> (env->CallObjectMethod (builder, CaptureRequestBuilder.build));
 
-                stillPictureTaker->takePicture (stillPictureCaptureRequest.get());
+                stillPictureTaker->takePicture (stillPictureCaptureRequest);
             }
 
         private:
@@ -1659,25 +1686,17 @@ private:
                       previewCaptureRequest (previewCaptureRequestToUse),
                       handler (handlerToUse),
                       runnable (*this),
-                      captureSessionPreviewCaptureCallback (LocalRef<jobject> (getEnv()->NewObject (CameraCaptureSessionCaptureCallback,
-                                                                                                    CameraCaptureSessionCaptureCallback.constructor,
-                                                                                                    android.activity.get(),
-                                                                                                    reinterpret_cast<jlong> (this),
-                                                                                                    true))),
-                      captureSessionStillPictureCaptureCallback (LocalRef<jobject> (getEnv()->NewObject (CameraCaptureSessionCaptureCallback,
-                                                                                                         CameraCaptureSessionCaptureCallback.constructor,
-                                                                                                         android.activity.get(),
-                                                                                                         reinterpret_cast<jlong> (this),
-                                                                                                         false))),
+                      captureSessionPreviewCaptureCallback (createCaptureSessionCallback (true)),
+                      captureSessionStillPictureCaptureCallback (createCaptureSessionCallback (false)),
                       autoFocusMode (autoFocusModeToUse)
                 {
                 }
 
-                void takePicture (jobject stillPictureCaptureRequestToUse)
+                void takePicture (const LocalRef<jobject>& stillPictureCaptureRequestToUse)
                 {
                     JUCE_CAMERA_LOG ("Taking picture...");
 
-                    stillPictureCaptureRequest = GlobalRef (stillPictureCaptureRequestToUse);
+                    stillPictureCaptureRequest = GlobalRef (LocalRef<jobject>(stillPictureCaptureRequestToUse));
 
                     lockFocus();
                 }
@@ -1697,6 +1716,29 @@ private:
                 GlobalRef captureSessionStillPictureCaptureCallback;
 
                 int autoFocusMode;
+
+                //==============================================================================
+                #define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD, CALLBACK) \
+                   METHOD (constructor, "<init>", "(JZ)V")              \
+                   CALLBACK (cameraCaptureSessionCaptureCompletedCallback,         "cameraCaptureSessionCaptureCompleted",         "(JZLandroid/hardware/camera2/CameraCaptureSession;Landroid/hardware/camera2/CaptureRequest;Landroid/hardware/camera2/TotalCaptureResult;)V") \
+                   CALLBACK (cameraCaptureSessionCaptureFailedCallback,            "cameraCaptureSessionCaptureFailed",            "(JZLandroid/hardware/camera2/CameraCaptureSession;Landroid/hardware/camera2/CaptureRequest;Landroid/hardware/camera2/CaptureFailure;)V") \
+                   CALLBACK (cameraCaptureSessionCaptureProgressedCallback,        "cameraCaptureSessionCaptureProgressed",        "(JZLandroid/hardware/camera2/CameraCaptureSession;Landroid/hardware/camera2/CaptureRequest;Landroid/hardware/camera2/CaptureResult;)V") \
+                   CALLBACK (cameraCaptureSessionCaptureStartedCallback,           "cameraCaptureSessionCaptureStarted",           "(JZLandroid/hardware/camera2/CameraCaptureSession;Landroid/hardware/camera2/CaptureRequest;JJ)V") \
+                   CALLBACK (cameraCaptureSessionCaptureSequenceAbortedCallback,   "cameraCaptureSessionCaptureSequenceAborted",   "(JZLandroid/hardware/camera2/CameraCaptureSession;I)V") \
+                   CALLBACK (cameraCaptureSessionCaptureSequenceCompletedCallback, "cameraCaptureSessionCaptureSequenceCompleted", "(JZLandroid/hardware/camera2/CameraCaptureSession;IJ)V")
+
+                DECLARE_JNI_CLASS_WITH_BYTECODE (CameraCaptureSessionCaptureCallback, "com/rmsl/juce/CameraCaptureSessionCaptureCallback", 21, CameraSupportByteCode, sizeof(CameraSupportByteCode))
+                #undef JNI_CLASS_MEMBERS
+
+                LocalRef<jobject> createCaptureSessionCallback (bool createPreviewSession)
+                {
+                    return LocalRef<jobject>(getEnv()->NewObject (CameraCaptureSessionCaptureCallback,
+                                                                  CameraCaptureSessionCaptureCallback.constructor,
+                                                                  reinterpret_cast<jlong> (this),
+                                                                  createPreviewSession ? 1 : 0));
+                }
+
+                //==============================================================================
 
                 enum class State
                 {
@@ -1863,7 +1905,7 @@ private:
                     // Delay still picture capture for devices that can't handle it right after
                     // stopRepeating/abortCaptures calls.
                     if (delayedCaptureRunnable.get() == nullptr)
-                        delayedCaptureRunnable = GlobalRef (CreateJavaInterface (&runnable, "java/lang/Runnable").get());
+                        delayedCaptureRunnable = GlobalRef (CreateJavaInterface (&runnable, "java/lang/Runnable"));
 
                     env->CallBooleanMethod (handler, AndroidHandler.postDelayed, delayedCaptureRunnable.get(), (jlong) 200);
                 }
@@ -1982,12 +2024,73 @@ private:
                     ignoreUnused (isPreview, session, request, timestamp, frameNumber);
                 }
 
-                friend void juce_cameraCaptureSessionCaptureCompleted (int64, bool, void*, void*, void*);
-                friend void juce_cameraCaptureSessionCaptureFailed (int64, bool, void*, void*, void*);
-                friend void juce_cameraCaptureSessionCaptureProgressed (int64, bool, void*, void*, void*);
-                friend void juce_cameraCaptureSessionCaptureSequenceAborted (int64, bool, void*, int);
-                friend void juce_cameraCaptureSessionCaptureSequenceCompleted (int64, bool, void*, int, int64);
-                friend void juce_cameraCaptureSessionCaptureStarted (int64, bool, void*, void*, int64, int64);
+                //==============================================================================
+                static void cameraCaptureSessionCaptureCompletedCallback (JNIEnv*, jobject /*object*/, jlong host, jboolean isPreview, jobject rawSession, jobject rawRequest, jobject rawResult)
+                {
+                    if (auto* myself = reinterpret_cast<StillPictureTaker*> (host))
+                    {
+                        LocalRef<jobject> session (getEnv()->NewLocalRef(rawSession));
+                        LocalRef<jobject> request (getEnv()->NewLocalRef(rawRequest));
+                        LocalRef<jobject> result (getEnv()->NewLocalRef(rawResult));
+
+                        myself->cameraCaptureSessionCaptureCompleted (isPreview != 0, session, request, result);
+                    }
+                }
+
+                static void cameraCaptureSessionCaptureFailedCallback (JNIEnv*, jobject /*object*/, jlong host, jboolean isPreview, jobject rawSession, jobject rawRequest, jobject rawResult)
+                {
+                    if (auto* myself = reinterpret_cast<StillPictureTaker*> (host))
+                    {
+                        LocalRef<jobject> session (getEnv()->NewLocalRef(rawSession));
+                        LocalRef<jobject> request (getEnv()->NewLocalRef(rawRequest));
+                        LocalRef<jobject> result (getEnv()->NewLocalRef(rawResult));
+
+                        myself->cameraCaptureSessionCaptureFailed (isPreview != 0, session, request, result);
+                    }
+                }
+
+                static void cameraCaptureSessionCaptureProgressedCallback (JNIEnv*, jobject /*object*/, jlong host, jboolean isPreview, jobject rawSession, jobject rawRequest, jobject rawResult)
+                {
+                    if (auto* myself = reinterpret_cast<StillPictureTaker*> (host))
+                    {
+                        LocalRef<jobject> session (getEnv()->NewLocalRef(rawSession));
+                        LocalRef<jobject> request (getEnv()->NewLocalRef(rawRequest));
+                        LocalRef<jobject> result (getEnv()->NewLocalRef(rawResult));
+
+                        myself->cameraCaptureSessionCaptureProgressed (isPreview != 0, session, request, result);
+                    }
+                }
+
+                static void cameraCaptureSessionCaptureSequenceAbortedCallback (JNIEnv*, jobject /*object*/, jlong host, jboolean isPreview, jobject rawSession, jint sequenceId)
+                {
+                    if (auto* myself = reinterpret_cast<StillPictureTaker*> (host))
+                    {
+                        LocalRef<jobject> session (getEnv()->NewLocalRef(rawSession));
+
+                        myself->cameraCaptureSessionCaptureSequenceAborted (isPreview != 0, session, sequenceId);
+                    }
+                }
+
+                static void cameraCaptureSessionCaptureSequenceCompletedCallback (JNIEnv*, jobject /*object*/, jlong host, jboolean isPreview, jobject rawSession, jint sequenceId, jlong frameNumber)
+                {
+                    if (auto* myself = reinterpret_cast<StillPictureTaker*> (host))
+                    {
+                        LocalRef<jobject> session (getEnv()->NewLocalRef(rawSession));
+
+                        myself->cameraCaptureSessionCaptureSequenceCompleted (isPreview != 0, session, sequenceId, frameNumber);
+                    }
+                }
+
+                static void cameraCaptureSessionCaptureStartedCallback (JNIEnv*, jobject /*object*/, jlong host, jboolean isPreview, jobject rawSession, jobject rawRequest, jlong timestamp, jlong frameNumber)
+                {
+                    if (auto* myself = reinterpret_cast<StillPictureTaker*> (host))
+                    {
+                        LocalRef<jobject> session (getEnv()->NewLocalRef(rawSession));
+                        LocalRef<jobject> request (getEnv()->NewLocalRef(rawRequest));
+
+                        myself->cameraCaptureSessionCaptureStarted (isPreview != 0, session, request, timestamp, frameNumber);
+                    }
+                }
             };
 
             //==============================================================================
@@ -2013,6 +2116,19 @@ private:
             JUCE_DECLARE_WEAK_REFERENCEABLE (CaptureSession)
 
             //==============================================================================
+            #define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD, CALLBACK)    \
+                METHOD (constructor, "<init>", "(J)V") \
+                CALLBACK(cameraCaptureSessionActiveCallback,          "cameraCaptureSessionActive",          "(JLandroid/hardware/camera2/CameraCaptureSession;)V") \
+                CALLBACK(cameraCaptureSessionClosedCallback,          "cameraCaptureSessionClosed",          "(JLandroid/hardware/camera2/CameraCaptureSession;)V") \
+                CALLBACK(cameraCaptureSessionConfigureFailedCallback, "cameraCaptureSessionConfigureFailed", "(JLandroid/hardware/camera2/CameraCaptureSession;)V") \
+                CALLBACK(cameraCaptureSessionConfiguredCallback,      "cameraCaptureSessionConfigured",      "(JLandroid/hardware/camera2/CameraCaptureSession;)V") \
+                CALLBACK(cameraCaptureSessionReadyCallback,           "cameraCaptureSessionReady",           "(JLandroid/hardware/camera2/CameraCaptureSession;)V")
+
+            DECLARE_JNI_CLASS_WITH_MIN_SDK (CameraCaptureSessionStateCallback, "com/rmsl/juce/CameraCaptureSessionStateCallback", 21)
+            #undef JNI_CLASS_MEMBERS
+
+
+            //==============================================================================
             CaptureSession (ScopedCameraDevice& scopedCameraDeviceToUse, ConfiguredCallback& configuredCallbackToUse,
                             const LocalRef<jobject>& surfacesList, GlobalRef& handlerToUse,
                             int captureSessionTemplate, int autoFocusModeToUse)
@@ -2024,7 +2140,6 @@ private:
                                                                                         (jint) captureSessionTemplate))),
                   captureSessionStateCallback (LocalRef<jobject> (getEnv()->NewObject (CameraCaptureSessionStateCallback,
                                                                                        CameraCaptureSessionStateCallback.constructor,
-                                                                                       android.activity.get(),
                                                                                        reinterpret_cast<jlong> (this)))),
                   autoFocusMode (autoFocusModeToUse)
             {
@@ -2079,7 +2194,7 @@ private:
                 });
             }
 
-            void cameraCaptureSessionConfigured (jobject session)
+            void cameraCaptureSessionConfigured (const LocalRef<jobject>& session)
             {
                 JUCE_CAMERA_LOG ("cameraCaptureSessionConfigured()");
 
@@ -2117,26 +2232,65 @@ private:
                 });
             }
 
-            void cameraCaptureSessionReady (jobject session)
+            void cameraCaptureSessionReady (const LocalRef<jobject>& session)
             {
                 JUCE_CAMERA_LOG ("cameraCaptureSessionReady()");
                 ignoreUnused (session);
             }
 
+            //==============================================================================
+            static void cameraCaptureSessionActiveCallback (JNIEnv*, jobject, jlong host, jobject rawSession)
+            {
+                if (auto* myself = reinterpret_cast<CaptureSession*> (host))
+                {
+                    LocalRef<jobject> session (getEnv()->NewLocalRef(rawSession));
+
+                    myself->cameraCaptureSessionActive (session);
+                }
+            }
+
+            static void cameraCaptureSessionClosedCallback (JNIEnv*, jobject, jlong host, jobject rawSession)
+            {
+                if (auto* myself = reinterpret_cast<CaptureSession*> (host))
+                {
+                    LocalRef<jobject> session (getEnv()->NewLocalRef(rawSession));
+
+                    myself->cameraCaptureSessionClosed (session);
+                }
+            }
+
+            static void cameraCaptureSessionConfigureFailedCallback (JNIEnv*, jobject, jlong host, jobject rawSession)
+            {
+                if (auto* myself = reinterpret_cast<CaptureSession*> (host))
+                {
+                    LocalRef<jobject> session (getEnv()->NewLocalRef(rawSession));
+
+                    myself->cameraCaptureSessionConfigureFailed (session);
+                }
+            }
+
+            static void cameraCaptureSessionConfiguredCallback (JNIEnv*, jobject, jlong host, jobject rawSession)
+            {
+                if (auto* myself = reinterpret_cast<CaptureSession*> (host))
+                {
+                    LocalRef<jobject> session (getEnv()->NewLocalRef(rawSession));
+
+                    myself->cameraCaptureSessionConfigured (session);
+                }
+            }
+
+            static void cameraCaptureSessionReadyCallback (JNIEnv*, jobject, jlong host, jobject rawSession)
+            {
+                if (auto* myself = reinterpret_cast<CaptureSession*> (host))
+                {
+                    LocalRef<jobject> session (getEnv()->NewLocalRef(rawSession));
+
+                    myself->cameraCaptureSessionReady (session);
+                }
+            }
+
+            //==============================================================================
             friend class ScopedCameraDevice;
-
-            friend void juce_cameraCaptureSessionActive (int64, void*);
-            friend void juce_cameraCaptureSessionClosed (int64, void*);
-            friend void juce_cameraCaptureSessionConfigureFailed (int64, void*);
-            friend void juce_cameraCaptureSessionConfigured (int64, void*);
-            friend void juce_cameraCaptureSessionReady (int64, void*);
-
-            friend void juce_cameraCaptureSessionCaptureCompleted (int64, bool, void*, void*, void*);
-            friend void juce_cameraCaptureSessionCaptureFailed (int64, bool, void*, void*, void*);
-            friend void juce_cameraCaptureSessionCaptureProgressed (int64, bool, void*, void*, void*);
-            friend void juce_cameraCaptureSessionCaptureSequenceAborted (int64, bool, void*, int);
-            friend void juce_cameraCaptureSessionCaptureSequenceCompleted (int64, bool, void*, int, int64);
-            friend void juce_cameraCaptureSessionCaptureStarted (int64, bool, void*, void*, int64, int64);
 
             JUCE_DECLARE_NON_COPYABLE (CaptureSession)
         };
@@ -2148,10 +2302,7 @@ private:
               cameraId (cameraIdToUse),
               cameraManager (cameraManagerToUse),
               handler (handlerToUse),
-              cameraStateCallback (LocalRef<jobject> (getEnv()->NewObject (CameraDeviceStateCallback,
-                                                                           CameraDeviceStateCallback.constructor,
-                                                                           android.activity.get(),
-                                                                           reinterpret_cast<jlong> (this)))),
+              cameraStateCallback (createCameraStateCallbackObject()),
               autoFocusMode (autoFocusModeToUse)
         {
             open();
@@ -2230,6 +2381,25 @@ private:
 
         WaitableEvent closedEvent;
 
+        //==============================================================================
+        #define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD, CALLBACK)    \
+            METHOD (constructor, "<init>", "(J)V") \
+            CALLBACK (cameraDeviceStateClosedCallback,       "cameraDeviceStateClosed",       "(JLandroid/hardware/camera2/CameraDevice;)V")  \
+            CALLBACK (cameraDeviceStateDisconnectedCallback, "cameraDeviceStateDisconnected", "(JLandroid/hardware/camera2/CameraDevice;)V")  \
+            CALLBACK (cameraDeviceStateErrorCallback,        "cameraDeviceStateError",        "(JLandroid/hardware/camera2/CameraDevice;I)V") \
+            CALLBACK (cameraDeviceStateOpenedCallback,       "cameraDeviceStateOpened",       "(JLandroid/hardware/camera2/CameraDevice;)V")
+
+        DECLARE_JNI_CLASS_WITH_MIN_SDK (CameraDeviceStateCallback, "com/rmsl/juce/CameraDeviceStateCallback", 21)
+        #undef JNI_CLASS_MEMBERS
+
+        LocalRef<jobject> createCameraStateCallbackObject()
+        {
+            return LocalRef<jobject> (getEnv()->NewObject (CameraDeviceStateCallback,
+                                                           CameraDeviceStateCallback.constructor,
+                                                           reinterpret_cast<jlong> (this)));
+        }
+
+        //==============================================================================
         void cameraDeviceStateClosed()
         {
             JUCE_CAMERA_LOG ("cameraDeviceStateClosed()");
@@ -2273,7 +2443,7 @@ private:
                                        });
         }
 
-        void cameraDeviceStateOpened (jobject cameraDeviceToUse)
+        void cameraDeviceStateOpened (const LocalRef<jobject>& cameraDeviceToUse)
         {
             JUCE_CAMERA_LOG ("cameraDeviceStateOpened()");
 
@@ -2289,29 +2459,40 @@ private:
             MessageManager::callAsync ([this]() { owner.cameraOpenFinished (openError); });
         }
 
-        friend void juce_cameraDeviceStateClosed (int64);
-        friend void juce_cameraDeviceStateDisconnected (int64);
-        friend void juce_cameraDeviceStateError (int64, int);
-        friend void juce_cameraDeviceStateOpened (int64, void*);
+        //==============================================================================
+        static void JNICALL cameraDeviceStateClosedCallback (JNIEnv*, jobject, jlong host, jobject)
+        {
+            if (auto* myself = reinterpret_cast<ScopedCameraDevice*>(host))
+                myself->cameraDeviceStateClosed();
+        }
 
-        friend void juce_cameraCaptureSessionActive (int64, void*);
-        friend void juce_cameraCaptureSessionClosed (int64, void*);
-        friend void juce_cameraCaptureSessionConfigureFailed (int64, void*);
-        friend void juce_cameraCaptureSessionConfigured (int64, void*);
-        friend void juce_cameraCaptureSessionReady (int64, void*);
+        static void JNICALL cameraDeviceStateDisconnectedCallback (JNIEnv*, jobject, jlong host, jobject)
+        {
+            if (auto* myself = reinterpret_cast<ScopedCameraDevice*>(host))
+                myself->cameraDeviceStateDisconnected();
+        }
 
-        friend void juce_cameraCaptureSessionCaptureCompleted (int64, bool, void*, void*, void*);
-        friend void juce_cameraCaptureSessionCaptureFailed (int64, bool, void*, void*, void*);
-        friend void juce_cameraCaptureSessionCaptureProgressed (int64, bool, void*, void*, void*);
-        friend void juce_cameraCaptureSessionCaptureSequenceAborted (int64, bool, void*, int);
-        friend void juce_cameraCaptureSessionCaptureSequenceCompleted (int64, bool, void*, int, int64);
-        friend void juce_cameraCaptureSessionCaptureStarted (int64, bool, void*, void*, int64, int64);
+        static void JNICALL cameraDeviceStateErrorCallback (JNIEnv*, jobject, jlong host, jobject, jint error)
+        {
+            if (auto* myself = reinterpret_cast<ScopedCameraDevice*>(host))
+                myself->cameraDeviceStateError (error);
+        }
+
+        static void JNICALL cameraDeviceStateOpenedCallback (JNIEnv*, jobject, jlong host, jobject rawCamera)
+        {
+            if (auto* myself = reinterpret_cast<ScopedCameraDevice*>(host))
+            {
+                LocalRef<jobject> camera(getEnv()->NewLocalRef(rawCamera));
+
+                myself->cameraDeviceStateOpened (camera);
+            }
+        }
     };
 
     //==============================================================================
     struct CaptureSessionModeBase
     {
-        virtual ~CaptureSessionModeBase() { }
+        virtual ~CaptureSessionModeBase() = default;
 
         virtual bool isVideoRecordSession() const = 0;
 
@@ -2324,7 +2505,7 @@ private:
                                   private PreviewDisplay::Listener,
                                   private ScopedCameraDevice::CaptureSession::ConfiguredCallback
     {
-        ~CaptureSessionMode()
+        ~CaptureSessionMode() override
         {
             captureSession.reset();
 
@@ -2464,10 +2645,10 @@ private:
     struct CaptureSessionPreviewMode : public CaptureSessionMode<CaptureSessionPreviewMode>
     {
         CaptureSessionPreviewMode (Pimpl& ownerToUse, ScopedCameraDevice& cameraDeviceToUse, GlobalRef& handlerToUse,
-                                   PreviewDisplay& pd, ImageReader& ir, int cameraSensorOrientation,
+                                   PreviewDisplay& pd, ImageReader& ir, int sensorOrientation,
                                    int cameraLensFacingToUse, StreamConfigurationMap& streamConfigurationMapToUse)
             : CaptureSessionMode<CaptureSessionPreviewMode> (ownerToUse, cameraDeviceToUse, handlerToUse, pd,
-                                                             cameraSensorOrientation, cameraLensFacingToUse, streamConfigurationMapToUse),
+                                                             sensorOrientation, cameraLensFacingToUse, streamConfigurationMapToUse),
               imageReader (ir)
         {
         }
@@ -2529,10 +2710,10 @@ private:
     struct CaptureSessionVideoRecordingMode : public CaptureSessionMode<CaptureSessionVideoRecordingMode>
     {
         CaptureSessionVideoRecordingMode (Pimpl& ownerToUse, ScopedCameraDevice& cameraDeviceToUse, GlobalRef& handlerToUse,
-                                          PreviewDisplay& pd, MediaRecorder& mr, int cameraSensorOrientation,
+                                          PreviewDisplay& pd, MediaRecorder& mr, int sensorOrientation,
                                           int cameraLensFacingToUse, StreamConfigurationMap& streamConfigurationMapToUse)
             : CaptureSessionMode<CaptureSessionVideoRecordingMode> (ownerToUse, cameraDeviceToUse, handlerToUse, pd,
-                                                                    cameraSensorOrientation, cameraLensFacingToUse, streamConfigurationMapToUse),
+                                                                    sensorOrientation, cameraLensFacingToUse, streamConfigurationMapToUse),
               mediaRecorder (mr)
         {
         }
@@ -2597,12 +2778,7 @@ private:
     public:
         DeviceOrientationChangeListener (PreviewDisplay& pd)
             : previewDisplay (pd),
-              orientationEventListener (getEnv()->NewObject (OrientationEventListener,
-                                                             OrientationEventListener.constructor,
-                                                             android.activity.get(),
-                                                             reinterpret_cast<jlong> (this),
-                                                             android.activity.get(),
-                                                             sensorDelayUI)),
+              orientationEventListener (createOrientationEventListener()),
               canDetectChange (getEnv()->CallBooleanMethod (orientationEventListener,
                                                             OrientationEventListener.canDetectOrientation) != 0),
               deviceOrientation (Desktop::getInstance().getCurrentOrientation()),
@@ -2611,7 +2787,7 @@ private:
             setEnabled (true);
         }
 
-        ~DeviceOrientationChangeListener()
+        ~DeviceOrientationChangeListener() override
         {
             setEnabled (false);
         }
@@ -2650,6 +2826,27 @@ private:
         Desktop::DisplayOrientation lastKnownScreenOrientation;
         int numChecksForOrientationChange = 10;
 
+        //==============================================================================
+        #define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD, CALLBACK) \
+            METHOD (canDetectOrientation, "canDetectOrientation", "()Z") \
+            METHOD (constructor,          "<init>",               "(JLandroid/content/Context;I)V") \
+            METHOD (disable,              "disable",              "()V") \
+            METHOD (enable,               "enable",               "()V") \
+            CALLBACK (deviceOrientationChanged, "deviceOrientationChanged", "(JI)V")
+
+        DECLARE_JNI_CLASS_WITH_MIN_SDK (OrientationEventListener, "com/rmsl/juce/JuceOrientationEventListener", 21)
+        #undef JNI_CLASS_MEMBERS
+
+        LocalRef<jobject> createOrientationEventListener()
+        {
+            return LocalRef<jobject> (getEnv()->NewObject (OrientationEventListener,
+                                                           OrientationEventListener.constructor,
+                                                           reinterpret_cast<jlong> (this),
+                                                           getAppContext().get(),
+                                                           sensorDelayUI));
+        }
+
+        //==============================================================================
         void orientationChanged (int orientation)
         {
             jassert (orientation < 360);
@@ -2702,7 +2899,11 @@ private:
             }
         }
 
-        friend void juce_deviceOrientationChanged (int64, int);
+        static void deviceOrientationChanged (JNIEnv*, jobject /*obj*/, jlong host, jint orientation)
+        {
+            if (auto* myself = reinterpret_cast<DeviceOrientationChangeListener*> (host))
+                myself->orientationChanged (orientation);
+        }
     };
 
     //==============================================================================
@@ -2712,9 +2913,7 @@ private:
     String cameraId;
     InternalOpenCameraResultCallback cameraOpenCallback;
 
-   #if __ANDROID_API__ >= 21
-    AppPausedResumedListener appPausedResumedListener;
-    GlobalRef appPausedResumedListenerNative;
+    GlobalRef activityLifeListener;
 
     GlobalRef cameraManager;
     GlobalRef cameraCharacteristics;
@@ -2738,7 +2937,6 @@ private:
 
     Time firstRecordedFrameTimeMs;
     bool notifiedOfCameraOpening = false;
-   #endif
 
     bool appWasPaused = false;
 
@@ -2785,7 +2983,7 @@ private:
     {
         auto* env = getEnv();
 
-        auto* jArrayElems = env->GetIntArrayElements (jArray, 0);
+        auto* jArrayElems = env->GetIntArrayElements (jArray, nullptr);
         auto numElems = env->GetArrayLength (jArray);
 
         Array<int> juceArray;
@@ -2948,7 +3146,7 @@ private:
     }
 
     //==============================================================================
-    void appPaused() override
+    void onActivityPaused (jobject) override
     {
         JUCE_CAMERA_LOG ("appPaused, closing camera...");
 
@@ -2965,7 +3163,7 @@ private:
         stopBackgroundThread();
     }
 
-    void appResumed() override
+    void onActivityResumed (jobject) override
     {
         // Only care about resumed event when paused event was called first.
         if (! appWasPaused)
@@ -2999,7 +3197,12 @@ private:
     {
         auto* env = getEnv();
 
-        env->CallBooleanMethod (handlerThread, AndroidHandlerThread.quitSafely);
+        auto quitSafelyMethod = env->GetMethodID(AndroidHandlerThread, "quitSafely", "()Z");
+
+        // this code will only run on SDK >= 21
+        jassert(quitSafelyMethod != nullptr);
+
+        env->CallBooleanMethod (handlerThread, quitSafelyMethod);
         env->CallVoidMethod (handlerThread, AndroidHandlerThread.join);
 
         jniCheckHasExceptionOccurredAndClear();
@@ -3007,29 +3210,8 @@ private:
         handlerThread.clear();
         handler.clear();
     }
-#endif
 
     friend struct CameraDevice::ViewerComponent;
-
-    friend void juce_cameraDeviceStateClosed (int64);
-    friend void juce_cameraDeviceStateDisconnected (int64);
-    friend void juce_cameraDeviceStateError (int64, int);
-    friend void juce_cameraDeviceStateOpened (int64, void*);
-
-    friend void juce_cameraCaptureSessionActive (int64, void*);
-    friend void juce_cameraCaptureSessionClosed (int64, void*);
-    friend void juce_cameraCaptureSessionConfigureFailed (int64, void*);
-    friend void juce_cameraCaptureSessionConfigured (int64, void*);
-    friend void juce_cameraCaptureSessionReady (int64, void*);
-
-    friend void juce_cameraCaptureSessionCaptureCompleted (int64, bool, void*, void*, void*);
-    friend void juce_cameraCaptureSessionCaptureFailed (int64, bool, void*, void*, void*);
-    friend void juce_cameraCaptureSessionCaptureProgressed (int64, bool, void*, void*, void*);
-    friend void juce_cameraCaptureSessionCaptureSequenceAborted (int64, bool, void*, int);
-    friend void juce_cameraCaptureSessionCaptureSequenceCompleted (int64, bool, void*, int, int64);
-    friend void juce_cameraCaptureSessionCaptureStarted (int64, bool, void*, void*, int64, int64);
-
-    friend void juce_deviceOrientationChanged (int64, int);
 
     JUCE_DECLARE_NON_COPYABLE (Pimpl)
 };
@@ -3040,7 +3222,6 @@ struct CameraDevice::ViewerComponent  : public Component,
 {
     ViewerComponent (CameraDevice& device) : ComponentMovementWatcher (this)
     {
-       #if __ANDROID_API__ >= 21
         auto previewSize = device.pimpl->streamConfigurationMap.getDefaultPreviewSize();
 
         targetAspectRatio = previewSize.getWidth() / (float) previewSize.getHeight();
@@ -3052,9 +3233,6 @@ struct CameraDevice::ViewerComponent  : public Component,
 
         addAndMakeVisible (viewerComponent);
         viewerComponent.setView (device.pimpl->previewDisplay.getNativeView());
-       #else
-        ignoreUnused (device);
-       #endif
     }
 
 private:
@@ -3108,222 +3286,8 @@ String CameraDevice::getFileExtension()
     return ".mp4";
 }
 
-#if __ANDROID_API__ >= 21
 //==============================================================================
-void juce_cameraDeviceStateClosed (int64 host)
-{
-    reinterpret_cast<CameraDevice::Pimpl::ScopedCameraDevice*> (host)->cameraDeviceStateClosed();
-}
-
-void juce_cameraDeviceStateDisconnected (int64 host)
-{
-    reinterpret_cast<CameraDevice::Pimpl::ScopedCameraDevice*> (host)->cameraDeviceStateDisconnected();
-}
-
-void juce_cameraDeviceStateError (int64 host, int error)
-{
-    reinterpret_cast<CameraDevice::Pimpl::ScopedCameraDevice*> (host)->cameraDeviceStateError (error);
-}
-
-void juce_cameraDeviceStateOpened (int64 host, void* camera)
-{
-    reinterpret_cast<CameraDevice::Pimpl::ScopedCameraDevice*> (host)->cameraDeviceStateOpened ((jobject) camera);
-}
-
-//==============================================================================
-JUCE_JNI_CALLBACK (JUCE_JOIN_MACRO (JUCE_ANDROID_ACTIVITY_CLASSNAME, _00024CameraDeviceStateCallback), cameraDeviceStateClosed, void, (JNIEnv* env, jobject /*activity*/, jlong host, jobject /*camera*/))
-{
-    setEnv (env);
-
-    juce_cameraDeviceStateClosed (host);
-}
-
-JUCE_JNI_CALLBACK (JUCE_JOIN_MACRO (JUCE_ANDROID_ACTIVITY_CLASSNAME, _00024CameraDeviceStateCallback), cameraDeviceStateDisconnected, void, (JNIEnv* env, jobject /*activity*/, jlong host, jobject /*camera*/))
-{
-    setEnv (env);
-
-    juce_cameraDeviceStateDisconnected (host);
-}
-
-JUCE_JNI_CALLBACK (JUCE_JOIN_MACRO (JUCE_ANDROID_ACTIVITY_CLASSNAME, _00024CameraDeviceStateCallback), cameraDeviceStateError, void, (JNIEnv* env, jobject /*activity*/, jlong host, jobject /*camera*/, int error))
-{
-    setEnv (env);
-
-    juce_cameraDeviceStateError (host, error);
-}
-
-JUCE_JNI_CALLBACK (JUCE_JOIN_MACRO (JUCE_ANDROID_ACTIVITY_CLASSNAME, _00024CameraDeviceStateCallback), cameraDeviceStateOpened, void, (JNIEnv* env, jobject /*activity*/, jlong host, jobject camera))
-{
-    setEnv (env);
-
-    juce_cameraDeviceStateOpened (host, camera);
-}
-
-//==============================================================================
-void juce_cameraCaptureSessionActive (int64 host, void* session)
-{
-    auto* juceCaptureSession = reinterpret_cast<CameraDevice::Pimpl::ScopedCameraDevice::CaptureSession*> (host);
-    juceCaptureSession->cameraCaptureSessionActive ((jobject) session);
-}
-
-void juce_cameraCaptureSessionClosed (int64 host, void* session)
-{
-    auto* juceCaptureSession = reinterpret_cast<CameraDevice::Pimpl::ScopedCameraDevice::CaptureSession*> (host);
-    juceCaptureSession->cameraCaptureSessionClosed ((jobject) session);
-}
-
-void juce_cameraCaptureSessionConfigureFailed (int64 host, void* session)
-{
-    auto* juceCaptureSession = reinterpret_cast<CameraDevice::Pimpl::ScopedCameraDevice::CaptureSession*> (host);
-    juceCaptureSession->cameraCaptureSessionConfigureFailed ((jobject) session);
-}
-
-void juce_cameraCaptureSessionConfigured (int64 host, void* session)
-{
-    auto* juceCaptureSession = reinterpret_cast<CameraDevice::Pimpl::ScopedCameraDevice::CaptureSession*> (host);
-    juceCaptureSession->cameraCaptureSessionConfigured ((jobject) session);
-}
-
-void juce_cameraCaptureSessionReady (int64 host, void* session)
-{
-    auto* juceCaptureSession = reinterpret_cast<CameraDevice::Pimpl::ScopedCameraDevice::CaptureSession*> (host);
-    juceCaptureSession->cameraCaptureSessionReady ((jobject) session);
-}
-
-//==============================================================================
-JUCE_JNI_CALLBACK (JUCE_JOIN_MACRO (JUCE_ANDROID_ACTIVITY_CLASSNAME, _00024CameraCaptureSessionStateCallback), cameraCaptureSessionActive, void, (JNIEnv* env, jobject /*activity*/, jlong host, jobject session))
-{
-    setEnv (env);
-
-    juce_cameraCaptureSessionActive (host, session);
-}
-
-JUCE_JNI_CALLBACK (JUCE_JOIN_MACRO (JUCE_ANDROID_ACTIVITY_CLASSNAME, _00024CameraCaptureSessionStateCallback), cameraCaptureSessionClosed, void, (JNIEnv* env, jobject /*activity*/, jlong host, jobject session))
-{
-    setEnv (env);
-
-    juce_cameraCaptureSessionClosed (host, session);
-}
-
-JUCE_JNI_CALLBACK (JUCE_JOIN_MACRO (JUCE_ANDROID_ACTIVITY_CLASSNAME, _00024CameraCaptureSessionStateCallback), cameraCaptureSessionConfigureFailed, void, (JNIEnv* env, jobject /*activity*/, jlong host, jobject session))
-{
-    setEnv (env);
-
-    juce_cameraCaptureSessionConfigureFailed (host, session);
-}
-
-JUCE_JNI_CALLBACK (JUCE_JOIN_MACRO (JUCE_ANDROID_ACTIVITY_CLASSNAME, _00024CameraCaptureSessionStateCallback), cameraCaptureSessionConfigured, void, (JNIEnv* env, jobject /*activity*/, jlong host, jobject session))
-{
-    setEnv (env);
-
-    juce_cameraCaptureSessionConfigured (host, session);
-}
-
-JUCE_JNI_CALLBACK (JUCE_JOIN_MACRO (JUCE_ANDROID_ACTIVITY_CLASSNAME, _00024CameraCaptureSessionStateCallback), cameraCaptureSessionReady, void, (JNIEnv* env, jobject /*activity*/, jlong host, jobject session))
-{
-    setEnv (env);
-
-    juce_cameraCaptureSessionReady (host, session);
-}
-
-
-//==============================================================================
-void juce_cameraCaptureSessionCaptureCompleted (int64 host, bool isPreview, void* session, void* request, void* result)
-{
-    auto* stillPictureTaker = reinterpret_cast<CameraDevice::Pimpl::ScopedCameraDevice::CaptureSession::StillPictureTaker*> (host);
-    stillPictureTaker->cameraCaptureSessionCaptureCompleted (isPreview, (jobject) session, (jobject) request, (jobject) result);
-}
-
-void juce_cameraCaptureSessionCaptureFailed (int64 host, bool isPreview, void* session, void* request, void* failure)
-{
-    auto* stillPictureTaker = reinterpret_cast<CameraDevice::Pimpl::ScopedCameraDevice::CaptureSession::StillPictureTaker*> (host);
-    stillPictureTaker->cameraCaptureSessionCaptureFailed (isPreview, (jobject) session, (jobject) request, (jobject) failure);
-}
-
-void juce_cameraCaptureSessionCaptureProgressed (int64 host, bool isPreview, void* session, void* request, void* partialResult)
-{
-    auto* stillPictureTaker = reinterpret_cast<CameraDevice::Pimpl::ScopedCameraDevice::CaptureSession::StillPictureTaker*> (host);
-    stillPictureTaker->cameraCaptureSessionCaptureProgressed (isPreview, (jobject) session, (jobject) request, (jobject) partialResult);
-}
-
-void juce_cameraCaptureSessionCaptureSequenceAborted (int64 host, bool isPreview, void* session, int sequenceId)
-{
-    auto* stillPictureTaker = reinterpret_cast<CameraDevice::Pimpl::ScopedCameraDevice::CaptureSession::StillPictureTaker*> (host);
-    stillPictureTaker->cameraCaptureSessionCaptureSequenceAborted (isPreview, (jobject) session, sequenceId);
-}
-
-void juce_cameraCaptureSessionCaptureSequenceCompleted (int64 host, bool isPreview, void* session, int sequenceId, int64 frameNumber)
-{
-    auto* stillPictureTaker = reinterpret_cast<CameraDevice::Pimpl::ScopedCameraDevice::CaptureSession::StillPictureTaker*> (host);
-    stillPictureTaker->cameraCaptureSessionCaptureSequenceCompleted (isPreview, (jobject) session, sequenceId, frameNumber);
-}
-
-void juce_cameraCaptureSessionCaptureStarted (int64 host, bool isPreview, void* session, void* request, int64 timestamp, int64 frameNumber)
-{
-    auto* stillPictureTaker = reinterpret_cast<CameraDevice::Pimpl::ScopedCameraDevice::CaptureSession::StillPictureTaker*> (host);
-    stillPictureTaker->cameraCaptureSessionCaptureStarted (isPreview, (jobject) session, (jobject) request, timestamp, frameNumber);
-}
-
-JUCE_JNI_CALLBACK (JUCE_JOIN_MACRO (JUCE_ANDROID_ACTIVITY_CLASSNAME, _00024CameraCaptureSessionCaptureCallback), cameraCaptureSessionCaptureCompleted, \
-                   void, (JNIEnv* env, jobject /*activity*/, jlong host, bool isPreview, jobject session, jobject request, jobject result))
-{
-    setEnv (env);
-
-    juce_cameraCaptureSessionCaptureCompleted (host, isPreview, session, request, result);
-}
-
-JUCE_JNI_CALLBACK (JUCE_JOIN_MACRO (JUCE_ANDROID_ACTIVITY_CLASSNAME, _00024CameraCaptureSessionCaptureCallback), cameraCaptureSessionCaptureFailed, \
-                   void, (JNIEnv* env, jobject /*activity*/, jlong host, bool isPreview, jobject session, jobject request, jobject failure))
-{
-    setEnv (env);
-
-    juce_cameraCaptureSessionCaptureFailed (host, isPreview, session, request, failure);
-}
-
-JUCE_JNI_CALLBACK (JUCE_JOIN_MACRO (JUCE_ANDROID_ACTIVITY_CLASSNAME, _00024CameraCaptureSessionCaptureCallback), cameraCaptureSessionCaptureProgressed, \
-                   void, (JNIEnv* env, jobject /*activity*/, jlong host, bool isPreview, jobject session, jobject request, jobject partialResult))
-{
-    setEnv (env);
-
-    juce_cameraCaptureSessionCaptureProgressed (host, isPreview, session, request, partialResult);
-}
-
-JUCE_JNI_CALLBACK (JUCE_JOIN_MACRO (JUCE_ANDROID_ACTIVITY_CLASSNAME, _00024CameraCaptureSessionCaptureCallback), cameraCaptureSessionCaptureSequenceAborted, \
-                   void, (JNIEnv* env, jobject /*activity*/, jlong host, bool isPreview, jobject session, jint sequenceId))
-{
-    setEnv (env);
-
-    juce_cameraCaptureSessionCaptureSequenceAborted (host, isPreview, session, (int) sequenceId);
-}
-
-JUCE_JNI_CALLBACK (JUCE_JOIN_MACRO (JUCE_ANDROID_ACTIVITY_CLASSNAME, _00024CameraCaptureSessionCaptureCallback), cameraCaptureSessionCaptureSequenceCompleted, \
-                   void, (JNIEnv* env, jobject /*activity*/, jlong host, bool isPreview, jobject session, jint sequenceId, jlong frameNumber))
-{
-    setEnv (env);
-
-    juce_cameraCaptureSessionCaptureSequenceCompleted (host, isPreview, session, (int) sequenceId, frameNumber);
-}
-
-JUCE_JNI_CALLBACK (JUCE_JOIN_MACRO (JUCE_ANDROID_ACTIVITY_CLASSNAME, _00024CameraCaptureSessionCaptureCallback), cameraCaptureSessionCaptureStarted, \
-                   void, (JNIEnv* env, jobject /*activity*/, jlong host, bool isPreview, jobject session, jobject request, int64 timestamp, int64 frameNumber))
-{
-    setEnv (env);
-
-    juce_cameraCaptureSessionCaptureStarted (host, isPreview, session, request, timestamp, frameNumber);
-}
-
-//==============================================================================
-void juce_deviceOrientationChanged (int64 host, int orientation)
-{
-    auto* listener = reinterpret_cast<CameraDevice::Pimpl::DeviceOrientationChangeListener*> (host);
-    listener->orientationChanged (orientation);
-}
-
-JUCE_JNI_CALLBACK (JUCE_JOIN_MACRO (JUCE_ANDROID_ACTIVITY_CLASSNAME, _00024JuceOrientationEventListener), deviceOrientationChanged, \
-                   void, (JNIEnv* env, jobject /*activity*/, jlong host, jint orientation))
-{
-    setEnv (env);
-
-    juce_deviceOrientationChanged (host, (int) orientation);
-}
-#endif
+CameraDevice::Pimpl::ScopedCameraDevice::CaptureSession::StillPictureTaker::CameraCaptureSessionCaptureCallback_Class CameraDevice::Pimpl::ScopedCameraDevice::CaptureSession::StillPictureTaker::CameraCaptureSessionCaptureCallback;
+CameraDevice::Pimpl::ScopedCameraDevice::CameraDeviceStateCallback_Class CameraDevice::Pimpl::ScopedCameraDevice::CameraDeviceStateCallback;
+CameraDevice::Pimpl::ScopedCameraDevice::CaptureSession::CameraCaptureSessionStateCallback_Class CameraDevice::Pimpl::ScopedCameraDevice::CaptureSession::CameraCaptureSessionStateCallback;
+CameraDevice::Pimpl::DeviceOrientationChangeListener::OrientationEventListener_Class CameraDevice::Pimpl::DeviceOrientationChangeListener::OrientationEventListener;

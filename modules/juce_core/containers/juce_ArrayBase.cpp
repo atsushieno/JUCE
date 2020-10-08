@@ -2,7 +2,7 @@
   ==============================================================================
 
    This file is part of the JUCE library.
-   Copyright (c) 2018 - ROLI Ltd.
+   Copyright (c) 2020 - Raw Material Software Limited
 
    JUCE is an open source library subject to commercial or open-source
    licensing.
@@ -87,14 +87,14 @@ namespace ArrayBaseTestsHelpers
     };
 }
 
-bool operator== (const ArrayBaseTestsHelpers::TriviallyCopyableType& tct,
-                 const ArrayBaseTestsHelpers::NonTriviallyCopyableType& ntct)
+static bool operator== (const ArrayBaseTestsHelpers::TriviallyCopyableType& tct,
+                        const ArrayBaseTestsHelpers::NonTriviallyCopyableType& ntct)
 {
     return tct.getValue() == ntct.getValue();
 }
 
-bool operator== (const ArrayBaseTestsHelpers::NonTriviallyCopyableType& ntct,
-                 const ArrayBaseTestsHelpers::TriviallyCopyableType& tct)
+static bool operator== (const ArrayBaseTestsHelpers::NonTriviallyCopyableType& ntct,
+                        const ArrayBaseTestsHelpers::TriviallyCopyableType& tct)
 {
     return tct == ntct;
 }
@@ -104,18 +104,20 @@ class ArrayBaseTests  : public UnitTest
     using CopyableType    = ArrayBaseTestsHelpers::TriviallyCopyableType;
     using NoncopyableType = ArrayBaseTestsHelpers::NonTriviallyCopyableType;
 
+   #if ! (defined(__GNUC__) && __GNUC__ < 5 && ! defined(__clang__))
+    static_assert (std::is_trivially_copyable<CopyableType>::value,
+                   "Test TriviallyCopyableType is not trivially copyable");
+    static_assert (! std::is_trivially_copyable<NoncopyableType>::value,
+                   "Test NonTriviallyCopyableType is trivially copyable");
+   #endif
+
 public:
     ArrayBaseTests()
-        : UnitTest ("ArrayBase", "Containers")
+        : UnitTest ("ArrayBase", UnitTestCategories::containers)
     {}
 
     void runTest() override
     {
-        static_assert (std::is_trivially_copyable<CopyableType>::value,
-                       "Test TriviallyCopyableType is not trivially copyable");
-        static_assert (! std::is_trivially_copyable<NoncopyableType>::value,
-                       "Test NonTriviallyCopyableType is trivially copyable");
-
         beginTest ("grow capacity");
         {
             std::vector<CopyableType> referenceContainer;
@@ -302,7 +304,7 @@ public:
             checkEqual (copyableContainer, noncopyableContainer, referenceContainer);
         }
 
-        beginTest ("add array from initilizer list");
+        beginTest ("add array from initializer_list");
         {
             std::vector<CopyableType> referenceContainer;
             ArrayBase<CopyableType,    DummyCriticalSection> copyableContainer;

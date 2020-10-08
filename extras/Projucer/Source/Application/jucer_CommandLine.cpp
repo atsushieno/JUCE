@@ -2,17 +2,16 @@
   ==============================================================================
 
    This file is part of the JUCE library.
-   Copyright (c) 2017 - ROLI Ltd.
+   Copyright (c) 2020 - Raw Material Software Limited
 
    JUCE is an open source library subject to commercial or open-source
    licensing.
 
-   By using JUCE, you agree to the terms of both the JUCE 5 End-User License
-   Agreement and JUCE 5 Privacy Policy (both updated and effective as of the
-   27th April 2017).
+   By using JUCE, you agree to the terms of both the JUCE 6 End-User License
+   Agreement and JUCE Privacy Policy (both effective as of the 16th June 2020).
 
-   End User License Agreement: www.juce.com/juce-5-licence
-   Privacy Policy: www.juce.com/juce-5-privacy-policy
+   End User License Agreement: www.juce.com/juce-6-licence
+   Privacy Policy: www.juce.com/juce-privacy-policy
 
    Or: You may also use this code under the terms of the GPL v3 (see
    www.gnu.org/licenses).
@@ -31,8 +30,8 @@
 #include "jucer_CommandLine.h"
 
 //==============================================================================
-const char* preferredLinefeed = "\r\n";
-const char* getPreferredLinefeed()     { return preferredLinefeed; }
+const char* preferredLineFeed = "\r\n";
+const char* getPreferredLineFeed()     { return preferredLineFeed; }
 
 //==============================================================================
 namespace
@@ -48,7 +47,7 @@ namespace
     {
         Array<File> files;
 
-        for (DirectoryIterator di (folder, true, "*.cpp;*.cxx;*.cc;*.c;*.h;*.hpp;*.hxx;*.hpp;*.mm;*.m;*.java;*.dox;", File::findFiles); di.next();)
+        for (const auto& di : RangedDirectoryIterator (folder, true, "*.cpp;*.cxx;*.cc;*.c;*.h;*.hpp;*.hxx;*.hpp;*.mm;*.m;*.java;*.dox;*.soul;*.js", File::findFiles))
             if (! di.getFile().isSymbolicLink())
                 files.add (di.getFile());
 
@@ -71,7 +70,7 @@ namespace
     //==============================================================================
     struct LoadedProject
     {
-        LoadedProject (const ArgumentList::Argument& fileToLoad)
+        explicit LoadedProject (const ArgumentList::Argument& fileToLoad)
         {
             hideDockIcon();
 
@@ -82,11 +81,13 @@ namespace
 
             project.reset (new Project (projectFile));
 
-            if (! project->loadFrom (projectFile, true))
+            if (! project->loadFrom (projectFile, true, false))
             {
                 project.reset();
                 ConsoleApplication::fail ("Failed to load the project file: " + projectFile.getFullPathName());
             }
+
+            preferredLineFeed = project->getProjectLineFeed().toRawUTF8();
         }
 
         void save (bool justSaveResources)
@@ -96,8 +97,8 @@ namespace
                 if (! justSaveResources)
                     rescanModulePathsIfNecessary();
 
-                auto error = justSaveResources ? project->saveResourcesOnly (project->getFile())
-                                               : project->saveProject (project->getFile(), true);
+                auto error = justSaveResources ? project->saveResourcesOnly()
+                                               : project->saveProject();
 
                 project.reset();
 
@@ -228,7 +229,6 @@ namespace
     //==============================================================================
     static void showStatus (const ArgumentList& args)
     {
-        hideDockIcon();
         args.checkMinNumArguments (2);
 
         LoadedProject proj (args[1]);
@@ -237,7 +237,7 @@ namespace
                   << "Name: " << proj.project->getProjectNameString() << std::endl
                   << "UID: " << proj.project->getProjectUIDString() << std::endl;
 
-        EnabledModuleList& modules = proj.project->getEnabledModules();
+        auto& modules = proj.project->getEnabledModules();
 
         if (int numModules = modules.getNumModules())
         {
@@ -269,9 +269,7 @@ namespace
         ZipFile::Builder zip;
 
         {
-            DirectoryIterator i (moduleFolder, true, "*", File::findFiles);
-
-            while (i.next())
+            for (const auto& i : RangedDirectoryIterator (moduleFolder, true, "*", File::findFiles))
                 if (! i.getFile().isHidden())
                     zip.addFile (i.getFile(), 9, i.getFile().getRelativePathFrom (moduleFolderParent));
         }
@@ -304,10 +302,9 @@ namespace
         if (buildAllWithIndex)
         {
             auto folderToSearch = args[2].resolveAsFile();
-            DirectoryIterator i (folderToSearch, false, "*", File::findDirectories);
             var infoList;
 
-            while (i.next())
+            for (const auto& i : RangedDirectoryIterator (folderToSearch, false, "*", File::findDirectories))
             {
                 LibraryModule module (i.getFile());
 
@@ -317,7 +314,7 @@ namespace
 
                     var moduleInfo (new DynamicObject());
                     moduleInfo.getDynamicObject()->setProperty ("file", getModulePackageName (module));
-                    moduleInfo.getDynamicObject()->setProperty ("info", module.moduleInfo.moduleInfo);
+                    moduleInfo.getDynamicObject()->setProperty ("info", module.moduleInfo.getModuleInfo());
                     infoList.append (moduleInfo);
                 }
             }
@@ -344,8 +341,14 @@ namespace
     {
         auto content = file.loadFileAsString();
 
-        if (content.contains ("%""%") && content.contains ("//["))
-            return; // ignore projucer GUI template files
+        auto isProjucerTemplateFile = [file, content]
+        {
+            return file.getFullPathName().contains ("Templates")
+                  && content.contains ("%""%") && content.contains ("//[");
+        }();
+
+        if (isProjucerTemplateFile)
+            return;
 
         StringArray lines;
         lines.addLines (content);
@@ -398,7 +401,7 @@ namespace
 
         auto newText = joinLinesIntoSourceFile (lines);
 
-        if (newText != content && newText != content + getPreferredLinefeed())
+        if (newText != content && newText != content + getPreferredLineFeed())
             replaceFile (file, newText, options.removeTabs ? "Removing tabs in: "
                                                            : "Cleaning file: ");
     }
@@ -419,7 +422,7 @@ namespace
                 files.add (target);
 
             for (int i = 0; i < files.size(); ++i)
-                cleanWhitespace (files.getReference(i), options);
+                cleanWhitespace (files.getReference (i), options);
         }
     }
 
@@ -494,7 +497,7 @@ namespace
         {
             auto newText = joinLinesIntoSourceFile (lines);
 
-            if (newText != content && newText != content + getPreferredLinefeed())
+            if (newText != content && newText != content + getPreferredLineFeed())
                 replaceFile (file, newText, "Fixing includes in: ");
         }
     }
@@ -517,7 +520,7 @@ namespace
         if (length == 1)
             return "s" + String (start);
 
-        int breakPos = jlimit (1, length - 1, (length / 3) + rng.nextInt (length / 3));
+        int breakPos = jlimit (1, length - 1, (length / 3) + rng.nextInt (jmax (1, length / 3)));
 
         return "(" + getStringConcatenationExpression (rng, start, breakPos)
                 + " + " + getStringConcatenationExpression (rng, start + breakPos, length - breakPos) + ")";
@@ -539,10 +542,18 @@ namespace
 
                 out << "    String " << name << ";  " << name;
 
-                for (int i = 0; i < text.length(); ++i)
-                    out << " << '" << String::charToString (text[i]) << "'";
+                auto escapeIfSingleQuote = [] (const String& s) -> String
+                {
+                    if (s == "\'")
+                        return "\\'";
 
-                out << ";" << preferredLinefeed;
+                    return s;
+                };
+
+                for (int i = 0; i < text.length(); ++i)
+                    out << " << '" << escapeIfSingleQuote (String::charToString (text[i])) << "'";
+
+                out << ";" << preferredLineFeed;
             }
         };
 
@@ -566,18 +577,18 @@ namespace
 
         MemoryOutputStream out;
 
-        out << "String createString()" << preferredLinefeed
-            << "{" << preferredLinefeed;
+        out << "String createString()" << preferredLineFeed
+            << "{" << preferredLineFeed;
 
         for (int i = 0; i < sections.size(); ++i)
             sections.getReference(i).writeGenerator (out);
 
-        out << preferredLinefeed
-            << "    String result = " << getStringConcatenationExpression (rng, 0, sections.size()) << ";" << preferredLinefeed
-            << preferredLinefeed
-            << "    jassert (result == " << originalText.quoted() << ");" << preferredLinefeed
-            << "    return result;" << preferredLinefeed
-            << "}" << preferredLinefeed;
+        out << preferredLineFeed
+            << "    String result = " << getStringConcatenationExpression (rng, 0, sections.size()) << ";" << preferredLineFeed
+            << preferredLineFeed
+            << "    jassert (result == " << originalText.quoted() << ");" << preferredLineFeed
+            << "    return result;" << preferredLineFeed
+            << "}" << preferredLineFeed;
 
         std::cout << out.toString() << std::endl;
     }
@@ -627,40 +638,40 @@ namespace
             MemoryBlock data;
             FileInputStream input (source);
             input.readIntoMemoryBlock (data);
-            CodeHelpers::writeDataAsCppLiteral (data, literal, true, true);
+            build_tools::writeDataAsCppLiteral (data, literal, true, true);
             dataSize = data.getSize();
         }
 
-        auto variableName = CodeHelpers::makeBinaryDataIdentifierName (source);
+        auto variableName = build_tools::makeBinaryDataIdentifierName (source);
 
         MemoryOutputStream header, cpp;
 
-        header << "// Auto-generated binary data by the Projucer" << preferredLinefeed
-               << "// Source file: " << source.getRelativePathFrom (target.getParentDirectory()) << preferredLinefeed
-               << preferredLinefeed;
+        header << "// Auto-generated binary data by the Projucer" << preferredLineFeed
+               << "// Source file: " << source.getRelativePathFrom (target.getParentDirectory()) << preferredLineFeed
+               << preferredLineFeed;
 
         cpp << header.toString();
 
         if (target.hasFileExtension (headerFileExtensions))
         {
-            header << "static constexpr unsigned char " << variableName << "[] =" << preferredLinefeed
-                   << literal.toString() << preferredLinefeed
-                   << preferredLinefeed;
+            header << "static constexpr unsigned char " << variableName << "[] =" << preferredLineFeed
+                   << literal.toString() << preferredLineFeed
+                   << preferredLineFeed;
 
             replaceFile (target, header.toString(), "Writing: ");
         }
         else if (target.hasFileExtension (cppFileExtensions))
         {
-            header << "extern const char*  " << variableName << ";" << preferredLinefeed
-                   << "const unsigned int  " << variableName << "Size = " << (int) dataSize << ";" << preferredLinefeed
-                   << preferredLinefeed;
+            header << "extern const char*  " << variableName << ";" << preferredLineFeed
+                   << "const unsigned int  " << variableName << "Size = " << (int) dataSize << ";" << preferredLineFeed
+                   << preferredLineFeed;
 
-            cpp << CodeHelpers::createIncludeStatement (target.withFileExtension (".h").getFileName()) << preferredLinefeed
-                << preferredLinefeed
-                << "static constexpr unsigned char " << variableName << "_local[] =" << preferredLinefeed
-                << literal.toString() << preferredLinefeed
-                << preferredLinefeed
-                << "const char* " << variableName << " = (const char*) " << variableName << "_local;" << preferredLinefeed;
+            cpp << CodeHelpers::createIncludeStatement (target.withFileExtension (".h").getFileName()) << preferredLineFeed
+                << preferredLineFeed
+                << "static constexpr unsigned char " << variableName << "_local[] =" << preferredLineFeed
+                << literal.toString() << preferredLineFeed
+                << preferredLineFeed
+                << "const char* " << variableName << " = (const char*) " << variableName << "_local;" << preferredLineFeed;
 
             replaceFile (target, cpp.toString(), "Writing: ");
             replaceFile (target.withFileExtension (".h"), header.toString(), "Writing: ");
@@ -688,15 +699,8 @@ namespace
 
     static bool isValidPathIdentifier (const String& id, const String& os)
     {
-        return id == "vst3Path" || (id == "aaxPath" && os != "linux") || (id == "rtasPath" && os != "linux")
+        return id == "vstLegacyPath" || (id == "aaxPath" && os != "linux") || (id == "rtasPath" && os != "linux")
             || id == "androidSDKPath" || id == "androidNDKPath" || id == "defaultJuceModulePath" || id == "defaultUserModulePath";
-    }
-
-    static void checkIfUserModulesPathsAreValid (const String& list)
-    {
-        for (auto& p : StringArray::fromTokens (list, ";", {}))
-            if (! File (p.trim()).exists())
-                ConsoleApplication::fail (p + " doesn't exist!");
     }
 
     static void setGlobalPath (const ArgumentList& args)
@@ -740,19 +744,7 @@ namespace
         if (! childToSet.isValid())
             ConsoleApplication::fail ("Failed to set the requested setting!");
 
-        if (args[2].text == Ids::defaultUserModulePath.toString())
-        {
-            auto pathList = args[3].text.removeCharacters ("\"");
-
-            if (isThisOS (args[1].text))
-                checkIfUserModulesPathsAreValid (pathList);
-
-            childToSet.setProperty (args[2].text, pathList, nullptr);
-        }
-        else
-        {
-            childToSet.setProperty (args[2].text, args[3].resolveAsFile().getFullPathName(), nullptr);
-        }
+        childToSet.setProperty (args[2].text, args[3].resolveAsFile().getFullPathName(), nullptr);
 
         settingsFile.replaceWithText (settingsTree.toXmlString());
     }
@@ -774,8 +766,7 @@ namespace
             std::cout << "Creating directory " << outputDir.getFullPathName() << std::endl;
         }
 
-        File juceModulesPath;
-        Array<File> userModulesPaths;
+        File juceModulesPath, userModulesPath;
 
         if (args.size() > 3)
         {
@@ -786,15 +777,14 @@ namespace
 
             if (args.size() == 5)
             {
-                auto pathList = args[4].text.removeCharacters ("\"");
-                checkIfUserModulesPathsAreValid (pathList);
+                userModulesPath = args[4].resolveAsFile();
 
-                for (auto& p : StringArray::fromTokens (pathList, ";", {}))
-                    userModulesPaths.add ({ p });
+                if (! userModulesPath.exists())
+                    ConsoleApplication::fail ("Specified JUCE modules directory doesn't exist.");
             }
         }
 
-        PIPGenerator generator (pipFile, outputDir, juceModulesPath, userModulesPaths);
+        PIPGenerator generator (pipFile, outputDir, juceModulesPath, userModulesPath);
 
         auto createJucerFileResult = generator.createJucerFile();
 
@@ -871,12 +861,11 @@ namespace
                   << std::endl
                   << " " << appName << " --set-global-search-path os identifier_to_set new_path" << std::endl
                   << "    Sets the global path for a specified os and identifier. The os should be either osx, windows or linux and the identifiers can be any of the following: "
-                  << "defaultJuceModulePath, defaultUserModulePath, vst3Path, aaxPath (not valid on linux), rtasPath (not valid on linux), androidSDKPath or androidNDKPath. "
-                     "When setting defaultUserModulePath you can specify multiple paths by surrounding a semicolon-separated list of paths with double quotes \"like;so\"" << std::endl
+                  << "defaultJuceModulePath, defaultUserModulePath, vstLegacyPath, aaxPath (not valid on linux), rtasPath (not valid on linux), androidSDKPath or androidNDKPath. " << std::endl
                   << std::endl
                   << " " << appName << " --create-project-from-pip path/to/PIP path/to/output path/to/JUCE/modules (optional) path/to/user/modules (optional)" << std::endl
                   << "    Generates a folder containing a JUCE project in the specified output path using the specified PIP file. Use the optional JUCE and user module paths to override "
-                     "the global module paths (you can specify multiple user module paths by using a semicolon-separated list)." << std::endl
+                     "the global module paths." << std::endl
                   << std::endl
                   << "Note that for any of the file-rewriting commands, add the option \"--lf\" if you want it to use LF linefeeds instead of CRLF" << std::endl
                   << std::endl;
@@ -886,10 +875,10 @@ namespace
 //==============================================================================
 int performCommandLine (const ArgumentList& args)
 {
-    return ConsoleApplication::invokeCatchingFailures ([&] () -> int
+    return ConsoleApplication::invokeCatchingFailures ([&]() -> int
     {
         if (args.containsOption ("--lf"))
-            preferredLinefeed = "\n";
+            preferredLineFeed = "\n";
 
         auto command = args[0];
 

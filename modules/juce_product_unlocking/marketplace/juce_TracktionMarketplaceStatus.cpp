@@ -2,17 +2,16 @@
   ==============================================================================
 
    This file is part of the JUCE library.
-   Copyright (c) 2017 - ROLI Ltd.
+   Copyright (c) 2020 - Raw Material Software Limited
 
    JUCE is an open source library subject to commercial or open-source
    licensing.
 
-   By using JUCE, you agree to the terms of both the JUCE 5 End-User License
-   Agreement and JUCE 5 Privacy Policy (both updated and effective as of the
-   27th April 2017).
+   By using JUCE, you agree to the terms of both the JUCE 6 End-User License
+   Agreement and JUCE Privacy Policy (both effective as of the 16th June 2020).
 
-   End User License Agreement: www.juce.com/juce-5-licence
-   Privacy Policy: www.juce.com/juce-5-privacy-policy
+   End User License Agreement: www.juce.com/juce-6-licence
+   Privacy Policy: www.juce.com/juce-privacy-policy
 
    Or: You may also use this code under the terms of the GPL v3 (see
    www.gnu.org/licenses).
@@ -62,37 +61,19 @@ String TracktionMarketplaceStatus::readReplyFromWebserver (const String& email, 
 
     if (stream->connect (nullptr))
     {
-        auto* thread = Thread::getCurrentThread();
+        auto thread = Thread::getCurrentThread();
+        MemoryOutputStream result;
 
-        if (thread->threadShouldExit() || stream->isError())
-            return {};
-
-        auto contentLength = stream->getTotalLength();
-        auto downloaded    = 0;
-
-        const size_t bufferSize = 0x8000;
-        HeapBlock<char> buffer (bufferSize);
-
-        while (! (stream->isExhausted() || stream->isError() || thread->threadShouldExit()))
+        while (! (stream->isExhausted() || stream->isError()
+                    || (thread != nullptr && thread->threadShouldExit())))
         {
-            auto max = jmin ((int) bufferSize, contentLength < 0 ? std::numeric_limits<int>::max()
-                                                                 : static_cast<int> (contentLength - downloaded));
+            auto bytesRead = result.writeFromInputStream (*stream, 8192);
 
-            auto actualBytesRead = stream->read (buffer.get() + downloaded, max - downloaded);
-
-            if (actualBytesRead < 0 || thread->threadShouldExit() || stream->isError())
-                break;
-
-            downloaded += actualBytesRead;
-
-            if (downloaded == contentLength)
+            if (bytesRead < 0)
                 break;
         }
 
-        if (thread->threadShouldExit() || stream->isError() || (contentLength > 0 && downloaded < contentLength))
-            return {};
-
-        return { CharPointer_UTF8 (buffer.get()), static_cast<size_t> (downloaded) };
+        return result.toString();
     }
 
     return {};
