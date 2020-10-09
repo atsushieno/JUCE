@@ -362,7 +362,7 @@ class JuceLV2FileCreator
 
         // Parameters
         OwnedArray<Lv2ParameterWrapper> parameters = wrapParameters (filter);
-        const OwnedArray<AudioProcessorParameter> &rawParams = filter->getParameters();
+        const Array<AudioProcessorParameter*> &rawParams = filter->getParameters();
         for (int i=0; i < parameters.size(); ++i)
         {
             if (i == 0)
@@ -463,7 +463,7 @@ class JuceLV2FileCreator
             preset += "<" + pluginURI + presetSeparator + "preset" + String::formatted("%03i", i+1) + "> a pset:Preset ;\n";
 
             // State
-            const OwnedArray<AudioProcessorParameter>& rawParams = filter->getParameters();
+            const Array<AudioProcessorParameter*>& rawParams = filter->getParameters();
 #if JucePlugin_WantsLV2State
             preset += "    state:state [\n";
 #if JucePlugin_WantsLV2StateString

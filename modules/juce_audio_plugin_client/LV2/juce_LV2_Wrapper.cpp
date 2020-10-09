@@ -9,6 +9,8 @@
 #include "../../juce_core/system/juce_TargetPlatform.h"
 #include "../utility/juce_CheckSettingMacros.h"
 
+#define JUCE_GUI_BASICS_INCLUDE_XHEADERS 1
+
 #if JucePlugin_Build_LV2
 
 /** Enable latency port */
@@ -301,7 +303,8 @@ public:
         const int ch = child->getHeight();
 
 #if JUCE_LINUX
-        XResizeWindow (display.display, (Window) getWindowHandle(), cw, ch);
+        ::Display* display = XWindowSystem::getInstance()->getDisplay();
+        XResizeWindow (display, (Window) getWindowHandle(), cw, ch);
 #else
         setSize (cw, ch);
 #endif
@@ -321,9 +324,6 @@ public:
 private:
     //==============================================================================
     const LV2UI_Resize* uiResize;
-#if JUCE_LINUX
-    ScopedXDisplay display;
-#endif
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JuceLv2ParentContainer);
 };
@@ -606,9 +606,6 @@ private:
     ScopedPointer<JuceLv2ParentContainer> parentContainer;
     const LV2UI_Resize* uiResize;
 
-#if JUCE_LINUX
-    ScopedXDisplay display;
-#endif
 
     //==============================================================================
     void resetExternalUI (const LV2_Feature* const* features)
@@ -668,7 +665,8 @@ private:
 #if JUCE_LINUX
             Window hostWindow = (Window) parent;
             Window editorWnd  = (Window) parentContainer->getWindowHandle();
-            XReparentWindow (display.display, editorWnd, hostWindow, 0, 0);
+            ::Display* display = XWindowSystem::getInstance()->getDisplay();
+            XReparentWindow (display, editorWnd, hostWindow, 0, 0);
 #endif
 
             parentContainer->reset (uiResize);
