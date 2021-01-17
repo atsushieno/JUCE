@@ -36,7 +36,7 @@ protected:
     public:
         MakeBuildConfiguration (Project& p, const ValueTree& settings, const ProjectExporter& e)
             : BuildConfiguration (p, settings, e),
-              isEmscripten              (config, Ids::isEmscripten, getUndoManager(), false)
+              isEmscripten              (config, Ids::isEmscripten, getUndoManager(), false),
               architectureTypeValue     (config, Ids::linuxArchitecture,          getUndoManager(), String()),
               pluginBinaryCopyStepValue (config, Ids::enablePluginBinaryCopyStep, getUndoManager(), true),
               vstBinaryLocation         (config, Ids::vstBinaryLocation,          getUndoManager(), "$(HOME)/.vst"),
@@ -393,19 +393,13 @@ public:
     };
 
     //==============================================================================
-<<<<<<< HEAD
     static String getDisplayName()        { return "Linux Makefile"; }
     static String getValueTreeTypeName()  { return "LINUX_MAKE"; }
     static String getTargetFolderName()   { return "LinuxMakefile"; }
-=======
-    static const char* getNameLinux()           { return "Linux Makefile"; }
-    static const char* getNameWasm()            { return "Emscripten Makefile"; }
-    static const char* getValueTreeTypeName()   { return "LINUX_MAKE"; }
 
     bool isEmscripten{false};
 
     String getExtraPkgConfigString() const      { return extraPkgConfigValue.get(); }
->>>>>>> acc05f465... [emscripten][projucer] Add basic Emscripten export stuff in Makefile exporter.
 
     static MakefileProjectExporter* createForSettings (Project& projectToUse, const ValueTree& settingsToUse)
     {
@@ -420,15 +414,8 @@ public:
         : ProjectExporter (p, t),
           extraPkgConfigValue (settings, Ids::linuxExtraPkgConfig, getUndoManager())
     {
-<<<<<<< HEAD
         name = getDisplayName();
         targetLocationValue.setDefault (getDefaultBuildsRootFolder() + getTargetFolderName());
-=======
-        isEmscripten = t.getProperty(Ids::isEmscripten);
-        name = isEmscripten ? getNameWasm() : getNameLinux();
-
-        targetLocationValue.setDefault (getDefaultBuildsRootFolder() + getTargetFolderForExporter (getValueTreeTypeName()));
->>>>>>> acc05f465... [emscripten][projucer] Add basic Emscripten export stuff in Makefile exporter.
     }
 
     //==============================================================================
@@ -592,13 +579,8 @@ private:
     {
         auto compilePackages = getCompilePackages();
 
-<<<<<<< HEAD
-        if (compilePackages.size() > 0)
+        if (compilePackages.size() > 0 && !isEmscripten)
             return "$(shell pkg-config --cflags " + compilePackages.joinIntoString (" ") + ")";
-=======
-        if (packages.size() > 0 && !isEmscripten)
-            return "$(shell pkg-config --cflags " + packages.joinIntoString (" ") + ")";
->>>>>>> acc05f465... [emscripten][projucer] Add basic Emscripten export stuff in Makefile exporter.
 
         return {};
     }
@@ -607,17 +589,8 @@ private:
     {
         auto linkPackages = getLinkPackages();
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-        if (linkPackages.size() > 0)
+        if (linkPackages.size() > 0 && isEmscripten)
             return "$(shell pkg-config --libs " + linkPackages.joinIntoString (" ") + ")";
-=======
-        if (packages.size() > 0 && isEmscripten)
-=======
-        if (packages.size() > 0 && !isEmscripten)
->>>>>>> 5d57ff578... Fix bogus ldflags output that broke Linux (not emscripten) build.
-            return "$(shell pkg-config --libs " + packages.joinIntoString (" ") + ")";
->>>>>>> acc05f465... [emscripten][projucer] Add basic Emscripten export stuff in Makefile exporter.
 
         return {};
     }
