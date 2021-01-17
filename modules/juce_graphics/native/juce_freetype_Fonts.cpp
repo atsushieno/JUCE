@@ -237,6 +237,8 @@ private:
         int faceIndex = 0;
         int numFaces = 0;
 
+        std::clog << "got font: " << file.getFullPathName() << std::endl;
+
         do
         {
             FTFaceWrapper face (library, file, faceIndex);
@@ -262,12 +264,14 @@ private:
                   && (face->style.equalsIgnoreCase (style) || style.isEmpty()))
                 return face;
 
+        std::cout << "NO MATCHING FONT FOUND" << std::endl;
+
         return nullptr;
     }
 
     static bool isFaceSansSerif (const String& family)
     {
-        static const char* sansNames[] = { "Sans", "Verdana", "Arial", "Ubuntu" };
+        static const char* sansNames[] = { "Sans", "Verdana", "Arial", "Ubuntu", "Lato" };
 
         for (auto* name : sansNames)
             if (family.containsIgnoreCase (name))

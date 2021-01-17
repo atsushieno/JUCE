@@ -974,7 +974,7 @@ void JUCE_CALLTYPE Thread::yield()
    calls (the API for these has changed about quite a bit in various Linux
    versions, and a lot of distros seem to ship with obsolete versions)
 */
-#if defined (CPU_ISSET) && ! defined (SUPPORT_AFFINITIES)
+#if (! JUCE_EMSCRIPTEN) && defined (CPU_ISSET) && ! defined (SUPPORT_AFFINITIES)
  #define SUPPORT_AFFINITIES 1
 #endif
 

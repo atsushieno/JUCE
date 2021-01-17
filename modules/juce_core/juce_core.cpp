@@ -72,8 +72,7 @@
   #include <netinet/in.h>
  #endif
 
- #if JUCE_LINUX
-  #include <stdio.h>
+ #if JUCE_LINUX || JUCE_EMSCRIPTEN
   #include <langinfo.h>
   #include <ifaddrs.h>
   #include <sys/resource.h>
@@ -94,6 +93,11 @@
 
  #if ! JUCE_ANDROID
   #include <execinfo.h>
+ #endif
+ 
+ #if JUCE_EMSCRIPTEN
+  #include <signal.h>
+  #include <unistd.h>
  #endif
 #endif
 
@@ -209,15 +213,15 @@
  #include "native/juce_win32_Threads.cpp"
 
 //==============================================================================
-#elif JUCE_LINUX
- #include "native/juce_linux_CommonFile.cpp"
- #include "native/juce_linux_Files.cpp"
- #include "native/juce_linux_Network.cpp"
+#elif JUCE_LINUX || JUCE_EMSCRIPTEN
+#include "native/juce_linux_CommonFile.cpp"
+#include "native/juce_linux_Files.cpp"
+#include "native/juce_linux_Network.cpp"
  #if JUCE_USE_CURL
   #include "native/juce_curl_Network.cpp"
  #endif
- #include "native/juce_linux_SystemStats.cpp"
- #include "native/juce_linux_Threads.cpp"
+#include "native/juce_linux_SystemStats.cpp"
+#include "native/juce_linux_Threads.cpp"
 
 //==============================================================================
 #elif JUCE_ANDROID
