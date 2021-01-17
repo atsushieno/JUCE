@@ -589,7 +589,7 @@ private:
     {
         auto linkPackages = getLinkPackages();
 
-        if (linkPackages.size() > 0 && isEmscripten)
+        if (linkPackages.size() > 0 && !isEmscripten)
             return "$(shell pkg-config --libs " + linkPackages.joinIntoString (" ") + ")";
 
         return {};
