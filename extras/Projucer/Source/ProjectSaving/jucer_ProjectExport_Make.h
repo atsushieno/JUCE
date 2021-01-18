@@ -36,7 +36,6 @@ protected:
     public:
         MakeBuildConfiguration (Project& p, const ValueTree& settings, const ProjectExporter& e)
             : BuildConfiguration (p, settings, e),
-              isEmscripten              (config, Ids::isEmscripten, getUndoManager(), false),
               architectureTypeValue     (config, Ids::linuxArchitecture,          getUndoManager(), String()),
               pluginBinaryCopyStepValue (config, Ids::enablePluginBinaryCopyStep, getUndoManager(), true),
               vstBinaryLocation         (config, Ids::vstBinaryLocation,          getUndoManager(), "$(HOME)/.vst"),
@@ -108,7 +107,6 @@ protected:
     private:
         //==============================================================================
         ValueWithDefault architectureTypeValue, pluginBinaryCopyStepValue, vstBinaryLocation, vst3BinaryLocation, unityPluginBinaryLocation;
-        ValueWithDefault isEmscripten;
     };
 
     BuildConfiguration::Ptr createBuildConfig (const ValueTree& tree) const override
@@ -150,7 +148,7 @@ public:
                     result.add ("-Wl,--no-undefined");
             }
 
-            if (owner.isEmscripten) {
+            if (owner.isEmscripten()) {
                 result.add ("-lopenal");
                 result.add ("-s USE_PTHREADS=1");
                 result.add ("-s USE_FREETYPE=1");
@@ -257,7 +255,7 @@ public:
             if (type == SharedCodeTarget || type == StaticLibrary)
                 return ".a";
 
-            if (owner.isEmscripten)
+            if (owner.isEmscripten())
                 return ".html";
 
             return {};
@@ -320,7 +318,7 @@ public:
 
             out << newLine;
 
-            if (! packages.isEmpty() && !owner.isEmscripten)
+            if (! packages.isEmpty() && !owner.isEmscripten())
             {
                 out << "\t@command -v pkg-config >/dev/null 2>&1 || { echo >&2 \"pkg-config not installed. Please, install it.\"; exit 1; }" << newLine
                     << "\t@pkg-config --print-errors";
@@ -397,9 +395,8 @@ public:
     static String getValueTreeTypeName()  { return "LINUX_MAKE"; }
     static String getTargetFolderName()   { return "LinuxMakefile"; }
 
-    bool isEmscripten{false};
-
     String getExtraPkgConfigString() const      { return extraPkgConfigValue.get(); }
+    bool isEmscripten() const { return isEmscriptenValue.get(); }
 
     static MakefileProjectExporter* createForSettings (Project& projectToUse, const ValueTree& settingsToUse)
     {
@@ -412,6 +409,7 @@ public:
     //==============================================================================
     MakefileProjectExporter (Project& p, const ValueTree& t)
         : ProjectExporter (p, t),
+          isEmscriptenValue(settings, Ids::isEmscripten, getUndoManager()),
           extraPkgConfigValue (settings, Ids::linuxExtraPkgConfig, getUndoManager())
     {
         name = getDisplayName();
@@ -469,6 +467,8 @@ public:
 
     void createExporterProperties (PropertyListBuilder& properties) override
     {
+        properties.add (new TextPropertyComponent (isEmscriptenValue, "is Emscripten build?", 0, false),
+                   "True if it is for Emscripten export. Generates wasm, js and HTML instead of native code.");
         properties.add (new TextPropertyComponent (extraPkgConfigValue, "pkg-config libraries", 8192, false),
                    "Extra pkg-config libraries for you application. Each package should be space separated.");
     }
@@ -528,6 +528,7 @@ public:
 
 private:
     ValueWithDefault extraPkgConfigValue;
+    ValueWithDefault isEmscriptenValue;
 
     //==============================================================================
     StringPairArray getDefines (const BuildConfiguration& config) const
@@ -579,7 +580,7 @@ private:
     {
         auto compilePackages = getCompilePackages();
 
-        if (compilePackages.size() > 0 && !isEmscripten)
+        if (compilePackages.size() > 0 && !isEmscripten())
             return "$(shell pkg-config --cflags " + compilePackages.joinIntoString (" ") + ")";
 
         return {};
@@ -589,7 +590,7 @@ private:
     {
         auto linkPackages = getLinkPackages();
 
-        if (linkPackages.size() > 0 && !isEmscripten)
+        if (linkPackages.size() > 0 && !isEmscripten())
             return "$(shell pkg-config --libs " + linkPackages.joinIntoString (" ") + ")";
 
         return {};
@@ -647,7 +648,7 @@ private:
 
         result.add (cppStandard);
 
-        if (isEmscripten) {
+        if (isEmscripten()) {
             result.add("-s USE_PTHREADS=1");
             result.add("-s USE_FREETYPE=1");
             result.add("-s DISABLE_EXCEPTION_CATCHING=0");
@@ -768,7 +769,12 @@ private:
         for (auto& libName : getLibraryNames (config))
             out << " -l" << libName;
 
-        out << " $(LDFLAGS)" << newLine;
+        out << " $(LDFLAGS)";
+
+        if (isEmscripten())
+            out << " --preload-file /usr/X11R6/lib/X11/fonts --emrun";
+
+        out << newLine;
     }
 
     void writeTargetLines (OutputStream& out, const StringArray& packages) const

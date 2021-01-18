@@ -40,6 +40,8 @@ Play with JUCE [DemoRunner](https://synthesizerv.com/lab/wasm-juce-demorunner/De
 
 ## Build instructions
 
+- To embed fonts in the resulting application, there has to be `/usr/X11R6/lib/X11/fonts` directory, which may not exist on your Linux distribution. On Ubuntu, it can be a simple symbolic link: `ln -s /usr/share/fonts/x11 /usr/X11R6/lib/x11/fonts`. The path is old-school and awkward, but JUCE somehow expects that directory by default as well.
+
 - [Download Emscripten](https://emscripten.org/docs/getting_started/downloads.html)
 - install Emscripten
 ```shell
@@ -65,7 +67,7 @@ python -m SimpleHTTPServer
 ```
 - Goto http://127.0.0.1:8000
 
-Note: I had to modify the auto-generated Makefile to get everything to work. So be carefull when you modify and save the jucer project. In the long run, it would be nice to have a emscripten target inside Projucer.
+There are couple of changes to make DemoRunner builds for Emscripten. Namely, it adds a new `LINUX_MAKE` exporter section for Emscripten, and removed a handful of not-supported modules and commented out some related code. The changes can be tracked by git diff from the original JUCE sources.
 
 ## Firefox support
 
