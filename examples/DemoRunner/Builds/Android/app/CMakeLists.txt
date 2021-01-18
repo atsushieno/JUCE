@@ -23,9 +23,9 @@ include_directories( AFTER
 enable_language(ASM)
 
 if(JUCE_BUILD_CONFIGURATION MATCHES "DEBUG")
-    add_definitions("-DJUCE_DISPLAY_SPLASH_SCREEN=0" "-DJUCE_USE_DARK_SPLASH_SCREEN=1" "-DJUCE_PROJUCER_VERSION=0x60007" "-DJUCE_MODULE_AVAILABLE_juce_analytics=1" "-DJUCE_MODULE_AVAILABLE_juce_audio_basics=1" "-DJUCE_MODULE_AVAILABLE_juce_audio_devices=1" "-DJUCE_MODULE_AVAILABLE_juce_audio_formats=1" "-DJUCE_MODULE_AVAILABLE_juce_audio_processors=1" "-DJUCE_MODULE_AVAILABLE_juce_audio_utils=1" "-DJUCE_MODULE_AVAILABLE_juce_blocks_basics=1" "-DJUCE_MODULE_AVAILABLE_juce_box2d=1" "-DJUCE_MODULE_AVAILABLE_juce_core=1" "-DJUCE_MODULE_AVAILABLE_juce_cryptography=1" "-DJUCE_MODULE_AVAILABLE_juce_data_structures=1" "-DJUCE_MODULE_AVAILABLE_juce_dsp=1" "-DJUCE_MODULE_AVAILABLE_juce_events=1" "-DJUCE_MODULE_AVAILABLE_juce_graphics=1" "-DJUCE_MODULE_AVAILABLE_juce_gui_basics=1" "-DJUCE_MODULE_AVAILABLE_juce_gui_extra=1" "-DJUCE_MODULE_AVAILABLE_juce_opengl=1" "-DJUCE_MODULE_AVAILABLE_juce_osc=1" "-DJUCE_MODULE_AVAILABLE_juce_product_unlocking=1" "-DJUCE_MODULE_AVAILABLE_juce_video=1" "-DJUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1" "-DJUCE_USE_MP3AUDIOFORMAT=1" "-DJUCE_ALLOW_STATIC_NULL_VARIABLES=0" "-DJUCE_STRICT_REFCOUNTEDPOINTER=1" "-DJUCE_USE_CAMERA=1" "-DJUCE_STANDALONE_APPLICATION=1" "-DJUCE_DEMO_RUNNER=1" "-DJUCE_UNIT_TESTS=1" "-DJUCER_ANDROIDSTUDIO_7F0E4A25=1" "-DJUCE_APP_VERSION=6.0.7" "-DJUCE_APP_VERSION_HEX=0x60007" "-DDEBUG=1" "-D_DEBUG=1")
+    add_definitions("-DJUCE_DISPLAY_SPLASH_SCREEN=0" "-DJUCE_USE_DARK_SPLASH_SCREEN=1" "-DJUCE_PROJUCER_VERSION=0x60007" "-DJUCE_MODULE_AVAILABLE_juce_analytics=1" "-DJUCE_MODULE_AVAILABLE_juce_audio_basics=1" "-DJUCE_MODULE_AVAILABLE_juce_audio_devices=1" "-DJUCE_MODULE_AVAILABLE_juce_audio_formats=1" "-DJUCE_MODULE_AVAILABLE_juce_audio_processors=1" "-DJUCE_MODULE_AVAILABLE_juce_audio_utils=1" "-DJUCE_MODULE_AVAILABLE_juce_blocks_basics=1" "-DJUCE_MODULE_AVAILABLE_juce_box2d=1" "-DJUCE_MODULE_AVAILABLE_juce_core=1" "-DJUCE_MODULE_AVAILABLE_juce_cryptography=1" "-DJUCE_MODULE_AVAILABLE_juce_data_structures=1" "-DJUCE_MODULE_AVAILABLE_juce_dsp=1" "-DJUCE_MODULE_AVAILABLE_juce_events=1" "-DJUCE_MODULE_AVAILABLE_juce_graphics=1" "-DJUCE_MODULE_AVAILABLE_juce_gui_basics=1" "-DJUCE_MODULE_AVAILABLE_juce_gui_extra=1" "-DJUCE_MODULE_AVAILABLE_juce_osc=1" "-DJUCE_MODULE_AVAILABLE_juce_product_unlocking=1" "-DJUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1" "-DJUCE_USE_MP3AUDIOFORMAT=1" "-DJUCE_ALLOW_STATIC_NULL_VARIABLES=0" "-DJUCE_STRICT_REFCOUNTEDPOINTER=1" "-DJUCE_STANDALONE_APPLICATION=1" "-DJUCE_DEMO_RUNNER=1" "-DJUCE_UNIT_TESTS=1" "-DJUCER_ANDROIDSTUDIO_7F0E4A25=1" "-DJUCE_APP_VERSION=6.0.7" "-DJUCE_APP_VERSION_HEX=0x60007" "-DDEBUG=1" "-D_DEBUG=1")
 elseif(JUCE_BUILD_CONFIGURATION MATCHES "RELEASE")
-    add_definitions("-DJUCE_DISPLAY_SPLASH_SCREEN=0" "-DJUCE_USE_DARK_SPLASH_SCREEN=1" "-DJUCE_PROJUCER_VERSION=0x60007" "-DJUCE_MODULE_AVAILABLE_juce_analytics=1" "-DJUCE_MODULE_AVAILABLE_juce_audio_basics=1" "-DJUCE_MODULE_AVAILABLE_juce_audio_devices=1" "-DJUCE_MODULE_AVAILABLE_juce_audio_formats=1" "-DJUCE_MODULE_AVAILABLE_juce_audio_processors=1" "-DJUCE_MODULE_AVAILABLE_juce_audio_utils=1" "-DJUCE_MODULE_AVAILABLE_juce_blocks_basics=1" "-DJUCE_MODULE_AVAILABLE_juce_box2d=1" "-DJUCE_MODULE_AVAILABLE_juce_core=1" "-DJUCE_MODULE_AVAILABLE_juce_cryptography=1" "-DJUCE_MODULE_AVAILABLE_juce_data_structures=1" "-DJUCE_MODULE_AVAILABLE_juce_dsp=1" "-DJUCE_MODULE_AVAILABLE_juce_events=1" "-DJUCE_MODULE_AVAILABLE_juce_graphics=1" "-DJUCE_MODULE_AVAILABLE_juce_gui_basics=1" "-DJUCE_MODULE_AVAILABLE_juce_gui_extra=1" "-DJUCE_MODULE_AVAILABLE_juce_opengl=1" "-DJUCE_MODULE_AVAILABLE_juce_osc=1" "-DJUCE_MODULE_AVAILABLE_juce_product_unlocking=1" "-DJUCE_MODULE_AVAILABLE_juce_video=1" "-DJUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1" "-DJUCE_USE_MP3AUDIOFORMAT=1" "-DJUCE_ALLOW_STATIC_NULL_VARIABLES=0" "-DJUCE_STRICT_REFCOUNTEDPOINTER=1" "-DJUCE_USE_CAMERA=1" "-DJUCE_STANDALONE_APPLICATION=1" "-DJUCE_DEMO_RUNNER=1" "-DJUCE_UNIT_TESTS=1" "-DJUCER_ANDROIDSTUDIO_7F0E4A25=1" "-DJUCE_APP_VERSION=6.0.7" "-DJUCE_APP_VERSION_HEX=0x60007" "-DNDEBUG=1")
+    add_definitions("-DJUCE_DISPLAY_SPLASH_SCREEN=0" "-DJUCE_USE_DARK_SPLASH_SCREEN=1" "-DJUCE_PROJUCER_VERSION=0x60007" "-DJUCE_MODULE_AVAILABLE_juce_analytics=1" "-DJUCE_MODULE_AVAILABLE_juce_audio_basics=1" "-DJUCE_MODULE_AVAILABLE_juce_audio_devices=1" "-DJUCE_MODULE_AVAILABLE_juce_audio_formats=1" "-DJUCE_MODULE_AVAILABLE_juce_audio_processors=1" "-DJUCE_MODULE_AVAILABLE_juce_audio_utils=1" "-DJUCE_MODULE_AVAILABLE_juce_blocks_basics=1" "-DJUCE_MODULE_AVAILABLE_juce_box2d=1" "-DJUCE_MODULE_AVAILABLE_juce_core=1" "-DJUCE_MODULE_AVAILABLE_juce_cryptography=1" "-DJUCE_MODULE_AVAILABLE_juce_data_structures=1" "-DJUCE_MODULE_AVAILABLE_juce_dsp=1" "-DJUCE_MODULE_AVAILABLE_juce_events=1" "-DJUCE_MODULE_AVAILABLE_juce_graphics=1" "-DJUCE_MODULE_AVAILABLE_juce_gui_basics=1" "-DJUCE_MODULE_AVAILABLE_juce_gui_extra=1" "-DJUCE_MODULE_AVAILABLE_juce_osc=1" "-DJUCE_MODULE_AVAILABLE_juce_product_unlocking=1" "-DJUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1" "-DJUCE_USE_MP3AUDIOFORMAT=1" "-DJUCE_ALLOW_STATIC_NULL_VARIABLES=0" "-DJUCE_STRICT_REFCOUNTEDPOINTER=1" "-DJUCE_STANDALONE_APPLICATION=1" "-DJUCE_DEMO_RUNNER=1" "-DJUCE_UNIT_TESTS=1" "-DJUCER_ANDROIDSTUDIO_7F0E4A25=1" "-DJUCE_APP_VERSION=6.0.7" "-DJUCE_APP_VERSION_HEX=0x60007" "-DNDEBUG=1")
 else()
     message( FATAL_ERROR "No matching build-configuration found." )
 endif()
@@ -163,6 +163,8 @@ add_library( ${BINARY_NAME}
     "../../../../../modules/juce_audio_devices/midi_io/juce_MidiDevices.h"
     "../../../../../modules/juce_audio_devices/midi_io/juce_MidiMessageCollector.cpp"
     "../../../../../modules/juce_audio_devices/midi_io/juce_MidiMessageCollector.h"
+    "../../../../../modules/juce_audio_devices/native/emscripten/RtMidi.cpp"
+    "../../../../../modules/juce_audio_devices/native/emscripten/RtMidi.h"
     "../../../../../modules/juce_audio_devices/native/oboe/include/oboe/AudioStream.h"
     "../../../../../modules/juce_audio_devices/native/oboe/include/oboe/AudioStreamBase.h"
     "../../../../../modules/juce_audio_devices/native/oboe/include/oboe/AudioStreamBuilder.h"
@@ -282,6 +284,8 @@ add_library( ${BINARY_NAME}
     "../../../../../modules/juce_audio_devices/native/juce_android_Midi.cpp"
     "../../../../../modules/juce_audio_devices/native/juce_android_Oboe.cpp"
     "../../../../../modules/juce_audio_devices/native/juce_android_OpenSL.cpp"
+    "../../../../../modules/juce_audio_devices/native/juce_emscripten_Audio.cpp"
+    "../../../../../modules/juce_audio_devices/native/juce_emscripten_Midi.cpp"
     "../../../../../modules/juce_audio_devices/native/juce_ios_Audio.cpp"
     "../../../../../modules/juce_audio_devices/native/juce_ios_Audio.h"
     "../../../../../modules/juce_audio_devices/native/juce_linux_ALSA.cpp"
@@ -1190,6 +1194,7 @@ add_library( ${BINARY_NAME}
     "../../../../../modules/juce_events/messages/juce_MountedVolumeListChangeDetector.h"
     "../../../../../modules/juce_events/messages/juce_NotificationType.h"
     "../../../../../modules/juce_events/native/juce_android_Messaging.cpp"
+    "../../../../../modules/juce_events/native/juce_emscripten_Messaging.cpp"
     "../../../../../modules/juce_events/native/juce_ios_MessageManager.mm"
     "../../../../../modules/juce_events/native/juce_linux_EventLoop.h"
     "../../../../../modules/juce_events/native/juce_linux_Messaging.cpp"
@@ -1562,6 +1567,8 @@ add_library( ${BINARY_NAME}
     "../../../../../modules/juce_gui_basics/native/juce_android_FileChooser.cpp"
     "../../../../../modules/juce_gui_basics/native/juce_android_Windowing.cpp"
     "../../../../../modules/juce_gui_basics/native/juce_common_MimeTypes.cpp"
+    "../../../../../modules/juce_gui_basics/native/juce_emscripten_FileChooser.cpp"
+    "../../../../../modules/juce_gui_basics/native/juce_emscripten_Windowing.cpp"
     "../../../../../modules/juce_gui_basics/native/juce_ios_ContentSharer.cpp"
     "../../../../../modules/juce_gui_basics/native/juce_ios_FileChooser.mm"
     "../../../../../modules/juce_gui_basics/native/juce_ios_UIViewComponentPeer.mm"
@@ -1720,39 +1727,6 @@ add_library( ${BINARY_NAME}
     "../../../../../modules/juce_gui_extra/juce_gui_extra.cpp"
     "../../../../../modules/juce_gui_extra/juce_gui_extra.mm"
     "../../../../../modules/juce_gui_extra/juce_gui_extra.h"
-    "../../../../../modules/juce_opengl/geometry/juce_Draggable3DOrientation.h"
-    "../../../../../modules/juce_opengl/geometry/juce_Matrix3D.h"
-    "../../../../../modules/juce_opengl/geometry/juce_Quaternion.h"
-    "../../../../../modules/juce_opengl/geometry/juce_Vector3D.h"
-    "../../../../../modules/juce_opengl/native/juce_MissingGLDefinitions.h"
-    "../../../../../modules/juce_opengl/native/juce_OpenGL_android.h"
-    "../../../../../modules/juce_opengl/native/juce_OpenGL_ios.h"
-    "../../../../../modules/juce_opengl/native/juce_OpenGL_linux_X11.h"
-    "../../../../../modules/juce_opengl/native/juce_OpenGL_osx.h"
-    "../../../../../modules/juce_opengl/native/juce_OpenGL_win32.h"
-    "../../../../../modules/juce_opengl/native/juce_OpenGLExtensions.h"
-    "../../../../../modules/juce_opengl/opengl/juce_OpenGLContext.cpp"
-    "../../../../../modules/juce_opengl/opengl/juce_OpenGLContext.h"
-    "../../../../../modules/juce_opengl/opengl/juce_OpenGLFrameBuffer.cpp"
-    "../../../../../modules/juce_opengl/opengl/juce_OpenGLFrameBuffer.h"
-    "../../../../../modules/juce_opengl/opengl/juce_OpenGLGraphicsContext.cpp"
-    "../../../../../modules/juce_opengl/opengl/juce_OpenGLGraphicsContext.h"
-    "../../../../../modules/juce_opengl/opengl/juce_OpenGLHelpers.cpp"
-    "../../../../../modules/juce_opengl/opengl/juce_OpenGLHelpers.h"
-    "../../../../../modules/juce_opengl/opengl/juce_OpenGLImage.cpp"
-    "../../../../../modules/juce_opengl/opengl/juce_OpenGLImage.h"
-    "../../../../../modules/juce_opengl/opengl/juce_OpenGLPixelFormat.cpp"
-    "../../../../../modules/juce_opengl/opengl/juce_OpenGLPixelFormat.h"
-    "../../../../../modules/juce_opengl/opengl/juce_OpenGLRenderer.h"
-    "../../../../../modules/juce_opengl/opengl/juce_OpenGLShaderProgram.cpp"
-    "../../../../../modules/juce_opengl/opengl/juce_OpenGLShaderProgram.h"
-    "../../../../../modules/juce_opengl/opengl/juce_OpenGLTexture.cpp"
-    "../../../../../modules/juce_opengl/opengl/juce_OpenGLTexture.h"
-    "../../../../../modules/juce_opengl/utils/juce_OpenGLAppComponent.cpp"
-    "../../../../../modules/juce_opengl/utils/juce_OpenGLAppComponent.h"
-    "../../../../../modules/juce_opengl/juce_opengl.cpp"
-    "../../../../../modules/juce_opengl/juce_opengl.mm"
-    "../../../../../modules/juce_opengl/juce_opengl.h"
     "../../../../../modules/juce_osc/osc/juce_OSCAddress.cpp"
     "../../../../../modules/juce_osc/osc/juce_OSCAddress.h"
     "../../../../../modules/juce_osc/osc/juce_OSCArgument.cpp"
@@ -1785,20 +1759,6 @@ add_library( ${BINARY_NAME}
     "../../../../../modules/juce_product_unlocking/juce_product_unlocking.cpp"
     "../../../../../modules/juce_product_unlocking/juce_product_unlocking.mm"
     "../../../../../modules/juce_product_unlocking/juce_product_unlocking.h"
-    "../../../../../modules/juce_video/capture/juce_CameraDevice.cpp"
-    "../../../../../modules/juce_video/capture/juce_CameraDevice.h"
-    "../../../../../modules/juce_video/native/juce_android_CameraDevice.h"
-    "../../../../../modules/juce_video/native/juce_android_Video.h"
-    "../../../../../modules/juce_video/native/juce_ios_CameraDevice.h"
-    "../../../../../modules/juce_video/native/juce_mac_CameraDevice.h"
-    "../../../../../modules/juce_video/native/juce_mac_Video.h"
-    "../../../../../modules/juce_video/native/juce_win32_CameraDevice.h"
-    "../../../../../modules/juce_video/native/juce_win32_Video.h"
-    "../../../../../modules/juce_video/playback/juce_VideoComponent.cpp"
-    "../../../../../modules/juce_video/playback/juce_VideoComponent.h"
-    "../../../../../modules/juce_video/juce_video.cpp"
-    "../../../../../modules/juce_video/juce_video.mm"
-    "../../../../../modules/juce_video/juce_video.h"
     "../../../JuceLibraryCode/include_juce_analytics.cpp"
     "../../../JuceLibraryCode/include_juce_audio_basics.cpp"
     "../../../JuceLibraryCode/include_juce_audio_devices.cpp"
@@ -1815,10 +1775,8 @@ add_library( ${BINARY_NAME}
     "../../../JuceLibraryCode/include_juce_graphics.cpp"
     "../../../JuceLibraryCode/include_juce_gui_basics.cpp"
     "../../../JuceLibraryCode/include_juce_gui_extra.cpp"
-    "../../../JuceLibraryCode/include_juce_opengl.cpp"
     "../../../JuceLibraryCode/include_juce_osc.cpp"
     "../../../JuceLibraryCode/include_juce_product_unlocking.cpp"
-    "../../../JuceLibraryCode/include_juce_video.cpp"
     "../../../JuceLibraryCode/JuceHeader.h"
 )
 
@@ -1945,6 +1903,8 @@ set_source_files_properties("../../../../../modules/juce_audio_devices/midi_io/j
 set_source_files_properties("../../../../../modules/juce_audio_devices/midi_io/juce_MidiDevices.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties("../../../../../modules/juce_audio_devices/midi_io/juce_MidiMessageCollector.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties("../../../../../modules/juce_audio_devices/midi_io/juce_MidiMessageCollector.h" PROPERTIES HEADER_FILE_ONLY TRUE)
+set_source_files_properties("../../../../../modules/juce_audio_devices/native/emscripten/RtMidi.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
+set_source_files_properties("../../../../../modules/juce_audio_devices/native/emscripten/RtMidi.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties("../../../../../modules/juce_audio_devices/native/oboe/include/oboe/AudioStream.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties("../../../../../modules/juce_audio_devices/native/oboe/include/oboe/AudioStreamBase.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties("../../../../../modules/juce_audio_devices/native/oboe/include/oboe/AudioStreamBuilder.h" PROPERTIES HEADER_FILE_ONLY TRUE)
@@ -2064,6 +2024,8 @@ set_source_files_properties("../../../../../modules/juce_audio_devices/native/ju
 set_source_files_properties("../../../../../modules/juce_audio_devices/native/juce_android_Midi.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties("../../../../../modules/juce_audio_devices/native/juce_android_Oboe.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties("../../../../../modules/juce_audio_devices/native/juce_android_OpenSL.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
+set_source_files_properties("../../../../../modules/juce_audio_devices/native/juce_emscripten_Audio.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
+set_source_files_properties("../../../../../modules/juce_audio_devices/native/juce_emscripten_Midi.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties("../../../../../modules/juce_audio_devices/native/juce_ios_Audio.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties("../../../../../modules/juce_audio_devices/native/juce_ios_Audio.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties("../../../../../modules/juce_audio_devices/native/juce_linux_ALSA.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
@@ -2972,6 +2934,7 @@ set_source_files_properties("../../../../../modules/juce_events/messages/juce_Me
 set_source_files_properties("../../../../../modules/juce_events/messages/juce_MountedVolumeListChangeDetector.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties("../../../../../modules/juce_events/messages/juce_NotificationType.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties("../../../../../modules/juce_events/native/juce_android_Messaging.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
+set_source_files_properties("../../../../../modules/juce_events/native/juce_emscripten_Messaging.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties("../../../../../modules/juce_events/native/juce_ios_MessageManager.mm" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties("../../../../../modules/juce_events/native/juce_linux_EventLoop.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties("../../../../../modules/juce_events/native/juce_linux_Messaging.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
@@ -3344,6 +3307,8 @@ set_source_files_properties("../../../../../modules/juce_gui_basics/native/juce_
 set_source_files_properties("../../../../../modules/juce_gui_basics/native/juce_android_FileChooser.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties("../../../../../modules/juce_gui_basics/native/juce_android_Windowing.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties("../../../../../modules/juce_gui_basics/native/juce_common_MimeTypes.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
+set_source_files_properties("../../../../../modules/juce_gui_basics/native/juce_emscripten_FileChooser.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
+set_source_files_properties("../../../../../modules/juce_gui_basics/native/juce_emscripten_Windowing.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties("../../../../../modules/juce_gui_basics/native/juce_ios_ContentSharer.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties("../../../../../modules/juce_gui_basics/native/juce_ios_FileChooser.mm" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties("../../../../../modules/juce_gui_basics/native/juce_ios_UIViewComponentPeer.mm" PROPERTIES HEADER_FILE_ONLY TRUE)
@@ -3502,39 +3467,6 @@ set_source_files_properties("../../../../../modules/juce_gui_extra/native/juce_w
 set_source_files_properties("../../../../../modules/juce_gui_extra/juce_gui_extra.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties("../../../../../modules/juce_gui_extra/juce_gui_extra.mm" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties("../../../../../modules/juce_gui_extra/juce_gui_extra.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_opengl/geometry/juce_Draggable3DOrientation.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_opengl/geometry/juce_Matrix3D.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_opengl/geometry/juce_Quaternion.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_opengl/geometry/juce_Vector3D.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_opengl/native/juce_MissingGLDefinitions.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_opengl/native/juce_OpenGL_android.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_opengl/native/juce_OpenGL_ios.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_opengl/native/juce_OpenGL_linux_X11.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_opengl/native/juce_OpenGL_osx.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_opengl/native/juce_OpenGL_win32.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_opengl/native/juce_OpenGLExtensions.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_opengl/opengl/juce_OpenGLContext.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_opengl/opengl/juce_OpenGLContext.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_opengl/opengl/juce_OpenGLFrameBuffer.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_opengl/opengl/juce_OpenGLFrameBuffer.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_opengl/opengl/juce_OpenGLGraphicsContext.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_opengl/opengl/juce_OpenGLGraphicsContext.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_opengl/opengl/juce_OpenGLHelpers.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_opengl/opengl/juce_OpenGLHelpers.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_opengl/opengl/juce_OpenGLImage.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_opengl/opengl/juce_OpenGLImage.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_opengl/opengl/juce_OpenGLPixelFormat.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_opengl/opengl/juce_OpenGLPixelFormat.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_opengl/opengl/juce_OpenGLRenderer.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_opengl/opengl/juce_OpenGLShaderProgram.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_opengl/opengl/juce_OpenGLShaderProgram.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_opengl/opengl/juce_OpenGLTexture.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_opengl/opengl/juce_OpenGLTexture.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_opengl/utils/juce_OpenGLAppComponent.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_opengl/utils/juce_OpenGLAppComponent.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_opengl/juce_opengl.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_opengl/juce_opengl.mm" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_opengl/juce_opengl.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties("../../../../../modules/juce_osc/osc/juce_OSCAddress.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties("../../../../../modules/juce_osc/osc/juce_OSCAddress.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties("../../../../../modules/juce_osc/osc/juce_OSCArgument.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
@@ -3567,20 +3499,6 @@ set_source_files_properties("../../../../../modules/juce_product_unlocking/nativ
 set_source_files_properties("../../../../../modules/juce_product_unlocking/juce_product_unlocking.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties("../../../../../modules/juce_product_unlocking/juce_product_unlocking.mm" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties("../../../../../modules/juce_product_unlocking/juce_product_unlocking.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_video/capture/juce_CameraDevice.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_video/capture/juce_CameraDevice.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_video/native/juce_android_CameraDevice.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_video/native/juce_android_Video.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_video/native/juce_ios_CameraDevice.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_video/native/juce_mac_CameraDevice.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_video/native/juce_mac_Video.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_video/native/juce_win32_CameraDevice.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_video/native/juce_win32_Video.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_video/playback/juce_VideoComponent.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_video/playback/juce_VideoComponent.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_video/juce_video.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_video/juce_video.mm" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties("../../../../../modules/juce_video/juce_video.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties("../../../JuceLibraryCode/JuceHeader.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 
 target_compile_options( ${BINARY_NAME} PRIVATE "-fsigned-char" )
