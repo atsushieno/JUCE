@@ -2,17 +2,16 @@
   ==============================================================================
 
    This file is part of the JUCE library.
-   Copyright (c) 2017 - ROLI Ltd.
+   Copyright (c) 2020 - Raw Material Software Limited
 
    JUCE is an open source library subject to commercial or open-source
    licensing.
 
-   By using JUCE, you agree to the terms of both the JUCE 5 End-User License
-   Agreement and JUCE 5 Privacy Policy (both updated and effective as of the
-   27th April 2017).
+   By using JUCE, you agree to the terms of both the JUCE 6 End-User License
+   Agreement and JUCE Privacy Policy (both effective as of the 16th June 2020).
 
-   End User License Agreement: www.juce.com/juce-5-licence
-   Privacy Policy: www.juce.com/juce-5-privacy-policy
+   End User License Agreement: www.juce.com/juce-6-licence
+   Privacy Policy: www.juce.com/juce-privacy-policy
 
    Or: You may also use this code under the terms of the GPL v3 (see
    www.gnu.org/licenses).
@@ -24,7 +23,7 @@
   ==============================================================================
 */
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include <JuceHeader.h>
 #include "../../../Assets/DemoUtilities.h"
 #include "JUCEDemos.h"
 
@@ -54,8 +53,6 @@ void JUCEDemos::registerDemo (std::function<Component*()> constructorCallback, c
    #if JUCE_MAC
     auto f = File::getSpecialLocation (File::currentExecutableFile)
                   .getParentDirectory().getParentDirectory().getChildFile ("Resources");
-   #elif JUCE_EMSCRIPTEN
-    auto f = File("/");
    #else
     auto f = findExamplesDirectoryFromExecutable (File::getSpecialLocation (File::currentApplicationFile));
    #endif
@@ -85,7 +82,6 @@ File JUCEDemos::findExamplesDirectoryFromExecutable (File exec)
         return exec;
     return {};
 }
-
 
 //==============================================================================
 static String getCurrentDefaultAudioDeviceName (AudioDeviceManager& deviceManager, bool isInput)
@@ -173,10 +169,6 @@ AudioDeviceManager& getSharedAudioDeviceManager (int numInputChannels, int numOu
 }
 
 //==============================================================================
-// need to split this into two files otherwise VS will fall over
-void registerDemos_One() noexcept;
-void registerDemos_Two() noexcept;
-
 void registerAllDemos() noexcept
 {
     registerDemos_One();

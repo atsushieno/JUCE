@@ -58,10 +58,12 @@
  #include "../../../GUI/OpenGLDemo2D.h"
 #endif
 #include "../../../GUI/PropertiesDemo.h"
-#if ! JUCE_LINUX
+#if ! JUCE_LINUX && ! JUCE_EMSCRIPTEN
  #include "../../../GUI/VideoDemo.h"
 #endif
+#if ! JUCE_EMSCRIPTEN
 #include "../../../GUI/WebBrowserDemo.h"
+#endif
 #include "../../../GUI/WidgetsDemo.h"
 #include "../../../GUI/WindowsDemo.h"
 
@@ -95,10 +97,12 @@ void registerDemos_Two() noexcept
     REGISTER_DEMO (OpenGLDemo,                GUI, true)
    #endif
     REGISTER_DEMO (PropertiesDemo,            GUI, false)
-   #if ! JUCE_LINUX
+   #if ! JUCE_LINUX && ! JUCE_EMSCRIPTEN
     REGISTER_DEMO (VideoDemo,                 GUI, true)
    #endif
+   #if ! JUCE_EMSCRIPTEN
     REGISTER_DEMO (WebBrowserDemo,            GUI, true)
+   #endif
     REGISTER_DEMO (WidgetsDemo,               GUI, false)
     REGISTER_DEMO (WindowsDemo,               GUI, false)
 }
