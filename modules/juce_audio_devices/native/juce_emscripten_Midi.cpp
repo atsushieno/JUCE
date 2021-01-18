@@ -29,8 +29,9 @@
 namespace juce
 {
 
-struct JuceRtMidiContext {
-    RtMidiIn* rtmidi;
+class MidiInput::Pimpl {
+public:
+    std::unique_ptr<RtMidiIn> rtmidi;
     MidiInput* midiIn;
     MidiInputCallback* callback{nullptr};
 };
@@ -38,14 +39,12 @@ struct JuceRtMidiContext {
 //==============================================================================
 MidiInput::MidiInput (const String& deviceName, const String& deviceID)
     : deviceInfo (deviceName, deviceID) {
-    auto ctx = new JuceRtMidiContext();
-    ctx->rtmidi = new RtMidiIn();
-    ctx->midiIn = this;
-    internal = ctx;
+    internal.reset(new MidiInput::Pimpl());
+    internal->rtmidi.reset(new RtMidiIn());
+    internal->midiIn = this;
 }
 
 MidiInput::~MidiInput() {
-    delete (RtMidiIn*) internal;
 }
 
 void MidiInput::start() { }
@@ -67,7 +66,7 @@ MidiDeviceInfo MidiInput::getDefaultDevice() {
 }
 
 void rtmidiCallback(double timeStamp, std::vector<unsigned char> *message, void *userData) {
-    auto ctx = (JuceRtMidiContext*) userData;
+    auto ctx = (MidiInput::Pimpl*) userData;
     auto callback = ctx->callback;
     auto midiIn = ctx->midiIn;
     const void* data = message->data();
@@ -86,9 +85,9 @@ std::unique_ptr<MidiInput> MidiInput::openDevice (const String& deviceIdentifier
     for (int i = 0; i < rtmidiStatic.getPortCount(); i++)
         if (String::formatted("MidiIn_%d", i) == deviceIdentifier) {
             ret.reset(new MidiInput(rtmidiStatic.getPortName(i), deviceIdentifier));
-            auto ctx = (JuceRtMidiContext*) ret->internal;
+            auto ctx = ret->internal.get();
             ctx->callback = callback;
-            auto rtmidi = ctx->rtmidi;
+            auto rtmidi = ctx->rtmidi.get();
             rtmidi->setCallback(rtmidiCallback, ctx);
             rtmidi->openPort(i);
             return std::move(ret);
@@ -112,12 +111,16 @@ std::unique_ptr<MidiInput> MidiInput::openDevice (int index, MidiInputCallback* 
 
 //==============================================================================
 
+class MidiOutput::Pimpl {
+public:
+    std::unique_ptr<RtMidiOut> rtmidi;
+};
+
 MidiOutput::~MidiOutput() {
-    delete (RtMidiOut*) internal;
 }
 
 void MidiOutput::sendMessageNow (const MidiMessage& message) {
-    ((RtMidiOut *) internal)->sendMessage(message.getRawData(), message.getRawDataSize());
+    internal->rtmidi->sendMessage(message.getRawData(), message.getRawDataSize());
 }
 
 Array<MidiDeviceInfo> MidiOutput::getAvailableDevices() {
@@ -141,8 +144,9 @@ std::unique_ptr<MidiOutput> MidiOutput::openDevice (const String& deviceIdentifi
         if (String::formatted("MidiOut_%d", i) == deviceIdentifier) {
             auto midiOut = new MidiOutput(rtmidi.getPortName(i), deviceIdentifier);
             ret.reset(midiOut);
-            midiOut->internal = new RtMidiOut();
-            ((RtMidiOut *) ret->internal)->openPort(i);
+            midiOut->internal.reset(new Pimpl());
+            midiOut->internal->rtmidi.reset(new RtMidiOut());
+            ret->internal->rtmidi->openPort(i);
             return std::move(ret);
         }
     }
