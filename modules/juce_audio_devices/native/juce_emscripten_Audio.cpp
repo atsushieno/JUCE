@@ -176,7 +176,6 @@ public:
 
                 int bytePerSampleOut = 2 * numOut;
 
-                DBG(val);
                 while (val --)
                 {
                     for (int c = 0; c < numOut; c ++)
