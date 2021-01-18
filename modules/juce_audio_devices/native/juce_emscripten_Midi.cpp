@@ -55,8 +55,11 @@ Array<MidiDeviceInfo> MidiInput::getAvailableDevices() {
     Array<MidiDeviceInfo> ret{};
     RtMidiIn rtmidi{};
 
+    // FIXME: it is temporarily disabled and no devices are detected. Enable this once it gets working again.
+    /*
     for (int i = 0; i < rtmidi.getPortCount(); i++)
         ret.add(MidiDeviceInfo(rtmidi.getPortName(i), String::formatted("MidiIn_%d", i)));
+    */
 
     return ret;
 }
@@ -127,8 +130,11 @@ Array<MidiDeviceInfo> MidiOutput::getAvailableDevices() {
     Array<MidiDeviceInfo> ret{};
     RtMidiOut rtmidi{};
 
+    // FIXME: it is temporarily disabled and no devices are detected. Enable this once it gets working again.
+    /*
     for (int i = 0; i < rtmidi.getPortCount(); i++)
         ret.add(MidiDeviceInfo(rtmidi.getPortName(i), String::formatted("MidiOut_%d", i)));
+    */
 
     return ret;
 }
