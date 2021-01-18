@@ -123,7 +123,7 @@ private:
                                                           .findColour (ResizableWindow::backgroundColourId),
                               DocumentWindow::allButtons)
         {
-            setUsingNativeTitleBar (true);
+            setUsingNativeTitleBar (false);
             setResizable (true, false);
             setResizeLimits (400, 400, 10000, 10000);
 
