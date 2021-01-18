@@ -89,7 +89,11 @@ bool SystemStats::isOperatingSystem64Bit()
 //==============================================================================
 static String getCpuInfo (const char* key)
 {
+    #if JUCE_EMSCRIPTEN
+    return "";
+    #else
     return readPosixConfigFileValue ("/proc/cpuinfo", key);
+    #endif
 }
 
 String SystemStats::getDeviceDescription()
